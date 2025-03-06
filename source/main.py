@@ -1,5 +1,4 @@
-import sys
-from core.inputHandler import Input
+from core import Input
 
 
 class Main:
@@ -9,7 +8,7 @@ class Main:
             Input.get()
         except KeyboardInterrupt:
             print(f"Good bye. );")
-            sys.exit()
+            exit()
 
 
 Main()

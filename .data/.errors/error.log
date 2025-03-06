@@ -21,3 +21,297 @@ FileNotFoundError: [Errno 2] No such file or directory: '.data/targeted.scan'
 [!] Program not found: import
 [!] Program not found: osin
 [!] Program not found: osint
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 126, in check
+    functions[inputs.index(data.split(" ")[0])](data)
+  File "/home/donald/.SuperSploit/source/core/clean.py", line 7, in __init__
+    with open(".data/.personSearch", "w") as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '.data/.personSearch'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/exploits/android_tools/adb Interface.py", line 252, in sys_call_Linux
+    subprocess.run(dataList)
+  File "/usr/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'check'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/exploits/android_tools/adb Interface.py", line 252, in sys_call_Linux
+    subprocess.run(dataList)
+  File "/usr/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^utable"
+p^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'check_root'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/exploits/android_tools/adb Interface.py", line 252, in sys_call_Linux
+    subprocess.run(dataList)
+  File "/usr/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'check-root'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 125, in check
+    Wififuncs = [n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
+                 ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'scan_whole_network'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 125, in check
+    Wififuncs = [n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
+                 ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'scan_whole_network'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 125, in check
+    Wififuncs = [n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
+                 ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'scan_whole_network'
+[!] Program not found: del
+[!] Program not found: cleaer
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 129, in check
+    functions[inputs.index(data.split(" ")[0])](data)
+  File "/home/donald/.SuperSploit/source/core/show.py", line 24, in show
+    exploitDetails()
+  File "/home/donald/.SuperSploit/source/core/exploithandler.py", line 17, in __init__
+    with open(DatabaseManagment.get()["EXPLOIT"]) as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/donald/.SuperSploit/exploits/Linux/DirtyPipe.py'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 129, in check
+    functions[inputs.index(data.split(" ")[0])](data)
+TypeError: Banners.__init__() takes 1 positional argument but 2 were given
+[!] Program not found: 'ls
+[!] Program not found: changelog
+[!] Program not found: usb
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 129, in check
+    functions[inputs.index(data.split(" ")[0])](data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+TypeError: Banners.__init__() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 37, in Import
+    with open(f"{installation}/.data/targets.json") as file:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/donald/.SuperSploit/.data/targets.json'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 49, in Import
+    for k, v in data.item():
+                ^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'item'. Did you mean: 'items'?
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 138, in check
+    cls.sys_call_Linux(data)
+    ~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 66, in sys_call_Linux
+    subprocess.run(dataList)
+    ~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 556, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+PermissionError: [Errno 13] Permission denied: ''
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 65, in show_detailed_target_list
+    for x, y in k.items():
+                ^^^^^^^
+AttributeError: 'str' object has no attribute 'items'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 88, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 88, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 88, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 88, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 88, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+[!] Program not found: y
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 63, in show_detailed_target_list
+    for k, v in self.targetlist.items():
+                ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'items'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 63, in show_detailed_target_list
+    for k, v in self.targetlist.items():
+                ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'items'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 57, in show_target_list
+    for k, v in self.targetlist.items():
+                ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'items'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 55, in show_target_list
+    with open(f"{installation}.data/target.json") as file:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/donald/.SuperSploit.data/target.json'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 57, in show_target_list
+    for k, v in self.targetlist.items():
+                ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'items'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 92, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 92, in scan_whole_network
+    li.append(x.split(" ")[4])
+              ~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 98, in scan_whole_network
+    with open(f"{installation}/.data/taget.json") as file:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/donald/.SuperSploit/.data/taget.json'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 102, in scan_whole_network
+    network = self.getessid()
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 180, in getessid
+    p2 = Popen(['grep' "ESSID"], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+  File "/usr/lib/python3.13/subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 1974, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'grepESSID'
+[!] Program not found: y
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 115, in scan_whole_network
+    print(targets[network]["MAC Address"])
+          ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'MAC Address'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 115, in scan_whole_network
+    print(targets[network][x]["MAC Address"])
+          ~~~~~~~~~~~~~~~~^^^
+KeyError: '192.168.0.1'
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 115, in scan_whole_network
+    print(targets[network][x]["MAC Address"])
+          ~~~~~~~~~~~~~~~~^^^
+KeyError: '192.168.0.32'
+[!] Program not found: y
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 126, in scan_whole_network
+    c = i.split(": ")[1].split(' ')[0]
+        ~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 135, in check
+    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/donald/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 88, in show_detailed_target_list
+    for k, v in self.targetlist.items():
+                ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'items'

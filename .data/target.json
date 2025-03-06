@@ -1,0 +1,35 @@
+{
+    "COMMERCE2.4G": {
+        "192.168.0.1": {
+            "Device type": "general purpose",
+            "IPV4": "192.168.0.1",
+            "MAC Address": "72:13:01:21:B8:61 (Unknown)",
+            "OS CPE": "cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5",
+            "OS details": "Linux 4.15 - 5.8",
+            "Running": "Linux 4.X|5.X"
+        },
+        "192.168.0.114": {
+            "IPV4": "192.168.0.114",
+            "MAC Address": "4C:31:2D:1C:A0:90 (Sichuan AI-Link Technology)"
+        },
+        "192.168.0.238": {
+            "IPV4": "192.168.0.238",
+            "MAC Address": "F2:56:B4:FE:2F:85 (Unknown)"
+        },
+        "192.168.0.246": {
+            "IPV4": "192.168.0.246",
+            "MAC Address": "84:3E:1D:F1:72:F9 (Unknown)"
+        },
+        "192.168.0.247": {
+            "IPV4": "192.168.0.247",
+            "MAC Address": "F8:4F:AD:10:63:62 (Hui Zhou Gaoshengda Technology)"
+        },
+        "192.168.0.252": {
+            "IPV4": "192.168.0.252"
+        },
+        "192.168.0.32": {
+            "IPV4": "192.168.0.32",
+            "MAC Address": "C4:8B:66:88:AF:94 (Unknown)"
+        }
+    }
+}

@@ -10,7 +10,7 @@ echo "Moving  supersploit to /bin folder"
 sudo mv supersploit /bin/supersploit && rm supersploit.c
 
 echo "Making desktop file and app drawer icon"
-printf "[Desktop Entry]\nName=supersploit\nComment=Exploit Management framework\nExec=/bin/supersploit\nIcon=/usr/share/icons/locolor/16x16/apps/logo1.png\nTerminal=true\nType=Application\nCategories=Utility" > supersploit.desktop
+printf "[Desktop Entry]\nName=supersploit\nComment=Exploit Management framework\nExec=/bin/supersploit\nIcon=/usr/share/icons/locolor/16x16/apps/logo1.png\nTerminal=true\nType=Application\nCategories=Exploitation Tools" > supersploit.desktop
 sudo cp supersploit.desktop /usr/share/applications/
 
 echo "Moving icon"
@@ -20,7 +20,7 @@ echo "Changing permissions for executable file"
 sudo chmod +x /bin/supersploit
 
 echo "Cleaning up"
-sudo rm supersploit.desktop supersploit.c
+# sudo rm supersploit.desktop supersploit.c
 cd $HOME/.SuperSploit
 
-sudo python3 setup.py
+python3 setup.py

@@ -13,6 +13,8 @@ Changes in version 1.1.0
 To upgrade and test:
     * Integrate bt commands in to the main menu
     * Integrate newly coded stuff
+    * Add a way to edit target data
+    * Add a way to save arguments for exploits
 
 
 

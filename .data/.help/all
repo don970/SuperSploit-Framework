@@ -26,11 +26,12 @@ commands:
 
     wifi menu:
                 custom-scan - Starts a custom nmap scan
-                get-targets - Uses nmap to do a ping scan
+                get-targets - Uses nmap to do a ping and -O scan on every device on the network
                 import-targets - Imports saved targets
                 scan-target - Uses nmap -A argument to do a detailed scan
                 save-targets - Makes a persistent target list
                 view-targets - Shows current target list
+                view-targets-v - Shows detailed target list
                 traceroute - starts a route trace to google.com
 
 For help with integrating a exploit type help integrate

@@ -14,7 +14,7 @@ from .show import Show
 from .set import SetV
 from .use import use
 from .search import Search
-from .banners import banners
+from .banners import Banners
 from .database import DatabaseManagment
 from .inputfixes import Input_fixes
 from .clean import clean
@@ -44,10 +44,14 @@ def get_network_info():
             subnet = i.split(" ")[5].split('/')[1]
             return ip, subnet, host
 
+try:
+    n = n(get_network_info())
+except TypeError:
+    n = n(["0.0.0.0", "24", "0.0.0.0"])
 
-n = n(get_network_info())
 
 class Input:
+
     @classmethod
     def sys_call_Linux(cls, data):
         dataList = data.split(' ')
@@ -80,8 +84,8 @@ class Input:
     def __init__(self):
         """This handles all the input"""
         pass
-
-    def recon_ng(self):
+    @staticmethod
+    def recon_ng():
         subprocess.run(["sudo", "recon-ng"])
         return 
 
@@ -114,12 +118,12 @@ class Input:
                     return
             if data.endswith(" "):
                 data = data.lstrip(" ")
-            functions = [clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, banners, DatabaseManagment.addVariableToDatabase]
+            functions = [clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, Banners, DatabaseManagment.addVariableToDatabase]
             inputs = ["clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
             reconFuctions = [cls.recon_ng, NameSearch.main, wireshark, bettercap, Phone, bt]
             recconInputs = ["recon-ng", "name-search", "wireshark", "bettercap", "phoneinfoga", "bt"]
-            Wififuncs = [n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
-            WifiInputs = ["get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
+            Wififuncs = [n.show_detailed_target_list, n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
+            WifiInputs = ["view-targets-v","get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
             try:
                 if data.split(" ")[0] in inputs:
                     functions[inputs.index(data.split(" ")[0])](data)
@@ -143,7 +147,8 @@ class Input:
 
     @classmethod
     def get(cls):
-        banners()
+        # call the class to make the banner
+        Banners()
         while True:
             DatabaseManagment.getCVE()
             try:

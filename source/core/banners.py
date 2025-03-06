@@ -7,18 +7,20 @@ import random
 installation = f'{os.getenv("HOME")}/.SuperSploit'
 
 
-class banners:
-     def __init__(self, *args):
+class Banners:
+     def __init__(self):
         os.system("clear")
         try:
+            # this will open the fun facts or osnit fact file and save it to a variable
             with open(f"{installation}/.data/.banners/{random.choice(os.listdir('.data/.banners/'))}") as file:
                 data = file.read()
                 file.close()
-                data = data.split("#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!")
-                choice = random.choice(data)
-                ToStdout.write(pyfiglet.figlet_format("Supersploit"))
-                ToStdout.write(choice)
-                return
-        except Exception:
+            # first we make a list out of the data each entry in the list contains a fact about computers
+            data = data.split("#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!")
+            choice = random.choice(data)
+            ToStdout.write(pyfiglet.figlet_format("Supersploit"))
+            ToStdout.write(choice)
+            return
+        except RuntimeError:
             ToStdout.write(traceback.format_exc())
 

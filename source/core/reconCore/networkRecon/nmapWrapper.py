@@ -1,7 +1,8 @@
 # This is a wrapper for nmap
+import json
 import os
 import sys
-from subprocess import run
+from subprocess import run, Popen, PIPE
 # redefine input method
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
@@ -22,7 +23,6 @@ def print(data):
     return
 
 
-
 class nmap:
     def __init__(self, ip):
         """This is a wrapper to use the tool nmap to
@@ -33,55 +33,121 @@ class nmap:
         return
 
     def Import(self):
-        with open(f"{installation}/.data/.targets") as file:
+        networks = []
+        targets = []
+        with open(f"{installation}/.data/target.json") as file:
             print("[*] Repopulating targets list via target file. ")
-            for x in file.read().split("\n"):
-                self.targetlist.append(x)
+            data = json.load(file)
             file.close()
+        for k, v in data.items():
+            networks.append(k)
+
+        for x in networks:
+            print(f"{networks.index(x)}: {x}")
+        network = data[networks[int(input("Please enter the index of the of the network: "))]]
+        for k, v in network.items():
+            print(f"{k}: {v}")
+        self.targetlist = network
         return "[*] Targets saved."
+
+    def format_ip(self):
+        ip = self.ip.split(".")
+        st = f"{ip[0]}.{ip[1]}.{ip[2]}.0"
+        ip = st
+        if not input(f"would you like to perform a scan with a subnet of ({ip}/{self.subnet}): ").startswith("y"):
+            ip = input("[*] Enter the address and subnet [ip/sub]: ")
+            print("[*] IP and subnet updated.")
+        ip = f"{ip}/{self.subnet}"
+        return ip
+
+    def build_ip_list(self):
+        li = []
+        ip = self.format_ip()
+        a = run(["nmap", "-sn", ip], capture_output=True)
+        result = a.stdout.decode().split('\n')
+        print("[*] Formatting output.")
+        for x in result:
+            if "Nmap scan report for" in x:
+                li.append(x.split(" ")[5][1:len(x.split(" ")[5]) - 1])
+        return li
 
     def show_target_list(self):
         if len(self.targetlist) == 0:
             return "[!] Target list is not populated"
-        for x in self.targetlist:
-            print(x)
+        try:
+            for k, v in self.targetlist.items():
+                print(f"{k}")
+        except AttributeError:
+            for x in self.targetlist:
+                print(f"{x}")
+
         return "[*] Showing all saved targets"
 
-    def scan_whole_network(self) -> list or False:
+    def show_detailed_target_list(self):
+        if len(self.targetlist) == 0:
+            return "[!] Target list not populated"
         try:
-            ip = self.ip.split(".")[0:3]
-            ip.append("0")
-            st = ""
-            for x in ip:
-                if ip.index(x) < len(ip) - 1:
-                    st += x + "."
-                else:
-                    st += x
-            ip = st
-            if not input(f"would you like to perform a scan with a subnet of ({ip}/{self.subnet}): ").startswith("y"):
-                ip = input("[*] Enter the address and subnet [ip/sub]: ")
-                print("[*] IP and subnet updated.")
-            print("[*] Scanning...")
-            a = run(["nmap", "-sn", ip], capture_output=True)
-            li = []
-            print("[*] Formatting output.")
-            result = a.stdout.decode().split('\n')
-            self.results = result
-            for x in result:
-                # 31 is the length of "scan report for xxx.xxx.xxx.xxx"
-                if len(x) > 31 and "http" not in x and "add" not in x:
-                    # split output and take the 4 index of the output and add to a list
-                    li.append(x.split(" ")[4])
-            print("[*] Populating targets file.")
-            with open(f"{installation}/.data/.targets", "w") as file:
-                for x in li:
-                    if li.index(x) < len(li) - 1:
-                        file.write(f"{x}\n")
-                    else:
-                        file.write(f"{x}")
+            for k, v in self.targetlist.items():
+                print(k)
+                for x, y in v.items():
+                    print(f"    {x}: {y}")
+        except AttributeError:
+            for k in self.targetlist:
+                print(k)
+
+    def scan_whole_network(self) -> str:
+        try:
+
+            # import target dictionary
+            with open(f"{installation}/.data/target.json") as file:
+                targets = json.load(file)
                 file.close()
+
+            # get ip an essid
+            li = self.build_ip_list()
+            network = self.getessid()
+
+            print(f"[*] Network ESSID: {network}")
+
+            if network not in targets:
+                targets[network] = {}
+
+            for x in li:
+                targets[network][x] = {}
+                print(f"[*] Doing a -O scan on {x}")
+                data = run(["sudo", "nmap", "-O", x], capture_output=True)
+                l = data.stdout.decode().split("\n")
+                for i in l:
+                    targets[network][x]["IPV4"] = x
+                    if l.index(i) > 4:
+                        try:
+                            if "MAC Address" in i:
+                                a = i.split(": ")[1]
+                                targets[network][x]["MAC Address"] = a
+                            if "Device type:" in i:
+                                b = i.split(": ")[1]
+                                targets[network][x]["Device type"] = b
+                            if "Running:" in i:
+                                c = i.split(": ")[1]
+                                targets[network][x]["Running"] = c
+                            if "OS details" in i:
+                                d = i.split(": ")[1]
+                                targets[network][x]["OS details"] = d
+                            if "OS CPE:" in i:
+                                e = i.split(": ")[1]
+                                targets[network][x]["OS CPE"] = e
+                        except IndexError:
+                            pass
+
+            print("[*] Populating targets file.")
+
+            with open(f"{installation}/.data/target.json", "w") as file:
+                file.write(json.dumps(targets, sort_keys=True, indent=4))
+                file.close()
+
             print("[*] Dumping targets to a global list.")
             self.targetlist = li
+
             return "[*] Targets added."
         except KeyboardInterrupt:
             return "[!] Exiting scan mode"
@@ -134,4 +200,14 @@ class nmap:
     def traceroute(self):
         run(["traceroute", "google.com"])
         return
+
+    def getessid(self):
+        p1 = Popen(['iwconfig'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        p2 = Popen(['grep', "ESSID"], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        p2.communicate(bytes(p1.communicate()[0]))
+        n = p2.communicate()[0].decode().split(" ")
+        for x in n:
+            if "ESSID" in x:
+                return x.split(":")[1][1:len(x.split(":")[1]) -1]
+
 

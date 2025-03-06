@@ -1,8 +1,9 @@
 ********************************Exploit integration with SuperSploit***************************
 
 To integrate a exploit simply copy one of the code snippets bellow in to your file. The exploit
-handler will automatically recognize the exploit and run as a integrated exploit
-
+handler will automatically recognize the exploit and run as a integrated exploit, when a exploit
+is integrated the framework can better interact with the exploit by allowing the exploit to have
+accesses to the var database
 ************************************* python files ********************************************
 # integrated = True
 #!#!#!

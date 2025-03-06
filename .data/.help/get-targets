@@ -1,8 +1,7 @@
               Help section for wifi attack menu [get-targets] command
-      This starts a ping scan to see who responds and then saves the active ips in a list
-      to be used with the scan-target and show-target command, along with the more advanced
-      targets can be used in main menu to allowing you to scan a network for targets then run
-      a exploit that uses the target selected.
+      This scans the whole network with a -sn scan to get the active clients. Then this
+      use the os scan on every client and saves the data to targets.json in the .data
+      file.
 
       [Usage]:
         get-targets

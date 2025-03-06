@@ -17,6 +17,7 @@ class Show:
     @staticmethod
     def show(data):
         if len(data.split(" ")) < 2:
+            ToStdout.write(f"==========Showing dynamic variables==============")
             for k, v in DatabaseManagment.get().items():
                 ToStdout.write(f"{k}: {v}")
             return

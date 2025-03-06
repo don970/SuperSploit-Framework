@@ -1,8 +1,0 @@
-                    Help section for recon wifi command
-      Starts the wifi recon menu, and loads ip and json database
-      for the programs Osnit mode. Just a wrapper for Wireshark and Nmap
-      capable of live id host discovery and more.
-
-      [Usage]:
-        wifi
-

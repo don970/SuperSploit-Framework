@@ -53,7 +53,6 @@ class Help:
                     ToStdout.write(file.read())
                     file.close()
                     return
-
         except Exception as e:
             if "Index Error" in str(e):
                 pass

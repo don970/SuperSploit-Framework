@@ -1,0 +1,8 @@
+                   Help section for clean command
+        Does a full clean. this opens each of the file's responsible
+        for keeping error logs, history, nmap history, target history, recon
+        history, phoneinfoga lookup history, harvested credentials history,
+        and google dork name search.
+
+      [Usage]:
+        clean

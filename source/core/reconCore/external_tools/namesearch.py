@@ -22,7 +22,6 @@ class NameSearch:
             file.write(strs)
             file.close()
 
-
     @classmethod
     def simpleNamesSearch(cls):
         name = input("Enter the name to search: ")
@@ -49,6 +48,7 @@ class NameSearch:
                 print(x)
         except IndexError:
             return
+
     @classmethod
     def help(cls):
         print("""[OSNIT Help Menu]
