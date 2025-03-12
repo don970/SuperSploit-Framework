@@ -12,13 +12,13 @@ input = input.prompt
 class NameSearch:
     @staticmethod
     def append(strs):
-        with open(f"{installation}/.data/personSearch", "a") as file:
+        with open(f"{installation}/.data/scans/personSearch", "a") as file:
             file.write(strs)
             file.close()
 
     @staticmethod
     def write(strs):
-        with open(f"{installation}/.data/personSearch", "w") as file:
+        with open(f"{installation}/.data/scans/personSearch", "w") as file:
             file.write(strs)
             file.close()
 

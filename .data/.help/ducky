@@ -1,0 +1,11 @@
+                   Help section for ducky command
+        Pentesting Bluetooth CVE-2023-45866 via BlueDucky Implementation Using DuckyScript
+        will attempt unauthenticated Peering Leading to Code Execution Using HID Keyboard
+        This is an implementation of the CVE discovered by marcnewlin. BlueDucky is a powerful
+        tool for exploiting a vulnerability in Bluetooth devices. By running this script, you can
+        Load saved Bluetooth devices that are no longer visible but have Bluetooth still enabled.
+        Automatically save any devices you scan. Send messages via ducky script format to interact
+        with devices.
+
+        [Usage]
+            ducky

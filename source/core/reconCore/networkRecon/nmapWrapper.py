@@ -38,7 +38,7 @@ class nmap:
     def Import(self):
         networks = []
         targets = []
-        with open(f"{installation}/.data/target.json") as file:
+        with open(f"{installation}/.data/.nmap/target.json") as file:
             print("[*] Repopulating targets list via target file. ")
             data = json.load(file)
             file.close()
@@ -100,7 +100,7 @@ class nmap:
         try:
 
             # import target dictionary
-            with open(f"{installation}/.data/target.json") as file:
+            with open(f"{installation}/.data/.nmap/target.json") as file:
                 targets = json.load(file)
                 file.close()
 
@@ -158,7 +158,7 @@ class nmap:
         try:
             target_l = []
             network = self.getessid()
-            with open(f"{installation}/.data/target.json") as file:
+            with open(f"{installation}/.data/.nmap/target.json") as file:
                 targets = json.load(file)
                 file.close()
             targets = targets[network]
@@ -198,7 +198,7 @@ class nmap:
             print("[*] Scanning... ")
             output = run(["nmap", data1, self.targetlist[data]], capture_output=True)
             print("[*] Populating custom scan file")
-            with open(f"{installation}/.data/.custom_scan", "w") as file:
+            with open(f"{installation}/.data/scans/.custom_scan", "w") as file:
                 file.write(output.stdout.decode())
                 file.close()
             return "[*] Full scan logged to .data/.custom_scan"

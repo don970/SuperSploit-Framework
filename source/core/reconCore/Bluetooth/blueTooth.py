@@ -101,3 +101,8 @@ Enter Here > """))
                     continue
             except KeyboardInterrupt:
                 return
+
+    @staticmethod
+    def ducky(arg):
+        cmd = "python3 source/core/reconCore/Bluetooth/BlueDucky.py".split(" ")
+        subprocess.run(cmd)

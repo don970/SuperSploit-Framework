@@ -1,21 +1,14 @@
-Changes in version 1.1.0
-    * Updated the exploit handler
-    * Updated setup.py file
-    * Updated the input handler to allow the && symbol
-        to be used for multiple commands
-    * Integrated recon mode into main menu
-    * Updated exploit handler to show cve number if a
-        cve is detected in the exploit file
-    * Integrated the wifi scan methods in to the main menu
-    * Added the ability to append the output of a command to a file on the filesystem
-    * Added the ability to use built in commands with system commands via && symbol
+Changes in version 1.1.1
+    * Added blueDucky hid attack script and payloads
+    * organized .data folder better
 
 To upgrade and test:
+    * nmap targeted scans need to be updated
+    * overhaul nmap recon code
     * Integrate bt commands in to the main menu
+    * Add blue-ducky script
     * Integrate newly coded stuff
     * Add a way to edit target data
     * Add a way to save arguments for exploits
-
-
 
 Error log:

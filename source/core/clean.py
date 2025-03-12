@@ -16,19 +16,20 @@ class clean:
         with open(".data/.history/history", "w") as file:
             file.write(" ")
             file.close()
-        with open(".data/.custom_scan", "w") as file:
+        with open(".data/.nmap/.custom_scan", "w") as file:
             file.write(" ")
             file.close()
         with open(".data/.phone_numbers", "w") as file:
             file.write(" ")
             file.close()
-        with open(".data/.targeted_scan", "w") as file:
+        with open(".data/.nmap/.targeted_scan", "w") as file:
             file.write(" ")
             file.close()
-        with open(".data/.targets", "w") as file:
+        with open(".data/.nmap/.targets", "w") as file:
             file.write(" ")
             file.close()
         with open(".data/.passwords", "w") as file:
             file.write(" ")
             file.close()
+
         return

@@ -30,7 +30,7 @@ installation = f'{os.getenv("HOME")}/.SuperSploit'
 history = FileHistory(f'{installation}/.data/.history/history')
 path = os.getenv("PATH").split(":")
 
-with open(".data/Aliases.json") as file:
+with open(".data/.config/Aliases.json") as file:
     aliases = json.load(file)
     file.close()
 
@@ -55,7 +55,7 @@ class Input:
     @classmethod
     def sys_call_Linux(cls, data):
         dataList = data.split(' ')
-        with open(f"{installation}/.data/Aliases.json") as file:
+        with open(f"{installation}/.data/.config/Aliases.json") as file:
             Aliases = json.load(file)
             file.close()
         for k, v in Aliases.items():
@@ -118,12 +118,18 @@ class Input:
                     return
             if data.endswith(" "):
                 data = data.lstrip(" ")
+
             functions = [clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, Banners, DatabaseManagment.addVariableToDatabase]
             inputs = ["clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
+
             reconFuctions = [cls.recon_ng, NameSearch.main, wireshark, bettercap, Phone, bt]
             recconInputs = ["recon-ng", "name-search", "wireshark", "bettercap", "phoneinfoga", "bt"]
+
             Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
             WifiInputs = ["port-scan", "view-targets-v","get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
+
+            btinputs = ["ducky"]
+            btfuncs = [bt.ducky]
             try:
                 if data.split(" ")[0] in inputs:
                     functions[inputs.index(data.split(" ")[0])](data)
@@ -133,6 +139,10 @@ class Input:
                     return True
                 if data.split(" ")[0] in WifiInputs:
                     print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+                    return True
+
+                if data.split(" ")[0] in btinputs:
+                    btfuncs[btinputs.index(data.split(" ")[0])](data)
                     return True
                 if "Linux" in os.uname():
                     cls.sys_call_Linux(data)

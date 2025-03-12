@@ -21,17 +21,17 @@ class Phone:
             if len(phone_number) < 10:
                 print("please enter a 10 digit phone number.")
                 return
-            with open(f"{installation}/.data/.phone_numbers", "r") as file:
+            with open(f"{installation}/.data/loot/phone_numbers", "r") as file:
                 if phone_number not in file.read():
                     file.close()
-                    with open(f"{installation}/.data/.phone_numbers", "a") as file1:
+                    with open(f"{installation}/.data/loot/phone_numbers", "a") as file1:
                         file1.write(phone_number)
                         file1.close()
             print(f"Scanning phone number: [{phone_number}].")
             data = run(["phoneinfoga", "scan", "-n", phone_number], capture_output=True)
-            with open("/tmp/phoneinfoga.scan", "w") as file:
+            with open(f"{installation}/.data/scans/phoneinfoga.scan", "w") as file:
                 file.write(data.stdout.decode())
                 file.close()
-            print(f"{data.stdout.decode()}\nscan logged to /tmp/phoneinfoga.scan")
+            print(f"{data.stdout.decode()}\nscan logged to {installation}/.data/scans/phoneinfoga.scan")
         except KeyboardInterrupt:
             return 

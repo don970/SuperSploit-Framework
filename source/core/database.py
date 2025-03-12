@@ -7,7 +7,7 @@ from .errors import Error as error
 
 global path_to_datbase
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
-path_to_database = f"{install_location}/.data/data.json"
+path_to_database = f"{install_location}/.data/.config/data.json"
 
 
 class DatabaseManagment:
@@ -89,7 +89,7 @@ class DatabaseManagment:
     @classmethod
     def findTerm(cls):
         term = None
-        with open(f"{install_location}/.data/.terminals", "r") as file:
+        with open(f"{install_location}/.data/.config/.terminals", "r") as file:
             terms = file.read().split("\n")
             file.close()
         for x in terms:
@@ -100,7 +100,7 @@ class DatabaseManagment:
     @classmethod
     def directlyModify(cls, data: list):
         try:
-            with open(f"{install_location}/.data/data.json") as file:
+            with open(f"{install_location}/.data/.config/data.json") as file:
                 variables = json.load(file)
                 file.close()
 
@@ -116,7 +116,7 @@ class DatabaseManagment:
             if "target" in data[0]:
                 variables["R_HOST"] = data[1]
 
-            with open(f"{install_location}/.data/data.json", "w") as file:
+            with open(f"{install_location}/.data/.config/data.json", "w") as file:
                 file.write(json.dumps(variables, sort_keys=True, indent=4))
                 file.close()
         except Exception:

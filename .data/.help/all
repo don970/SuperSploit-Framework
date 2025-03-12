@@ -19,6 +19,7 @@ commands:
                 bettercap - starts bettercap
                 name-search - Gives a list of google dorks with that name
                 clean - Does a full clean. Clearing history, error log along with all scan and target data also clears passwd list
+                ducky - starts blueducky script
 
      Command Line Info
                 this imitates a command line interface by running the inputs as a command
