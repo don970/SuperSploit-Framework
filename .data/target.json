@@ -12,24 +12,129 @@
             "IPV4": "192.168.0.114",
             "MAC Address": "4C:31:2D:1C:A0:90 (Sichuan AI-Link Technology)"
         },
+        "192.168.0.146": {
+            "Hostname": "D-s-A14",
+            "ports": [
+                "8000/tcp open  http-alt"
+            ]
+        },
         "192.168.0.238": {
+            "Device type": "Iphone",
+            "Hostname": "192.168.0.238",
             "IPV4": "192.168.0.238",
-            "MAC Address": "F2:56:B4:FE:2F:85 (Unknown)"
+            "MAC Address": "F2:56:B4:FE:2F:85 (Unknown)",
+            "Running": "IOS",
+            "ports": [
+                "62078/tcp open  iphone-sync"
+            ],
+            "vendor": "Apple"
         },
         "192.168.0.246": {
+            "Hostname": "40TCLRokuTVwork",
             "IPV4": "192.168.0.246",
-            "MAC Address": "84:3E:1D:F1:72:F9 (Unknown)"
+            "MAC Address": "84:3E:1D:F1:72:F9 (Unknown)",
+            "ports": [
+                "7000/tcp open  afs3-fileserver",
+                "9080/tcp open  glrpc"
+            ]
         },
         "192.168.0.247": {
             "IPV4": "192.168.0.247",
-            "MAC Address": "F8:4F:AD:10:63:62 (Hui Zhou Gaoshengda Technology)"
+            "MAC Address": "F8:4F:AD:10:63:62 (Hui Zhou Gaoshengda Technology)",
+            "ports": []
         },
         "192.168.0.252": {
-            "IPV4": "192.168.0.252"
+            "Hostname": "kali",
+            "IPV4": "192.168.0.252",
+            "MAC Address": "d8:0f:99:54:4c:39",
+            "OS CPE": "cpe:/o:linux:linux_kernel:6",
+            "OS details": "Linux 6.11.2",
+            "Running": "Linux kali 6.11.2-amd64",
+            "ports": [
+                "",
+                "Nmap done: 1 IP address (1 host up) scanned in 0.17 seconds"
+            ]
         },
         "192.168.0.32": {
             "IPV4": "192.168.0.32",
             "MAC Address": "C4:8B:66:88:AF:94 (Unknown)"
+        }
+    },
+    "SETUP-21E6": {
+        "192.168.0.1": {
+            "Device type": "general purpose",
+            "Hostname": "192.168.0.1",
+            "IPV4": "192.168.0.1",
+            "MAC Address": "98:52:4A:47:21:E9 (Technicolor CH USA)",
+            "OS CPE": "cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5",
+            "OS details": "Linux 4.15 - 5.8",
+            "Running": "Linux 4.X|5.X",
+            "ports": [
+                "22/tcp    filtered ssh",
+                "23/tcp    filtered telnet",
+                "53/tcp    open     domain",
+                "80/tcp    open     http",
+                "111/tcp   filtered rpcbind",
+                "443/tcp   open     https",
+                "8080/tcp  filtered http-proxy",
+                "8181/tcp  filtered intermapper",
+                "9000/tcp  filtered cslistener",
+                "49152/tcp open     unknown"
+            ]
+        },
+        "192.168.0.13": {
+            "Hostname": "192.168.0.13",
+            "IPV4": "192.168.0.13",
+            "ports": [
+                "",
+                "Nmap done: 1 IP address (1 host up) scanned in 0.20 seconds"
+            ]
+        },
+        "192.168.0.144": {
+            "Hostname": "192.168.0.144",
+            "IPV4": "192.168.0.144",
+            "MAC Address": "E2:4B:48:20:B3:50 (Unknown)",
+            "ports": [
+                "8000/tcp open  http-alt"
+            ]
+        },
+        "192.168.0.147": {
+            "Hostname": "192.168.0.147",
+            "IPV4": "192.168.0.147",
+            "ports": []
+        },
+        "192.168.0.16": {
+            "Hostname": "192.168.0.16",
+            "IPV4": "192.168.0.16",
+            "MAC Address": "F8:0D:AC:29:CA:E2 (HP)",
+            "ports": []
+        },
+        "192.168.0.191": {
+            "Hostname": "192.168.0.191",
+            "IPV4": "192.168.0.191",
+            "MAC Address": "34:F1:50:F2:46:60 (Hui Zhou Gaoshengda Technology)",
+            "ports": [
+                "7000/tcp open  afs3-fileserver"
+            ]
+        },
+        "192.168.0.207": {
+            "Hostname": "192.168.0.207",
+            "IPV4": "192.168.0.207",
+            "MAC Address": "B4:F1:DA:B7:7B:4E (LG Electronics (Mobile Communications))",
+            "ports": []
+        },
+        "192.168.0.50": {
+            "Device type": "general purpose",
+            "Hostname": "192.168.0.50",
+            "IPV4": "192.168.0.50",
+            "MAC Address": "38:1F:26:A9:7D:A2 (Sercomm)",
+            "OS CPE": "cpe:/o:linux:linux_kernel:3",
+            "OS details": "Linux 3.2 - 3.16",
+            "Running": "Linux 3.X",
+            "ports": [
+                "80/tcp  open  http",
+                "443/tcp open  https"
+            ]
         }
     }
 }

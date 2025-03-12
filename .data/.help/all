@@ -32,6 +32,7 @@ commands:
                 save-targets - Makes a persistent target list
                 view-targets - Shows current target list
                 view-targets-v - Shows detailed target list
-                traceroute - starts a route trace to google.com
+                traceroute - Starts a route trace to google.com
+                port-scan - Starts doing
 
 For help with integrating a exploit type help integrate

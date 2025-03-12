@@ -122,8 +122,8 @@ class Input:
             inputs = ["clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
             reconFuctions = [cls.recon_ng, NameSearch.main, wireshark, bettercap, Phone, bt]
             recconInputs = ["recon-ng", "name-search", "wireshark", "bettercap", "phoneinfoga", "bt"]
-            Wififuncs = [n.show_detailed_target_list, n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
-            WifiInputs = ["view-targets-v","get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
+            Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
+            WifiInputs = ["port-scan", "view-targets-v","get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
             try:
                 if data.split(" ")[0] in inputs:
                     functions[inputs.index(data.split(" ")[0])](data)

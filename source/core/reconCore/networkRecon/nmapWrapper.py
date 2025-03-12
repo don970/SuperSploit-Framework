@@ -3,10 +3,13 @@ import json
 import os
 import sys
 from subprocess import run, Popen, PIPE
+
+
 # redefine input method
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+
 history = FileHistory('.data/.history/history')
 input = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
 input = input.prompt
@@ -45,8 +48,6 @@ class nmap:
         for x in networks:
             print(f"{networks.index(x)}: {x}")
         network = data[networks[int(input("Please enter the index of the of the network: "))]]
-        for k, v in network.items():
-            print(f"{k}: {v}")
         self.targetlist = network
         return "[*] Targets saved."
 
@@ -63,12 +64,12 @@ class nmap:
     def build_ip_list(self):
         li = []
         ip = self.format_ip()
+        print(f"[*] Running a -sn scan on {ip}")
         a = run(["nmap", "-sn", ip], capture_output=True)
         result = a.stdout.decode().split('\n')
-        print("[*] Formatting output.")
         for x in result:
             if "Nmap scan report for" in x:
-                li.append(x.split(" ")[5][1:len(x.split(" ")[5]) - 1])
+                li.append(x.split(" ")[4])
         return li
 
     def show_target_list(self):
@@ -110,6 +111,7 @@ class nmap:
             print(f"[*] Network ESSID: {network}")
 
             if network not in targets:
+                print(f"[*] Adding ESSID {network}")
                 targets[network] = {}
 
             for x in li:
@@ -154,25 +156,31 @@ class nmap:
 
     def targetedScan(self) -> str or False:
         try:
-            if len(self.targetlist) < 1:
-                return "[!] No targets available."
-            for x in self.targetlist:
-                print(f"{self.targetlist.index(x)}: {x}")
-            data = input("Enter the index of the target: ")
-            try:
-                data = int(data)
-                pass
-            except Exception:
-                return "[!] Invaild Input"
-            print("[*] Scanning... ")
-            output = run(["nmap", "-A", self.targetlist[data]], capture_output=True)
-            print("[*] Populating targeted scan file")
-            with open(f"{installation}/.data/.targeted_scan", "w") as file:
-                file.write(output.stdout.decode())
+            target_l = []
+            network = self.getessid()
+            with open(f"{installation}/.data/target.json") as file:
+                targets = json.load(file)
                 file.close()
-            return "[*] Full scan logged to .data/.targeted_scan"
-        except KeyboardInterrupt:
-            return "[!] Exiting scan mode"
+            targets = targets[network]
+            for k, v in targets.items():
+                target_l.append(k)
+            for x in target_l:
+                print(f"{target_l.index(x)}: {x}")
+            target = target_l[int(input("Please enter the index of the target: "))]
+            print(f"[*] Running an -A scan on {target}")
+            data = run(["sudo", "nmap", "-A", target], capture_output=True)
+            print(data.stdout.decode())
+            fp = data.stdout.decode().split("TCP/IP fingerprint:")[1].split("\n")[0]
+            print(fp)
+            with open(f"{installation}/.data/.assets/figerprints.json") as file:
+                fpdb = json.load(file)
+                file.close()
+            for k, v in fpdb.items():
+                if fp == k:
+                    print("[*] Fingerprint found")
+            return
+        except OSError:
+            return
 
     def customScan(self):
         try:
@@ -210,4 +218,37 @@ class nmap:
             if "ESSID" in x:
                 return x.split(":")[1][1:len(x.split(":")[1]) -1]
 
+    def getports(self):
+        with open(f"{installation}/.data/target.json") as file:
+            targets = json.load(file)
+            file.close()
 
+        for x in targets[self.getessid()]:
+            print(f"[*] Running a port scan for {x}")
+            p = run(["nmap", x], capture_output=True)
+            fdata = p.stdout.decode().split("\n")
+            data = p.stdout.decode().split("\n")[5:]
+            print(f"[*] Attempting further os detection on {x}")
+            self.osdetect(fdata, targets, x)
+            targets[self.getessid()][x]["ports"] = data[0:len(data) - 4]
+
+        with open(f"{installation}/.data/target.json", "w") as file:
+            file.write(json.dumps(targets, sort_keys=True, indent=4))
+            file.close()
+
+        return
+
+    def osdetect(self, data, targets, x):
+        for i in data:
+            if "Nmap scan report for" in i:
+                targets[self.getessid()][x]["Hostname"] = i.split(" ")[4]
+                print(f'[*] Assining {targets[self.getessid()][x]["Hostname"]} as hostname for {x}')
+
+        # os detection via services for apple devices
+        if "62078/tcp open  iphone-sync" in data:
+            print(f"iphone detected for {x}")
+            targets[self.getessid()][x]["Device type"] = "Iphone"
+            targets[self.getessid()][x]["Running"] = "IOS"
+            targets[self.getessid()][x]["vendor"] = "Apple"
+
+        return
