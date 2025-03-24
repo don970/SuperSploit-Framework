@@ -1,4 +1,5 @@
-REM Opens a private browser to hackertyper.net
+REM Opens a private browser to google.com
+REM This is a example payload
 DELAY 200
 ESCAPE
 GUI d
@@ -10,7 +11,7 @@ PRIVATE_BROWSER
 DELAY 700
 CTRL l
 DELAY 300
-STRING google.com
+STRING youtube.com
 DELAY 300
 ENTER
 DELAY 300

@@ -49,6 +49,10 @@ class nmap:
             print(f"{networks.index(x)}: {x}")
         network = data[networks[int(input("Please enter the index of the of the network: "))]]
         self.targetlist = network
+        with open(f"{installation}/.data/.nmap/.targets", "w") as file1:
+            for x in self.targetlist:
+                file1.write(f"{x}\n")
+            file.close()
         return "[*] Targets saved."
 
     def format_ip(self):
@@ -154,61 +158,17 @@ class nmap:
         except KeyboardInterrupt:
             return "[!] Exiting scan mode"
 
-    def targetedScan(self) -> str or False:
-        try:
-            target_l = []
-            network = self.getessid()
-            with open(f"{installation}/.data/.nmap/target.json") as file:
-                targets = json.load(file)
-                file.close()
-            targets = targets[network]
-            for k, v in targets.items():
-                target_l.append(k)
-            for x in target_l:
-                print(f"{target_l.index(x)}: {x}")
-            target = target_l[int(input("Please enter the index of the target: "))]
-            print(f"[*] Running an -A scan on {target}")
-            data = run(["sudo", "nmap", "-A", target], capture_output=True)
-            print(data.stdout.decode())
-            fp = data.stdout.decode().split("TCP/IP fingerprint:")[1].split("\n")[0]
-            print(fp)
-            with open(f"{installation}/.data/.assets/figerprints.json") as file:
-                fpdb = json.load(file)
-                file.close()
-            for k, v in fpdb.items():
-                if fp == k:
-                    print("[*] Fingerprint found")
-            return
-        except OSError:
-            return
+    def targeted_scan(self):
+        if len(self.targetlist) == 0:
+            return "[!] target list not populated run import-targets or get-targets"
+        self.show_target_list()
 
-    def customScan(self):
-        try:
-            if len(self.targetlist) < 1:
-                return "[!] No targets available."
-            for x in self.targetlist:
-                print(f"{self.targetlist.index(x)}: {x}")
-            data = input("Enter the index of the target: ")
-            try:
-                data = int(data)
-                pass
-            except Exception:
-                return "[!] Invalid Input"
-            data1 = input("Now enter the arguments to use: ")
-            print("[*] Scanning... ")
-            output = run(["nmap", data1, self.targetlist[data]], capture_output=True)
-            print("[*] Populating custom scan file")
-            with open(f"{installation}/.data/scans/.custom_scan", "w") as file:
-                file.write(output.stdout.decode())
-                file.close()
-            return "[*] Full scan logged to .data/.custom_scan"
-        except KeyboardInterrupt:
-            return "[!] Exiting scan mode"
-
-    def traceroute(self):
-        run(["traceroute", "google.com"])
+    def custom_scan(self):
         return
 
+    def traceroute(self):
+        pass
+    
     def getessid(self):
         p1 = Popen(['iwconfig'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
         p2 = Popen(['grep', "ESSID"], stdout=PIPE, stdin=PIPE, stderr=PIPE)

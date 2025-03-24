@@ -56,7 +56,7 @@ class Search:
                     print(f'{exploits.index(xx)}: {xx}')
                 return
             elif data[1] == "targets":
-                with open(f"{installation}/.data/.targets") as file:
+                with open(f"{installation}/.data/.nmap/.targets") as file:
                     for x in file.read().split("\n"):
                         targetlist.append(x)
                     file.close()

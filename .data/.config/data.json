@@ -3,13 +3,14 @@
     "CVE": "CVE-2022-0847",
     "DURATION": "5",
     "EXE": "sudo",
-    "EXPLOIT": "/home/donald/.SuperSploit/exploits/Linux/Dirty Pipe passwd.py",
+    "EXPLOIT": "/home/d/.SuperSploit/exploits/Linux/Dirty Pipe multi.py",
     "L_HOST": "0.0.0.0",
     "L_PORT": "9999",
-    "PAYLOAD": "/home/donald/.SuperSploit/payloads/Linux/setuid_0_sh",
+    "PAYLOAD": "/home/d/.SuperSploit/payloads/Linux Bluetooth/forkbomb.txt",
     "R_HOST": "192.168.0.1",
     "R_PORT": "9999",
     "SHELL": "/bin/python3",
     "STAGED": false,
-    "TARGET": "/etc/passwd"
+    "TARGET": "/etc/passwd",
+    "TESTVAR": "none"
 }

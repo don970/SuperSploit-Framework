@@ -125,8 +125,8 @@ class Input:
             reconFuctions = [cls.recon_ng, NameSearch.main, wireshark, bettercap, Phone, bt]
             recconInputs = ["recon-ng", "name-search", "wireshark", "bettercap", "phoneinfoga", "bt"]
 
-            Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targetedScan, n.show_target_list, n.Import, n.customScan, n.traceroute]
-            WifiInputs = ["port-scan", "view-targets-v","get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
+            Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targeted_scan, n.show_target_list, n.Import, n.custom_scan, n.traceroute]
+            WifiInputs = ["port-scan", "view-targets-v", "get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
 
             btinputs = ["ducky"]
             btfuncs = [bt.ducky]
