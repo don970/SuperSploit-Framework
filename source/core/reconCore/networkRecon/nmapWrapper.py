@@ -1,4 +1,5 @@
 # This is a wrapper for nmap
+import getpass
 import json
 import os
 import sys
@@ -10,7 +11,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
-history = FileHistory('.data/.history/history')
+history = FileHistory('.data/.history/nhistory')
 input = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
 input = input.prompt
 installation = f'{os.getenv("HOME")}/.SuperSploit'
@@ -32,7 +33,8 @@ class nmap:
         scan for live host identification and more"""
         self.ip = ip[0]
         self.subnet = ip[1]
-        self.targetlist = []
+        self.targetlist = {}
+        self.targets = []
         return
 
     def Import(self):
@@ -49,6 +51,8 @@ class nmap:
             print(f"{networks.index(x)}: {x}")
         network = data[networks[int(input("Please enter the index of the of the network: "))]]
         self.targetlist = network
+        for k, v in self.targetlist.items():
+            self.targets.append(k)
         with open(f"{installation}/.data/.nmap/.targets", "w") as file1:
             for x in self.targetlist:
                 file1.write(f"{x}\n")
@@ -74,6 +78,7 @@ class nmap:
         for x in result:
             if "Nmap scan report for" in x:
                 li.append(x.split(" ")[4])
+        self.targets = li
         return li
 
     def show_target_list(self):
@@ -147,7 +152,7 @@ class nmap:
 
             print("[*] Populating targets file.")
 
-            with open(f"{installation}/.data/target.json", "w") as file:
+            with open(f"{installation}/.data/.nmap/target.json", "w") as file:
                 file.write(json.dumps(targets, sort_keys=True, indent=4))
                 file.close()
 
@@ -158,10 +163,32 @@ class nmap:
         except KeyboardInterrupt:
             return "[!] Exiting scan mode"
 
+    def printT(self) -> None:
+        for x in self.targets:
+            print(f"{self.targets.index(x)}: {x}")
+        return
+
     def targeted_scan(self):
         if len(self.targetlist) == 0:
             return "[!] target list not populated run import-targets or get-targets"
-        self.show_target_list()
+        self.printT()
+        target = self.targets[int(input("Please enter the index of the target: "))]
+        arg = input("Please enter the arguments for scan: ").split(" ")
+        arguments = arg
+        if arg == ['']:
+            arguments = []
+        if not arguments:
+            print(f"[*] Running nmap {target}")
+            run(["nmap", target])
+            return
+
+
+        cmd = 'sudo nmap '
+        for x in arguments:
+            cmd += f"{x} "
+        cmd += target
+        print(f"running {cmd}")
+        run(cmd.split(" "))
 
     def custom_scan(self):
         return
@@ -170,7 +197,10 @@ class nmap:
         pass
     
     def getessid(self):
-        p1 = Popen(['iwconfig'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        passwd = getpass.getpass("Enter sudo passwd: ")
+        passwd = f"{passwd}\n".encode("utf-8")
+        p1 = Popen(["sudo", "-S", 'iwconfig'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        p1.communicate(passwd)
         p2 = Popen(['grep', "ESSID"], stdout=PIPE, stdin=PIPE, stderr=PIPE)
         p2.communicate(bytes(p1.communicate()[0]))
         n = p2.communicate()[0].decode().split(" ")
