@@ -1,13 +1,21 @@
 Changes in version 1.1.1
     * Added blueDucky hid attack script and payloads
-    * organized .data folder better
+    * Integrated blue-ducky so now it uses the dynamic PAYLOAD value
+    * Organized .data folder better
+    * Added sha256-checksum verification for all external tools
+        including
+            - blue-ducky
+            - recon-ng
+            - blue-ranger
+            - nmap
+            - phoneinfoga
+    * Updated help sections
 
 To upgrade and test:
+    * create a function in setup.py that get checksums and dumps them
     * nmap targeted scans need to be updated
     * overhaul nmap recon code
     * Integrate bt commands in to the main menu
-    * Add blue-ducky script
-    * Integrate newly coded stuff
     * Add a way to edit target data
     * Add a way to save arguments for exploits
 

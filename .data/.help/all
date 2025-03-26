@@ -1,9 +1,10 @@
-**************************Help section********************************************************
+==============================================Help section==============================================================
+
 usage:
   help [command]
     help exploit
 
-commands:
+==============================================commands==================================================================
      Main Menu:
 
                 all - Shows this page.
@@ -13,27 +14,54 @@ commands:
                 show - Shows value or values supplied to it.
                 search - Search for exploits, payloads and targets
                 use - Set the EXPLOIT or PAYLOAD value
-                bt - Start the Bluetooth osnit menu
                 phoneinfoga - starts phoneinfoga wrapper
                 recon-ng - Starts recon-ng v5.1.2, by Tim Tomes (@lanmaster53)
                 bettercap - starts bettercap
                 name-search - Gives a list of google dorks with that name
                 clean - Does a full clean. Clearing history, error log along with all scan and target data also clears passwd list
                 ducky - starts blueducky script
-
-     Command Line Info
-                this imitates a command line interface by running the inputs as a command
-                if they are not found in the inputs list
-
-    wifi menu:
-                custom-scan - Starts a custom nmap scan
-                get-targets - Uses nmap to do a ping and -O scan on every device on the network
+                ranger - Starts blue ranger script
+                get-targets - Uses nmap to do a ping and os scan on every device on the network
                 import-targets - Imports saved targets
-                scan-target - Uses nmap -A argument to do a detailed scan
-                save-targets - Makes a persistent target list
+                scan-target - custom nmap scan
                 view-targets - Shows current target list
                 view-targets-v - Shows detailed target list
-                traceroute - Starts a route trace to google.com
                 port-scan - Starts doing
 
-For help with integrating a exploit type help integrate
+==============================================Command Line Info=========================================================
+                this imitates a command line interface by using prompt-toolkit for io
+                control, input history, auto-suggestions if the supplied input is not
+                found in the inputs list the program will attempt to run as a command
+                all errors are logged in .data/.errors folder for debugging.
+
+==================================Exploit integration with SuperSploit==================================================
+
+               To integrate a exploit simply copy one of the code snippets bellow in to your file.
+               The exploit handler will automatically recognize the exploit and run as a integrated
+               exploit, when an exploit is integrated the framework can better interact with the exploit
+               by allowing the exploit to have accesses to the dynamic variable database
+
+==============================================python files==============================================================
+# integrated = True
+#!#!#!
+# CVE: CVE-XXX-XXXX
+# Exploit description
+#
+# REQUIRED OPTIONS
+# this is gonna be target values and other
+#
+#!#!#!
+installation = f'{os.getenv("HOME")}/.SuperSploit'
+with open(f"{installation}/.data/data.json", 'r') as file:
+    di = json.load(file)
+    file.close()
+global di
+
+
+==============================================c files===================================================================
+/* #!#!#!
+CVE: CVE-XXX-XXXX
+# exploit description
+#
+# REQUIRED OPTIONS
+#!#!#! */

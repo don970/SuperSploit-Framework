@@ -23,7 +23,6 @@ from .reconCore.Bluetooth import bt
 from .reconCore.external_tools.namesearch import NameSearch
 from .reconCore.external_tools.phoneinfoga import Phone
 from .reconCore.external_tools.bettercap import bettercap
-from .reconCore.external_tools.wireshark import wireshark
 from .reconCore.networkRecon import nmap as n
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
@@ -33,6 +32,27 @@ path = os.getenv("PATH").split(":")
 with open(".data/.config/Aliases.json") as file:
     aliases = json.load(file)
     file.close()
+
+true, false = True, False
+
+with open(f"{installation}/.data/.security/checksums.json") as file:
+    io = json.load(file)
+    file.close()
+
+
+class checksums:
+    recon_ng = io["recon-ng"].encode()
+
+    @staticmethod
+    def get_checksum(path):
+        check = subprocess.run(["sha256sum", path], capture_output=true)
+        return check.stdout.decode().split(" ")[0]
+
+    @staticmethod
+    def check(original, to_check):
+        if original != to_check.encode():
+            return false
+        return true
 
 env = os.environ
 def get_network_info():
@@ -85,9 +105,17 @@ class Input:
         """This handles all the input"""
         pass
     @staticmethod
-    def recon_ng():
-        subprocess.run(["sudo", "recon-ng"])
-        return 
+    def recon_ng(args):
+        if not checksums.check(checksums.recon_ng, checksums.get_checksum("/usr/bin/recon-ng")):
+            print(f"[!] Checksum verification Failed")
+            if input("[*] Would you still like to proceed [y/n]").endswith("y"):
+                pass
+            else:
+                return
+        else:
+            print(f"[*] Checksum verified\noriginal checksum: {checksums.recon_ng.decode()}\ncurrent checksum: {checksums.get_checksum('/usr/bin/recon-ng')}")
+            subprocess.run(["sudo", "recon-ng"])
+            return
 
     @classmethod
     def check(cls, data):
@@ -122,14 +150,14 @@ class Input:
             functions = [clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, Banners, DatabaseManagment.addVariableToDatabase]
             inputs = ["clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
 
-            reconFuctions = [cls.recon_ng, NameSearch.main, wireshark, bettercap, Phone, bt]
-            recconInputs = ["recon-ng", "name-search", "wireshark", "bettercap", "phoneinfoga", "bt"]
+            reconFuctions = [cls.recon_ng, NameSearch.main, bettercap, Phone]
+            recconInputs = ["recon-ng", "name-search", "bettercap", "phoneinfoga"]
 
-            Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targeted_scan, n.show_target_list, n.Import, n.custom_scan, n.traceroute]
-            WifiInputs = ["port-scan", "view-targets-v", "get-targets", "scan-target", "view-targets", "import-targets", "custom-scan", "traceroute"]
+            Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targeted_scan, n.show_target_list, n.Import]
+            WifiInputs = ["port-scan", "view-targets-v", "get-targets", "scan-target", "view-targets", "import-targets"]
 
-            btinputs = ["ducky"]
-            btfuncs = [bt.ducky]
+            btinputs = ["ducky", "ranger", "scan"]
+            btfuncs = [bt.ducky, bt.ranger, bt.scan]
             try:
                 if data.split(" ")[0] in inputs:
                     functions[inputs.index(data.split(" ")[0])](data)

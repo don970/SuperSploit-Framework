@@ -1,6 +1,0 @@
-                     Help section for recon bt command
-      Starts the Bluetooth osnit menu. used for bt and bt/le
-      device discovery, enumeration and tracking.
-
-      [Usage]:
-        bt

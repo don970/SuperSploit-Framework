@@ -25,7 +25,7 @@ class Show:
             exploitDetails()
             return
         elif "aliases" in data.split(" ")[1]:
-            with open(f"{installation}/.data/Aliases.json") as file:
+            with open(f"{installation}/.data/.config/Aliases.json") as file:
                 aliases = json.load(file)
                 file.close()
             for k, v in aliases.items():

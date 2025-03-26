@@ -16,6 +16,28 @@ input = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), en
 input = input.prompt
 installation = f'{os.getenv("HOME")}/.SuperSploit'
 
+
+true, false = True, False
+
+with open(f"{installation}/.data/.security/checksums.json") as file:
+    io = json.load(file)
+    file.close()
+
+class checksums:
+    nmap = io["nmap"].encode()
+
+    @staticmethod
+    def get_checksum(path):
+        check = run(["sha256sum", path], capture_output=true)
+        return check.stdout.decode().split(" ")[0]
+
+    @staticmethod
+    def check(original, to_check):
+        if original != to_check.encode():
+            return false
+        return true
+
+
 # replace the print method
 def print(data):
     if "str" not in str(type(data)):
@@ -106,6 +128,14 @@ class nmap:
                 print(k)
 
     def scan_whole_network(self) -> str:
+        if not checksums.check(checksums.nmap, checksums.get_checksum("/usr/bin/nmap")):
+            print(f"[!] Checksum verification Failed")
+            if input("[*] Would you still like to proceed [y/n]").endswith("y"):
+                pass
+            else:
+                return
+        else:
+            print(f"[*] Checksum verified\noriginal checksum: {checksums.nmap.decode()}\ncurrent checksum: {checksums.get_checksum('/usr/bin/nmap')}")
         try:
 
             # import target dictionary
@@ -169,6 +199,14 @@ class nmap:
         return
 
     def targeted_scan(self):
+        if not checksums.check(checksums.nmap, checksums.get_checksum("/usr/bin/nmap")):
+            print(f"[!] Checksum verification Failed")
+            if input("[*] Would you still like to proceed [y/n]").endswith("y"):
+                pass
+            else:
+                return
+        else:
+            print(f"[*] Checksum verified\noriginal checksum: {checksums.nmap.decode()}\ncurrent checksum: {checksums.get_checksum('/usr/bin/nmap')}")
         if len(self.targetlist) == 0:
             return "[!] target list not populated run import-targets or get-targets"
         self.printT()
@@ -188,9 +226,22 @@ class nmap:
             cmd += f"{x} "
         cmd += target
         print(f"running {cmd}")
-        run(cmd.split(" "))
+        proc = Popen(cmd.split(" "), stderr=PIPE, stdout=PIPE, stdin=PIPE)
+        if proc.communicate()[1]:
+            print(proc.communicate()[1].decode())
+        out = proc.communicate()[0].decode()
+        print(out)
+        self.osdetect(out, self.targetlist, target)
 
     def custom_scan(self):
+        if not checksums.check(checksums.nmap, checksums.get_checksum("/usr/bin/nmap")):
+            print(f"[!] Checksum verification Failed")
+            if input("[*] Would you still like to proceed [y/n]").endswith("y"):
+                pass
+            else:
+                return
+        else:
+            print(f"[*] Checksum verified\noriginal checksum: {checksums.nmap.decode()}\ncurrent checksum: {checksums.get_checksum('/usr/bin/nmap')}")
         return
 
     def traceroute(self):
@@ -229,16 +280,17 @@ class nmap:
         return
 
     def osdetect(self, data, targets, x):
+        essid = self.getessid()
         for i in data:
             if "Nmap scan report for" in i:
                 targets[self.getessid()][x]["Hostname"] = i.split(" ")[4]
                 print(f'[*] Assining {targets[self.getessid()][x]["Hostname"]} as hostname for {x}')
 
         # os detection via services for apple devices
-        if "62078/tcp open  iphone-sync" in data:
+        if "iphone-sync" in data:
             print(f"iphone detected for {x}")
-            targets[self.getessid()][x]["Device type"] = "Iphone"
-            targets[self.getessid()][x]["Running"] = "IOS"
-            targets[self.getessid()][x]["vendor"] = "Apple"
+            targets[essid][x]["Device type"] = "Iphone"
+            targets[essid][x]["Running"] = "IOS"
+            targets[essid][x]["vendor"] = "Apple"
 
         return

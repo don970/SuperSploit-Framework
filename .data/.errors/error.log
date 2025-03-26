@@ -1,46 +1,8 @@
- [!] Program not found: dor
-[!] Program not found: dork
-[!] Program not found: osnit
 Traceback (most recent call last):
-  File "/home/donald/.SuperSploit/source/core/inputHandler.py", line 128, in check
-    Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targeted_scan, n.show_target_list, n.Import, n.customScan, n.traceroute]
-                                                                                                                               ^^^^^^^^^^^^
-AttributeError: 'nmap' object has no attribute 'customScan'
-[!] Program not found: duckyclear
-[!] Program not found: Help
-[!] Program not found: 0
-[!] Program not found: ifconfig
-Traceback (most recent call last):
-  File "/home/d/.SuperSploit/source/core/search.py", line 59, in search
-    with open(f"{installation}/.data/.targets") as file:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/d/.SuperSploit/.data/.targets'
-Traceback (most recent call last):
-  File "/home/d/.SuperSploit/source/core/search.py", line 59, in search
-    with open(f"{installation}/.data/.targets") as file:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/d/.SuperSploit/.data/.targets'
-Traceback (most recent call last):
-  File "/home/d/.SuperSploit/source/core/inputHandler.py", line 141, in check
-    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/d/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 52, in Import
-    with open(f"{installation}/.data/.nmap/.target") as file1:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/d/.SuperSploit/.data/.nmap/.target'
-Traceback (most recent call last):
-  File "/home/d/.SuperSploit/source/core/inputHandler.py", line 141, in check
-    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/d/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 54, in Import
-    file1.write(x)
-io.UnsupportedOperation: not writable
-[!] Program not found: cleaar
-Traceback (most recent call last):
-  File "/home/d/.SuperSploit/source/core/inputHandler.py", line 141, in check
-    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/d/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 179, in targeted_scan
-    if not arguments:
-           ^^^^^^^^^
-UnboundLocalError: cannot access local variable 'arguments' where it is not associated with a value
+  File "/home/d/.SuperSploit/source/core/inputHandler.py", line 163, in check
+    functions[inputs.index(data.split(" ")[0])](data)
+  File "/home/d/.SuperSploit/source/core/show.py", line 28, in show
+    with open(f"{installation}/.data/Aliases.json") as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/d/.SuperSploit/.data/Aliases.json'
+[!] Program not found: cler
