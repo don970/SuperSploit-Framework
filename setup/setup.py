@@ -10,8 +10,8 @@ try:
 except ImportError:
     requests_cmd = "sudo apt-get install python3-request"
     prompt_cmd = "sudo apt-get install python3-prompt-toolkit"
-    run(requests_cmd)
-    run(prompt_cmd)
+    run(requests_cmd.split())
+    run(prompt_cmd.split())
 
 from prompt_toolkit import prompt as input
 
