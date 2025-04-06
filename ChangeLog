@@ -19,6 +19,8 @@ To upgrade and test:
     * Integrate bt commands in to the main menu
     * Add a way to edit target data
     * Add a way to save arguments for exploits
+    * Add a better checksum for external application verification
+    * conduct a stress test 
 
 Error log:
 [SuperSploit]: use exploit
