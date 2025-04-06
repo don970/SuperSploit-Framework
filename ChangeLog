@@ -32,6 +32,10 @@ Traceback (most recent call last):
               ^^^^^^^^^^^^
 ValueError: invalid literal for int() with base 10: ''
 
+fix -- use a try statement to catch the error and silently log it in the error log 
+
+
+
 [SuperSploit]: cd ~
 ----> Cause: space proceeding the aliases
 
@@ -45,3 +49,7 @@ Traceback (most recent call last):
     os.chdir(self.list[1])
 FileNotFoundError: [Errno 2] No such file or directory: '~'
 [SuperSploit]:
+
+fix -- sanitizer input before calling input fix function 
+
+
