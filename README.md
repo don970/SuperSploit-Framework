@@ -32,4 +32,9 @@ Viewing exploit details
 Search feature
 ![Screenshot at 2025-04-19 17-40-13](https://github.com/user-attachments/assets/95f99124-b1e9-4e99-bb12-a8356799583c)
 ![Screenshot at 2025-04-19 17-40-30](https://github.com/user-attachments/assets/a66e4d10-29b1-4320-9052-b1690a665157)
-
+The search feature can also search for specific items
+![Screenshot at 2025-04-19 23-18-47](https://github.com/user-attachments/assets/1c39293f-7cd7-45e1-8828-337bda1e1be2)
+The search feature can take multiple arguments to as show in the picture bellow
+![Screenshot at 2025-04-19 23-19-27](https://github.com/user-attachments/assets/f1a35fef-bd0d-4633-8389-c65fb1a78521)
+Running a exploit
+![Screenshot at 2025-04-19 23-10-55](https://github.com/user-attachments/assets/1af60312-db23-4497-bbd4-c709b20e70fc)
