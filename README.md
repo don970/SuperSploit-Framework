@@ -32,3 +32,4 @@ Viewing exploit details
 Search feature
 ![Screenshot at 2025-04-19 17-40-13](https://github.com/user-attachments/assets/95f99124-b1e9-4e99-bb12-a8356799583c)
 ![Screenshot at 2025-04-19 17-40-30](https://github.com/user-attachments/assets/a66e4d10-29b1-4320-9052-b1690a665157)
+
