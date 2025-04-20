@@ -21,21 +21,17 @@ you will have get your self this is merely a exploit management platform.
     * Blueducky script incorporated
 
 Start screen
-![Screenshot 2024-05-13 5 24 16 PM](https://github.com/don970/SuperSploit-chrome-OS/assets/81848615/37dd53e4-1d48-4ef2-b3e4-9487c0181178)
+![Screenshot at 2025-04-19 17-35-38](https://github.com/user-attachments/assets/43518d6e-d1dc-4894-8e91-46074b1bb1cb)
 
-Viewing dynamic variables.
-![Screenshot 2024-05-13 5 24 51 PM](https://github.com/don970/SuperSploit-chrome-OS/assets/81848615/2f04aeab-31b6-437a-b2cf-a0ed349bfa70)
+Viewing dynamic variables
+![Screenshot at 2025-04-19 17-39-58](https://github.com/user-attachments/assets/c2dae21d-c71b-47cb-9de3-1015d3439006)
 
 Viewing exploit details
-![Screenshot 2024-05-13 5 24 58 PM](https://github.com/don970/SuperSploit-chrome-OS/assets/81848615/cd302f79-c4c7-4c60-bc68-3506d548be79)
+![Screenshot at 2025-04-19 18-05-11](https://github.com/user-attachments/assets/1bb8533e-0aa1-4d25-8615-6fbe452ec678)
 
 Search feature
-![Screenshot 2024-05-14 1 06 37 PM](https://github.com/don970/SuperSploit-chrome-OS/assets/81848615/d5122416-346d-4211-8d4e-c1f65231b7c0)
-![Screenshot 2024-05-14 1 06 51 PM](https://github.com/don970/SuperSploit-chrome-OS/assets/81848615/4f931edd-6258-4903-b11f-de2622b08eaa)
-
-Running a exploit
-![Screenshot 2024-05-14 11 52 46 AM](https://github.com/don970/SuperSploit-chrome-OS/assets/81848615/62d8d918-15a8-4f94-b65c-3def24c2439f)
-
+![Screenshot at 2025-04-19 17-40-13](https://github.com/user-attachments/assets/95f99124-b1e9-4e99-bb12-a8356799583c)
+![Screenshot at 2025-04-19 17-40-30](https://github.com/user-attachments/assets/a66e4d10-29b1-4320-9052-b1690a665157)
 
 
 
