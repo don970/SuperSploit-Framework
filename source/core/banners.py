@@ -8,7 +8,7 @@ installation = f'{os.getenv("HOME")}/.SuperSploit'
 
 
 class Banners:
-     def __init__(self):
+     def __init__(self, a):
         os.system("clear")
         try:
             # this will open the fun facts or osnit fact file and save it to a variable
