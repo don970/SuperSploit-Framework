@@ -9,6 +9,4 @@ class Main:
         except KeyboardInterrupt:
             print(f"Good bye. );")
             exit()
-
-
 Main()
