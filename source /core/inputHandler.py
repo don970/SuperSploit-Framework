@@ -7,6 +7,7 @@ from subprocess import PIPE
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from .encrypter import Encrypter
 from .errors import Error
 from .ToStdOut import ToStdout
 from .help import Help
@@ -24,6 +25,7 @@ from .reconCore.external_tools.namesearch import NameSearch
 from .reconCore.external_tools.phoneinfoga import Phone
 from .reconCore.external_tools.bettercap import bettercap
 from .reconCore.networkRecon import nmap as n
+
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
 history = FileHistory(f'{installation}/.data/.history/history')
@@ -104,6 +106,7 @@ class Input:
     def __init__(self):
         """This handles all the input"""
         pass
+
     @staticmethod
     def recon_ng(args):
         if not checksums.check(checksums.recon_ng, checksums.get_checksum("/usr/bin/recon-ng")):
@@ -147,8 +150,8 @@ class Input:
             if data.endswith(" "):
                 data = data.lstrip(" ")
 
-            functions = [clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, Banners, DatabaseManagment.addVariableToDatabase]
-            inputs = ["clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
+            functions = [Encrypter.decrypt_file, Encrypter.encrypt_file, clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, Banners, DatabaseManagment.addVariableToDatabase]
+            inputs = ["decrypt", "encrypt", "clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
 
             reconFuctions = [cls.recon_ng, NameSearch.main, bettercap, Phone]
             recconInputs = ["recon-ng", "name-search", "bettercap", "phoneinfoga"]
@@ -186,7 +189,7 @@ class Input:
     @classmethod
     def get(cls):
         # call the class to make the banner
-        Banners()
+        Banners(None)
         while True:
             DatabaseManagment.getCVE()
             try:
