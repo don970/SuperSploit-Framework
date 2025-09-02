@@ -6,25 +6,20 @@
 how the program is used. Make sure you have permission from the owner of the device or network 
 this is being used against or on.***
 
-**Author SuperSploit core code: Donald Ford aka don970**
-https://github.com/don970/SuperSploit-updated
+**Author SuperSploit core code: Donald Ford aka don970** https://github.com/don970/SuperSploit-updated
 
-**Author for phoneinfoga: Raphaël aka sundowndv**
-https://github.com/sundowndev/phoneinfoga
+**Author for phoneinfoga: Raphaël aka sundowndv** https://github.com/sundowndev/phoneinfoga
 
-**Author for recon-ng: Tim Tomes**
-https://github.com/lanmaster53/recon-ng
+**Author for recon-ng: Tim Tomes aka lanmaster53** https://github.com/lanmaster53/recon-ng
 
-**Author for Bettercap: Simone Margaritelli aka evilsocket**
-https://www.bettercap.org/
+**Author for Bettercap: Simone Margaritelli aka evilsocket** https://www.bettercap.org/
 
 SuperSploit is my first attempt at an exploit management system I took inspiration from Metasploit
-but wanted a lighter filling platform this does not have any actual exploits in the exploit db
-you will have get your self this is merely a exploit management platform.
+but wanted a lighter filling platform. This does not have any actual exploits in the exploit db
+you will have get them your self this is merely a exploit management platform.
 
 
 **KEY POINTS**
-    ***Based on metasploit***
     * Lightweight
     * Able to run on any platform with python3
     * Fully incorporated shell on linux
