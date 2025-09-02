@@ -6,3 +6,4 @@ PyGObject==3.48.1
 pyobjc
 pybluez
 setuptools==57.5.0
+pure-python-adb

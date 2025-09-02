@@ -82,8 +82,8 @@ class Encrypter:
             return False
 
     @classmethod
-    def loadKey(cls, key):
-        return open(key, "rb").read()
+    def load_key(cls, path):
+        return open(path, "rb").read()
 
     @classmethod
     def decrypt_file(cls, path):

@@ -75,6 +75,10 @@ class DatabaseManagment:
 
     @classmethod
     def addVariableToDatabase(cls, data):
+        if len(data.split(" ")) < 3:
+            with open(f"{install_location}/.data/.help/add", 'r') as file:
+                print(file.read())
+                file.close()
         try:
             if os.path.lexists(path_to_database):
                 with open(path_to_database) as file:

@@ -23,7 +23,7 @@ false = False
 home = getenv("HOME")
 pipe = PIPE
 
-# now lets create a class called SuperSploit
+# now create a class called SuperSploit
 class SuperSploit:
 
     def __init__(self):

@@ -2,6 +2,8 @@
 
 usage:
   help [command]
+
+  [example]:
     help exploit
 
 ==============================================commands==================================================================
@@ -33,35 +35,3 @@ usage:
                 control, input history, auto-suggestions if the supplied input is not
                 found in the inputs list the program will attempt to run as a command
                 all errors are logged in .data/.errors folder for debugging.
-
-==================================Exploit integration with SuperSploit==================================================
-
-               To integrate a exploit simply copy one of the code snippets bellow in to your file.
-               The exploit handler will automatically recognize the exploit and run as a integrated
-               exploit, when an exploit is integrated the framework can better interact with the exploit
-               by allowing the exploit to have accesses to the dynamic variable database
-
-==============================================python files==============================================================
-# integrated = True
-#!#!#!
-# CVE: CVE-XXX-XXXX
-# Exploit description
-#
-# REQUIRED OPTIONS
-# this is gonna be target values and other
-#
-#!#!#!
-installation = f'{os.getenv("HOME")}/.SuperSploit'
-with open(f"{installation}/.data/data.json", 'r') as file:
-    di = json.load(file)
-    file.close()
-global di
-
-
-==============================================c files===================================================================
-/* #!#!#!
-CVE: CVE-XXX-XXXX
-# exploit description
-#
-# REQUIRED OPTIONS
-#!#!#! */
