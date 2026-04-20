@@ -3,7 +3,7 @@
     "CVE": null,
     "DURATION": "5",
     "EXE": "sudo",
-    "EXPLOIT": "/home/donald/.SuperSploit/exploits/chrome/chrome os sudo nopass.c",
+    "EXPLOIT": "/home/donaldford05091997/.SuperSploit/exploits/Linux/Dirty Pipe multi.py",
     "L_HOST": "0.0.0.0",
     "L_PORT": "9999",
     "PAYLOAD": "/home/d/.SuperSploit/payloads/Linux Bluetooth/payload.dd",

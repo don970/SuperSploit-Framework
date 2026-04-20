@@ -1,25 +1,52 @@
 import os
-
 from .database import DatabaseManagment
+from .ToStdOut import ToStdout
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
+print = ToStdout.write
 
 class use:
-    def __init__(self, data):
-        targetList = []
-        data = data.split(" ")
-        exploits = DatabaseManagment.getExploits()
-        payloads = DatabaseManagment.getPayloads()
-        data[2] = int(data[2])
-        if data[1] == "exploit":
-            DatabaseManagment.directlyModify([data[1], exploits[data[2]]])
-        elif data[1] == "target":
-            with open(f"{installation}/.data/.targets") as file:
-                print("[*] setting R_HOST via target file. ")
-                for x in file.read().split("\n"):
-                    targetList.append(x)
-                file.close()
-            DatabaseManagment.directlyModify([data[1], targetList[data[2]]])
+    @classmethod
+    def execute(cls, data):
+        args = data.split()
+        if len(args) < 3:
+            print("[-] Usage: use <exploit|target|payload> <index>\n")
+            return
+            
+        category = args[1].lower()
+        
+        try:
+            index = int(args[2])
+        except ValueError:
+            print("[-] Error: Index must be a number.\n")
+            return
+
+        if category == "exploit":
+            exploits = DatabaseManagment.getExploits()
+            if 0 <= index < len(exploits):
+                DatabaseManagment.directlyModify(["exploit", exploits[index]])
+                print(f"[*] Set exploit to {exploits[index]}\n")
+            else:
+                print("[-] Invalid exploit index.\n")
+                
+        elif category == "target":
+            try:
+                with open(f"{installation}/.data/.targets", "r") as file:
+                    targetList = [x for x in file.read().split("\n") if x]
+                if 0 <= index < len(targetList):
+                    DatabaseManagment.directlyModify(["target", targetList[index]])
+                    print(f"[*] Set target to {targetList[index]}\n")
+                else:
+                    print("[-] Invalid target index.\n")
+            except FileNotFoundError:
+                print("[-] Targets file not found.\n")
+                
+        elif category == "payload":
+            payloads = DatabaseManagment.getPayloads()
+            if 0 <= index < len(payloads):
+                DatabaseManagment.directlyModify(["payload", payloads[index]])
+                print(f"[*] Set payload to {payloads[index]}\n")
+            else:
+                print("[-] Invalid payload index.\n")
         else:
-            DatabaseManagment.directlyModify([data[1], payloads[data[2]]])
-        pass
+            print(f"[-] Unknown category: {category}\n")

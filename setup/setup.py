@@ -5,7 +5,7 @@ from subprocess import run, Popen, PIPE
 import traceback
 
 try:
-    import requests
+    import request
     import prompt_toolkit
 except ImportError:
     requests_cmd = "sudo apt-get install python3-request"

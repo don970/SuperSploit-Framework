@@ -1,68 +1,67 @@
 import os
 import traceback
-
-from prompt_toolkit import prompt
+import shlex
 from .ToStdOut import ToStdout
 from .errors import Error
+from .database import DatabaseManagment
 
-input = prompt
 installation = f'{os.getenv("HOME")}/.SuperSploit'
+print = ToStdout.write
 
 class Search:
-    def __init__(self):
-        pass
-
     @classmethod
     def search(cls, data):
-        targetlist = []
         try:
-            data = data.split(" ")
-            if len(data) < 2:
-                ToStdout.write("Please provide a argument to search for. ")
-                with open(f"{installation}/.data/.help/search", "r") as file:
-                    ToStdout.write(file.read())
-                    file.close()
+            args = shlex.split(data)
+            if len(args) < 2:
+                print("[-] Please provide an argument to search for.\n")
+                try:
+                    with open(f"{installation}/.data/.help/search", "r") as file:
+                        print(file.read())
+                except FileNotFoundError:
+                    pass
+                return
+
+            category = args[1].lower()
+            search_terms = [term.lower() for term in args[2:]]
+            items = []
+
+            # Leverage the database methods to keep code DRY
+            if category == "exploits":
+                items = DatabaseManagment.getExploits()
+            elif category == "payloads":
+                items = DatabaseManagment.getPayloads()
+            elif category == "targets":
+                try:
+                    with open(f"{installation}/.data/.nmap/.targets", "r") as file:
+                        items = [x for x in file.read().split("\n") if x]
+                except FileNotFoundError:
+                    print("[-] No targets file found.\n")
                     return
-            key = {}
-            exploits = []
-            searches = data[2:]
-            found = []
-            if data[1] == "exploits":
-                for x in os.listdir(f"{installation}/exploits"):
-                    for y in os.listdir(f"{installation}/exploits/{x}"):
-                        exploits.append(f"{installation}/exploits/{x}/{y}")
-                if len(data) < 3:
-                    for i in exploits:
-                        print(f'{exploits.index(i)}: {i}')
-                for z in exploits:
-                    for s in searches:
-                        if s in z:
-                            found.append(z)
-                for xx in found:
-                    print(f'{exploits.index(xx)}: {xx}')
-                return
-            elif data[1] == "payloads":
-                for x in os.listdir(f"{installation}/payloads"):
-                    for y in os.listdir(f"{installation}/payloads/{x}"):
-                        exploits.append(f"{installation}/payloads/{x}/{y}")
-                if len(data) < 3:
-                    for i in exploits:
-                        print(f'{exploits.index(i)}: {i}')
-                for z in exploits:
-                    for s in searches:
-                        if s in z:
-                            found.append(z)
-                for xx in found:
-                    print(f'{exploits.index(xx)}: {xx}')
-                return
-            elif data[1] == "targets":
-                with open(f"{installation}/.data/.nmap/.targets") as file:
-                    for x in file.read().split("\n"):
-                        targetlist.append(x)
-                    file.close()
-                for x in targetlist:
-                    print(f"{targetlist.index(x)}: {x}")
             else:
+                print(f"[-] Unknown category: {category}\n")
                 return
+
+            # If no search terms, print everything
+            if not search_terms:
+                for idx, item in enumerate(items):
+                    print(f'{idx}: {item}\n')
+                return
+
+            # Filter items ensuring ALL search terms are found in the string
+            found = []
+            for item in items:
+                # Check if all search terms exist in the lowercased item path
+                if all(term in item.lower() for term in search_terms):
+                    found.append(item)
+
+            if not found:
+                print("[-] No results found.\n")
+            else:
+                # Use the original index from the main list so the user can use it with 'use'
+                for item in found:
+                    original_idx = items.index(item)
+                    print(f'{original_idx}: {item}\n')
+
         except Exception:
             Error(traceback.format_exc())

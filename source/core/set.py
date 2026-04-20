@@ -3,35 +3,41 @@ import os
 import traceback
 from .errors import Error
 from .ToStdOut import ToStdout
-import sys
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
+db_path = f"{installation}/.data/.config/data.json" # Fixed Path
 
 class SetV:
-
     @classmethod
     def SetV(cls, data):
         try:
-            if len(data.split(" ")) < 2:
-                print("No arguments supplied for set\n")
-                with open(f"{installation}/.data/.help/set", "r") as file:
-                    print(file.read())
-                    file.close()
+            args = data.split()
+            if len(args) < 3: # Changed from < 2 to < 3 to ensure data[2] exists
+                print("[-] No arguments supplied for set\n[-] Usage: set <VARIABLE> <VALUE>\n")
                 return
-            data = data.split(" ")
-            with open(f"{installation}/.data/data.json") as file:
-                variables = json.load(file)
-                file.close()
-            for k, v in variables.items():
-                if data[1] == k:
-                    if data[2] == "true":
-                        data[2] = True
-                    if data[2] == 'false':
-                        data[2] = False
-                    variables[k] = data[2]
-            with open(f"{installation}/.data/data.json", "w") as file:
-                file.write(json.dumps(variables))
-                file.close()
+                
+            key = args[1]
+            value = args[2]
+            
+            # Type casting for booleans
+            if value.lower() == "true":
+                value = True
+            elif value.lower() == "false":
+                value = False
+
+            try:
+                with open(db_path, "r") as file:
+                    variables = json.load(file)
+            except (FileNotFoundError, json.JSONDecodeError):
+                variables = {} # Create new if missing/corrupt
+
+            # Direct assignment handles both updating AND adding new variables
+            variables[key] = value
+
+            with open(db_path, "w") as file:
+                json.dump(variables, file, indent=4)
+                
+            print(f"[*] {key} => {value}\n")
+            
         except Exception:
             Error(traceback.format_exc())
-            return

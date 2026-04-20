@@ -8,3 +8,4 @@ Traceback (most recent call last):
     data1 = data1[1].split("\n")
             ~~~~~^^^
 IndexError: list index out of range
+[!] Program not found: run

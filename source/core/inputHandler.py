@@ -25,6 +25,7 @@ from .reconCore.external_tools.namesearch import NameSearch
 from .reconCore.external_tools.phoneinfoga import Phone
 from .reconCore.external_tools.bettercap import bettercap
 from .reconCore.networkRecon import nmap as n
+from .security import validator
 
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
@@ -33,28 +34,8 @@ path = os.getenv("PATH").split(":")
 
 with open(".data/.config/Aliases.json") as file:
     aliases = json.load(file)
-    file.close()
 
 true, false = True, False
-
-with open(f"{installation}/.data/.security/checksums.json") as file:
-    io = json.load(file)
-    file.close()
-
-
-class checksums:
-    recon_ng = io["recon-ng"].encode()
-
-    @staticmethod
-    def get_checksum(path):
-        check = subprocess.run(["sha256sum", path], capture_output=true)
-        return check.stdout.decode().split(" ")[0]
-
-    @staticmethod
-    def check(original, to_check):
-        if original != to_check.encode():
-            return false
-        return true
 
 env = os.environ
 def get_network_info():
@@ -79,7 +60,6 @@ class Input:
         dataList = data.split(' ')
         with open(f"{installation}/.data/.config/Aliases.json") as file:
             Aliases = json.load(file)
-            file.close()
         for k, v in Aliases.items():
             if k in dataList:
                 dataList[dataList.index(k)] = v
@@ -109,16 +89,16 @@ class Input:
 
     @staticmethod
     def recon_ng(args):
-        if not checksums.check(checksums.recon_ng, checksums.get_checksum("/usr/bin/recon-ng")):
-            print(f"[!] Checksum verification Failed")
-            if input("[*] Would you still like to proceed [y/n]").endswith("y"):
-                pass
-            else:
+        # UPDATED TO USE SYSTEM PACKAGE VERIFICATION
+        if not validator.verify_system_package("recon-ng"):
+            print(f"[!] Integrity verification Failed! 'recon-ng' package modified.")
+            if not input("[*] Would you still like to proceed [y/n]: ").lower().endswith("y"):
                 return
         else:
-            print(f"[*] Checksum verified\noriginal checksum: {checksums.recon_ng.decode()}\ncurrent checksum: {checksums.get_checksum('/usr/bin/recon-ng')}")
-            subprocess.run(["sudo", "recon-ng"])
-            return
+            print(f"[*] Integrity verified via dpkg for recon-ng.")
+            
+        subprocess.run(["sudo", "recon-ng"])
+        return
 
     @classmethod
     def check(cls, data):
@@ -131,7 +111,6 @@ class Input:
 
         # create a list to check for input fixes
         inputFixList = ["cd", "clear", "exit", "cat"]
-
 
         try:
             if "&&" in data:
@@ -148,40 +127,83 @@ class Input:
                 if Input_fixes(dataList):
                     return
             if data.endswith(" "):
-                data = data.lstrip(" ")
+                data = data.rstrip(" ") # NOTE: Changed lstrip to rstrip to fix trailing spaces properly
 
-            functions = [Encrypter.decrypt_file, Encrypter.encrypt_file, clean, Show.shells, Help.help, Show.show, SetV.SetV, ExploitHandler, use, Search.search, Banners, DatabaseManagment.addVariableToDatabase]
-            inputs = ["decrypt", "encrypt", "clean", "shells", "help", "show", "set", "exploit", "use", "search", "banner", "add"]
+            cmd_name = data.split(" ")[0]
 
-            reconFuctions = [cls.recon_ng, NameSearch.main, bettercap, Phone]
-            recconInputs = ["recon-ng", "name-search", "bettercap", "phoneinfoga"]
+            # ==========================================
+            # COMMAND REGISTRIES
+            # ==========================================
+            general_cmds = {
+                "decrypt": Encrypter.decrypt_file,
+                "encrypt": Encrypter.encrypt_file,
+                "clean": clean,
+                "shells": Show.shells,
+                "help": Help.help,
+                "show": Show.show,
+                "set": SetV.SetV,
+                "exploit": ExploitHandler,
+                "use": use,
+                "search": Search.search,
+                "banner": Banners,
+                "add": DatabaseManagment.addVariableToDatabase
+            }
 
-            Wififuncs = [n.getports, n.show_detailed_target_list, n.scan_whole_network, n.targeted_scan, n.show_target_list, n.Import]
-            WifiInputs = ["port-scan", "view-targets-v", "get-targets", "scan-target", "view-targets", "import-targets"]
+            recon_cmds = {
+                "recon-ng": cls.recon_ng,
+                "name-search": NameSearch.main,
+                "bettercap": bettercap,
+                "phoneinfoga": Phone
+            }
 
-            btinputs = ["ducky", "ranger", "scan"]
-            btfuncs = [bt.ducky, bt.ranger, bt.scan]
+            wifi_cmds = {
+                "port-scan": n.getports,
+                "view-targets-v": n.show_detailed_target_list,
+                "get-targets": n.scan_whole_network,
+                "scan-target": n.targeted_scan,
+                "view-targets": n.show_target_list,
+                "import-targets": n.Import
+            }
+
+            bt_cmds = {
+                "ducky": bt.ducky,
+                "ranger": bt.ranger,
+                "scan": bt.scan
+            }
+
+            # ==========================================
+            # COMMAND EXECUTION ROUTER
+            # ==========================================
             try:
-                if data.split(" ")[0] in inputs:
-                    functions[inputs.index(data.split(" ")[0])](data)
+                if cmd_name in general_cmds:
+                    general_cmds[cmd_name](data)
                     return True
-                if data.split(" ")[0] in recconInputs:
-                    reconFuctions[recconInputs.index(data.split(" ")[0])](data)
+                
+                elif cmd_name in recon_cmds:
+                    recon_cmds[cmd_name](data)
                     return True
-                if data.split(" ")[0] in WifiInputs:
-                    print(Wififuncs[WifiInputs.index(data.split(" ")[0])]())
+                
+                elif cmd_name in wifi_cmds:
+                    # Wifi commands print their output and take no 'data' argument
+                    print(wifi_cmds[cmd_name]())
                     return True
-
-                if data.split(" ")[0] in btinputs:
-                    btfuncs[btinputs.index(data.split(" ")[0])](data)
+                
+                elif cmd_name in bt_cmds:
+                    bt_cmds[cmd_name](data)
                     return True
-                if "Linux" in os.uname():
+                
+                elif "Linux" in os.uname():
                     cls.sys_call_Linux(data)
                     return True
-                cls.sys_call_other(data)
+                
+                else:
+                    cls.sys_call_other(data)
+                    return True
+
             except Exception:
                 Error(traceback.format_exc())
                 return False
+                
         except Exception:
             Error(traceback.format_exc())
             return False
