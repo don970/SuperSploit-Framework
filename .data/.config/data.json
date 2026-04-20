@@ -7,8 +7,9 @@
     "L_HOST": "0.0.0.0",
     "L_PORT": "9999",
     "PAYLOAD": "/home/d/.SuperSploit/payloads/Linux Bluetooth/payload.dd",
-    "R_HOST": "192.168.0.1",
+    "R_HOST": "192.0.0.1",
     "R_PORT": "9999",
+    "SESSION_ID": "None",
     "SHELL": "/bin/python3",
     "STAGED": false,
     "TARGET": "/etc/passwd"

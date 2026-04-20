@@ -9,18 +9,15 @@ def initialize_session():
     db = DatabaseManagment.get()
     # Generate an 8-character unique session ID
     session_id = uuid.uuid4().hex[:8]
-    SetV.SetV("SESSION_ID", session_id)
+    SetV.SetV(f"SESSION_ID {session_id}")
     
     # Trigger the initial staged log entry for the session
     Logger.start_session()
 
-# Ensure this runs before the main CLI loop starts
-if __name__ == "__main__":
-    initialize_session()
-    # ... rest of your startup logic ...
 
 class Main:
     def __init__(self):
+        initialize_session()
         try:
             """calls the main input handler"""
             Input.get()

@@ -143,7 +143,7 @@ class Input:
                 "show": Show.show,
                 "set": SetV.SetV,
                 "exploit": ExploitHandler,
-                "use": use,
+                "use": use.execute,
                 "search": Search.search,
                 "banner": Banners,
                 "add": DatabaseManagment.addVariableToDatabase
