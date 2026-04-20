@@ -9,9 +9,9 @@ db_path = f"{installation}/.data/.config/data.json" # Fixed Path
 
 class SetV:
     @classmethod
-    def SetV(cls, data):
+    def SetV(cls, data, value):
         try:
-            args = data.split()
+            args = data, value
             if len(args) < 3: # Changed from < 2 to < 3 to ensure data[2] exists
                 print("[-] No arguments supplied for set\n[-] Usage: set <VARIABLE> <VALUE>\n")
                 return
