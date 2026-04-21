@@ -1,4 +1,5 @@
-crytography
+psutil
+cryptography
 pyfiglet
 dbus-python
 PyBluez
