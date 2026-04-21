@@ -2,7 +2,8 @@ import json
 import os
 import traceback
 import subprocess
-from socket import gethostname
+import psutil
+import socket
 from subprocess import PIPE
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
@@ -31,21 +32,21 @@ from .exploithandler import ExploitHandler
 installation = DatabaseManagment.getInstall()
 history = FileHistory(f'{installation}/.data/.history/history')
 path = os.getenv("PATH").split(":")
+true, false = True, False
+env = os.environ
 
 with open(".data/.config/Aliases.json") as file:
     aliases = json.load(file)
 
-true, false = True, False
-
-env = os.environ
 def get_network_info():
-    host = gethostname()
-    data = subprocess.run(["ip", "addr"], capture_output=True).stdout.decode().split("\n")
-    for i in data:
-        if "inet" and "brd" in i and ":" not in i:
-            ip = i.split(" ")[5].split('/')[0]
-            subnet = i.split(" ")[5].split('/')[1]
-            return ip, subnet, host
+    host = socket.gethostname()
+    # Iterate through all network interfaces
+    for interface, addrs in psutil.net_if_addrs().items():
+        for addr in addrs:
+            # Look for IPv4 addresses and ignore loopback (127.0.0.1)
+            if addr.family == socket.AF_INET and not addr.address.startswith("127."):
+                return addr.address, addr.netmask, host
+    return None
 
 try:
     n = n(get_network_info())

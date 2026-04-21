@@ -5,13 +5,16 @@
 * **Python Exploit Handler Refactoring:** Restructured `exploithandler.py` with improved metadata handling using delimiter-based parsing (`#!#!#!`).
 * **Temporary File Execution:** Implemented cleaner temporary file handling for exploit execution with consistent path management via `exec_temp.py`.
 * **Module Execution Improvements:** Enhanced dynamic module loading with better file cleanup and metadata separation.
+* **Network Information Gathering:** Replaced subprocess-based network detection in `inputHandler.py` with efficient `psutil` library integration for improved reliability and cross-platform compatibility.
 
 ### New Features
 * **Test Exploit Framework:** Added new test exploit (`exploits/test/test.py`) demonstrating the new metadata delimiter system for exploit documentation.
+* **Enhanced Network Detection:** Implemented smarter IPv4 address detection that filters out loopback addresses and properly retrieves network interface information.
 
 ### Bug Fixes
 * **Handler Initialization:** Fixed database initialization in exploit handler with proper `DatabaseManagment.get()` calls.
 * **Argument Parsing:** Improved argument parsing and shell command construction in Python exploit execution.
+* **Network Information Retrieval:** Fixed `get_network_info()` in `inputHandler.py` to reliably detect non-loopback IPv4 addresses across different system configurations.
 
 ---
 
