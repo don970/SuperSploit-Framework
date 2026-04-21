@@ -11,3 +11,40 @@ Traceback (most recent call last):
   File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
     raise child_exception_type(errno_num, err_msg, err_filename)
 PermissionError: [Errno 13] Permission denied: ''
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 179, in check
+    general_cmds[cmd_name](data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/help.py", line 12, in display
+    topic = topic.split()[1]
+            ~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 179, in check
+    general_cmds[cmd_name](data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/help.py", line 12, in display
+    topic = topic.split()[1]
+            ~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 179, in check
+    general_cmds[cmd_name](data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/help.py", line 12, in display
+    topic = topic.split()[1]
+            ~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 179, in check
+    general_cmds[cmd_name](data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/help.py", line 24, in display
+    safe_topic = os.path.basename(topic).lower().strip()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen posixpath>", line 142, in basename
+TypeError: expected str, bytes or os.PathLike object, not builtin_function_or_method
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 179, in check
+    general_cmds[cmd_name](data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/help.py", line 24, in display
+    safe_topic = os.path.basename(topic).lower().strip()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen posixpath>", line 142, in basename
+TypeError: expected str, bytes or os.PathLike object, not builtin_function_or_method

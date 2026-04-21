@@ -3,19 +3,22 @@ from .ToStdOut import ToStdout
 from .errors import Error
 
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
-help_dir = f"{install_location}/.data/.help"
+help_dir = f"{install_location}/.data/.help/"
 write = ToStdout.write
 
 class Help:
     @staticmethod
     def display(topic=None):
-        topic = topic.split()[1]
+        try:
+            topic = topic.split()[1]
+        except IndexError:
+            topic = "all"  # Default help file for general overview
         """
         Dynamically fetches and displays modular help text files.
         If no topic is specified, loads the main overview.
         """
         if not topic:
-            topic = "main"
+            topic = "all"  # Default help file for general overview
             
         # Sanitize input to prevent directory traversal
         safe_topic = os.path.basename(topic).lower().strip()
