@@ -1,6 +1,6 @@
 {
     "BACKUP-PATH": "/tmp/passwd",
-    "CVE": null,
+    "CVE": "None",
     "DURATION": "5",
     "EXE": "sudo",
     "EXPLOIT": "/home/donaldford05091997/.SuperSploit/exploits/chrome/chrome os sudo nopasswd.py",
@@ -13,5 +13,5 @@
     "SHELL": "/bin/python3",
     "STAGED": false,
     "TARGET": "/etc/passwd",
-    "verbose": true
+    "verbose": false
 }

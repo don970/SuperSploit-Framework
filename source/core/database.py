@@ -225,3 +225,39 @@ class DatabaseManagment:
     @classmethod
     def getInstall(cls):
         return install_location
+    
+    @classmethod
+    def addVariableToDatabase(cls, data):
+        parts = data.split(" ", 2)
+        if len(parts) < 3:
+            help_path = f"{install_location}/.data/.help/add"
+            if os.path.exists(help_path):
+                with open(help_path, 'r') as file:
+                    print(file.read())
+            return
+            
+        try:
+            if os.path.exists(path_to_database):
+                with open(path_to_database, "r") as file:
+                    database = json.load(file)
+                
+                database[parts[1]] = parts[2]
+                
+                with open(path_to_database, "w") as file:
+                    json.dump(database, file, sort_keys=True, indent=4)
+        except Exception as e:
+            print(f"[-] Database Error: {e}")
+
+    @classmethod
+    def findTerm(cls):
+        try:
+            with open(f"{install_location}/.data/.config/.terminals", "r") as file:
+                terms = [line.strip() for line in file if line.strip()]
+                
+            bin_files = set(os.listdir("/bin"))
+            for term in terms:
+                if term in bin_files:
+                    return term
+        except Exception:
+            pass
+        return None
