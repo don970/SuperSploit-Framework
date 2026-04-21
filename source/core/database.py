@@ -3,106 +3,105 @@ import os
 import traceback
 from .errors import Error as error
 from .ToStdOut import ToStdout
+import yaml
 
 # Framework Constants
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
 path_to_database = f"{install_location}/.data/.config/data.json"
 write = ToStdout.write
 
+
 class ExploitCache:
-    """Caches parsed exploit details and file locations to reduce system overhead."""
+    """Manages memory-resident YAML metadata for all framework modules."""
     details = {}
+    metadata_index = {} # Maps path -> YAML metadata summary
     all_exploits = []
     all_payloads = []
 
     @classmethod
     def update(cls):
-        # 1. Update global file lists using DatabaseManagment helpers
+        # 1. Update file lists
         cls.all_exploits = DatabaseManagment.getExploits()
         cls.all_payloads = DatabaseManagment.getPayloads()
 
-        # 2. Update specific details for the active exploit
+        # 2. Index all metadata for the search engine
+        for path in cls.all_exploits + cls.all_payloads:
+            if path not in cls.metadata_index:
+                cls.metadata_index[path] = cls._quick_parse(path)
+
+        # 3. Cache the active exploit's full details
         db = DatabaseManagment.get()
         if db and db.get("EXPLOIT"):
             cls._parse_details(db["EXPLOIT"])
 
     @classmethod
-    def _parse_details(cls, path):
-        if not os.path.exists(path):
-            cls.details = {"path": path, "status": "missing"}
-            return
-
+    def _quick_parse(cls, path):
+        """Extracts basic metadata for search indexing without loading the full file."""
         try:
-            # Using encoding/errors to handle binary data safely
             with open(path, "r", encoding="utf-8", errors="ignore") as file:
                 data = file.read().split("#!#!#!")
-            
-            if len(data) > 1:
-                clean_data = data[1].lstrip('"').rstrip('"')
-                # Split details from the options section
-                info, options_raw = clean_data.split('# REQUIRED OPTIONS')[0], clean_data.split('# REQUIRED OPTIONS')[1]
-                
-                finds = []
-                for line in options_raw.split("\n"):
-                    if ":" in line and len(line.split(" ")) > 1:
-                        finds.append(line.split(":")[0].split(" ")[1])
+                if len(data) > 1:
+                    meta = yaml.safe_load(data[1])
+                    return {
+                        "name": meta.get("name", os.path.basename(path)),
+                        "cve": meta.get("cve", "N/A"),
+                        "desc": meta.get("description", "").lower()
+                    }
+        except Exception:
+            pass
+        return {"name": os.path.basename(path), "cve": "N/A", "desc": ""}
 
+    @classmethod
+    def _parse_details(cls, path):
+        """Full YAML parser for the 'info' command."""
+        if not os.path.exists(path):
+            cls.details = {"status": "missing"}
+            return
+        try:
+            with open(path, "r", encoding="utf-8", errors="ignore") as file:
+                data = file.read().split("#!#!#!")
+            if len(data) > 1:
+                meta = yaml.safe_load(data[1])
                 cls.details = {
                     "path": path,
-                    "info": info,
-                    "options": finds,
+                    "name": meta.get("name", "Unknown"),
+                    "info": meta.get("description", "No description provided."),
+                    "options": meta.get("options", []),
+                    "cve": meta.get("cve", "N/A"),
                     "status": "ok"
                 }
-            else:
-                cls.details = {"path": path, "status": "error"}
         except Exception:
             cls.details = {"status": "error"}
 
 class exploitDetails:
-    """Displays cached exploit information."""
+    
     def __init__(self, *args):
         os.system("clear")
         cache = ExploitCache.details
         if not cache or cache.get("status") != "ok":
-            write("[!] Exploit details unavailable or improperly formatted.")
+            write("[!] Select a valid exploit first.")
             return
 
-        write(f"[*] Exploit: {cache['path']}\nDetails:\n{cache['info']}")
-        write('# REQUIRED OPTIONS')
-        
+        write(f"[*] Exploit:     {cache['name']}")
+        write(f"[*] CVE:         {cache['cve']}")
+        write(f"[*] Description: {cache['info']}")
+        write("\n# REQUIRED OPTIONS")
         db = DatabaseManagment.get()
         for opt in cache['options']:
-            if opt in db:
-                write(f"{opt} = {db[opt]}")
+            write(f"{opt} = {db.get(opt, '[NOT SET]')}")
 
 class DatabaseManagment:
-
+    
     @classmethod
     def getCVE(cls):
-        """Retrieves and caches the CVE number from the active exploit file."""
-        try:
-            db_data = cls.get()
-            if db_data.get("CVE") and db_data.get("CVE") != "None":
-                return db_data["CVE"]
-
-            exploit_path = db_data.get("EXPLOIT")
-            if not exploit_path or not os.path.exists(exploit_path):
-                return None
-
-            with open(exploit_path, "r", encoding="utf-8", errors="ignore") as file:
-                for line in file:
-                    if "CVE: CVE" in line:
-                        try:
-                            cve = line.split("CVE:")[1].strip().replace(" ", "")
-                            cls.directlyModify(["CVE", cve])
-                            return cve
-                        except IndexError:
-                            pass
-            
-            cls.directlyModify(["CVE", "None"])
-            return None
-        except Exception:
-            return "None"
+        """Retrieves the CVE from the current memory cache."""
+        cache = ExploitCache.details
+        if cache and cache.get("status") == "ok":
+            cve = cache.get("cve", "None")
+            # Keep the database in sync for the banner
+            cls.directlyModify(["CVE", cve])
+            return cve
+        return "None"
 
     @classmethod
     def getTargets(cls):

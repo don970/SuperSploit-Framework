@@ -2,36 +2,34 @@ from .database import DatabaseManagment, ExploitCache
 import os
 
 class Search: 
+    from .database import DatabaseManagment, ExploitCache
+from .ToStdOut import ToStdout
+
+write = ToStdout.write
+
+class Search:
     @classmethod
     def search(cls, data):
         parts = data.split(" ")
         if len(parts) < 2:
-            print("Please provide an argument to search for.")
-            # Helper logic here...
+            write("Usage: search <exploits|payloads|targets> [keyword]")
             return
 
-        category = parts[1]
-        search_terms = parts[2:]
+        category, search_terms = parts[1], [t.lower() for t in parts[2:]]
         
-        # Select the correct list from the cache
-        if category == "exploits":
-            source_list = ExploitCache.all_exploits
-        elif category == "payloads":
-            source_list = ExploitCache.all_payloads
-        elif category == "targets":
-            targetlist = DatabaseManagment.getTargets()
-            for i, (target, port) in enumerate(targetlist.items()):
-                print(f"{i}: {target}:{port}")
-            return
-        else:
+        if category == "targets":
+            for i, (t, p) in enumerate(DatabaseManagment.getTargets().items()):
+                write(f"{i}: {t}:{p}")
             return
 
-        # Perform the search in memory
-        if not search_terms:
-            for i, path in enumerate(source_list):
-                print(f"{i}: {path}")
-            return
-
+        source_list = ExploitCache.all_exploits if category == "exploits" else ExploitCache.all_payloads
+        
         for i, path in enumerate(source_list):
-            if any(term.lower() in path.lower() for term in search_terms):
-                print(f"{i}: {path}")
+            meta = ExploitCache.metadata_index.get(path, {})
+            
+            # Match against Path, Name, CVE, or Description
+            match_pool = f"{path} {meta.get('name')} {meta.get('cve')} {meta.get('desc')}".lower()
+            
+            if not search_terms or any(term in match_pool for term in search_terms):
+                cve_str = f" [{meta.get('cve')}]" if meta.get('cve') != "N/A" else ""
+                write(f"{i}: {path}{cve_str}")

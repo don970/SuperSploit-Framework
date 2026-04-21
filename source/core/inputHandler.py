@@ -146,7 +146,8 @@ class Input:
                 "use": use.execute,
                 "search": Search.search,
                 "banner": Banners,
-                "add": DatabaseManagment.addVariableToDatabase
+                "add": DatabaseManagment.addVariableToDatabase,
+                "info": exploitDetails
             }
 
             recon_cmds = {

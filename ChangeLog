@@ -1,4 +1,23 @@
 # SuperSploit Framework - Changelog
+
+## [version 1.2.1] - 2026-04-21
+### Bug Fixes
+* **Missing Functions Resolution:** Fixed critical issues with missing functions that were causing execution failures.
+* **Code Refactoring:** Optimized `search.py` and `exploithandler.py` with streamlined logic and reduced redundancy.
+* **Input Handler Improvements:** Enhanced `inputHandler.py` with better error handling and validation.
+
+### Code Quality
+* **Database Optimization:** Further refined `database.py` with improved caching mechanisms and reduced complexity (225 lines refactored).
+* **Exploit Cleanup:** Removed obsolete exploit files for Windows, routers, and deprecated Android tools that were no longer maintained.
+* **Chrome Exploit Updates:** Updated Chrome OS privilege escalation exploit with refined execution logic.
+
+### Maintenance
+* **Asset Cleanup:** Removed outdated PDF and image assets from the assets folder for better repository hygiene.
+* **Activity Logging:** Enhanced operational logging in `activity.log` to track framework execution more reliably.
+* **Configuration Updates:** Updated `.data/.config/data.json` with improved settings management.
+
+---
+
 version 1.2.0
 
 ## [Core Updates & Refactoring]
