@@ -16,19 +16,19 @@ from .set import SetV
 from .use import use
 from .search import Search
 from .banners import Banners
-from .database import DatabaseManagment
 from .inputfixes import Input_fixes
 from .clean import clean
-from .exploithandler import ExploitHandler
+from .exploithandler import ExploitHandler, ExploitCache
 from .reconCore.Bluetooth import bt
 from .reconCore.external_tools.namesearch import NameSearch
 from .reconCore.external_tools.phoneinfoga import Phone
 from .reconCore.external_tools.bettercap import bettercap
 from .reconCore.networkRecon import nmap as n
 from .security import validator
+from .database import DatabaseManagment, ExploitCache, exploitDetails
+from .exploithandler import ExploitHandler
 
-
-installation = f'{os.getenv("HOME")}/.SuperSploit'
+installation = DatabaseManagment.getInstall()
 history = FileHistory(f'{installation}/.data/.history/history')
 path = os.getenv("PATH").split(":")
 
@@ -210,10 +210,12 @@ class Input:
 
     @classmethod
     def get(cls):
-        # call the class to make the banner
         Banners(None)
         while True:
             DatabaseManagment.getCVE()
+            # Refresh the memory cache from the database module
+            ExploitCache.update() 
+            
             try:
                 data = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
                 inp = data.prompt(f"[SuperSploit]: ")

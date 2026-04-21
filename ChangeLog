@@ -1,11 +1,16 @@
 # SuperSploit Framework - Changelog
-version 1.2.0
+version 1.1.0 - April 21, 2026
 
 ## [Core Updates & Refactoring]
 ### I/O & Performance Optimizations (Bottleneck Fixes)
 * **Database I/O Reduction:** Updated `getCVE` in `database.py` to cache results locally. It now returns the CVE immediately if present, preventing redundant disk reads on the exploit file during subsequent calls.
 * **Streamlined Standard Output:** Refactored `ToStdOut.py` to write directly to `/dev/stdout` instead of using the standard `print()` function, handling formatting and decoding on the fly to prevent output-heavy payloads from lagging the terminal.
 * **Silent Error Handling:** Reworked `errors.py` to dump stack traces silently to `.data/.errors/error.log` without interfering with active program execution or disrupting the CLI flow.
+
+### Centralized Caching & Data Management (`database.py`)
+* **In-Memory Exploit Location Cache:** Implemented centralized in-memory caching system for exploit locations and payloads to eliminate redundant file system traversals and significantly improve lookup performance across framework operations.
+* **Central Database Architecture:** Transitioned to a unified central database for managing all exploit metadata, locations, and associated payloads. This centralized approach ensures consistency across the framework and reduces data fragmentation.
+* **Optimized Cache Invalidation:** Integrated smart cache invalidation mechanisms that maintain data freshness while minimizing disk I/O operations.
 
 ### Execution Engine Enhancements (`exploithandler.py`)
 * **Dynamic Python Modules:** Added the ability to load and run Python exploits directly into memory as dynamic modules (`importlib.util`). This prevents polluting source folders or causing cache bugs, executing the `exploit()` function directly.
@@ -24,3 +29,20 @@ version 1.2.0
 ### Modular Help Architecture (`help.py`)
 * **File-Based Documentation:** Removed hardcoded help strings from the core logic. Help documentation is now pulled dynamically from modular text files stored in `.data/.help/` (e.g., `main`, `set`, `search`).
 * **Path Sanitization:** Integrated strict input sanitization (`os.path.basename`) on user topic requests to prevent directory traversal exploits when querying help files.
+* **Improved Topic Handling:** Added error handling for missing help topics, defaulting to "all" help file when no topic is specified. Updated help directory path for consistency.
+
+## [Bug Fixes]
+### Execution Engine Enhancements (`exploithandler.py`)
+* **Method Reordering:** Corrected the order of `sh` and `c` handler methods to match their intended functionality.
+* **Enhanced Return Code Auditing:** Updated bash and Python script execution to properly evaluate return codes, distinguishing between successful runs and failures.
+* **Improved C Compilation Logging:** Separated logging for C compilation and execution phases, with better error reporting using the Error class.
+* **Dynamic Module Execution:** Enhanced Python module loading with proper success/failure logging based on return codes.
+
+### Security and Stability Updates
+* **Comprehensive Security Review:** Conducted full framework security audit and implemented stability improvements across all core modules.
+* **Input Validation:** Strengthened input sanitization and validation throughout the codebase.
+* **Error Handling:** Improved error logging and handling mechanisms to prevent crashes and improve user experience.
+
+### General Improvements
+* **Typo Corrections:** Fixed typos in `main.py`, `set.py`, `exploitHandler.py`, and other files.
+* **Author Attribution:** Added proper citations for external tool authors (phoneinfoga, recon-ng, Bettercap) in documentation and code comments.

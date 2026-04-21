@@ -38,3 +38,13 @@
 [2026-04-20 20:40:19] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
 --------------------------------------------------
 [2026-04-20 23:49:25] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 05:29:19] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 05:58:06] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-04-21 05:59:07] [SESSION: None] TYPE: PYTHON-MODULE | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/chrome/chrome os sudo nopasswd.py | TARGET: 192.0.0.1 | SUCCESS: False
+[2026-04-21 05:59:28] [SESSION: None] TYPE: PYTHON-SCRIPT | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/chrome/chrome os sudo nopasswd.py | TARGET: 192.0.0.1 | SUCCESS: True
+[2026-04-21 06:00:08] [SESSION: None] TYPE: PYTHON-MODULE | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/chrome/chrome os sudo nopasswd.py | TARGET: 192.0.0.1 | SUCCESS: False
+--------------------------------------------------
+[2026-04-21 06:02:39] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-04-21 06:02:51] [SESSION: None] TYPE: PYTHON-MODULE | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/chrome/chrome os sudo nopasswd.py | TARGET: 192.0.0.1 | SUCCESS: True
