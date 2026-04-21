@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 197, in check
+    cls.sys_call_Linux(data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 68, in sys_call_Linux
+    subprocess.run(dataList)
+  File "/usr/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 1024, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+PermissionError: [Errno 13] Permission denied: ''

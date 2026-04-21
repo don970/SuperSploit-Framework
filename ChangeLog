@@ -1,5 +1,20 @@
 # SuperSploit Framework - Changelog
 
+## [version 1.2.2] - 2026-04-21
+### Enhancements
+* **Python Exploit Handler Refactoring:** Restructured `exploithandler.py` with improved metadata handling using delimiter-based parsing (`#!#!#!`).
+* **Temporary File Execution:** Implemented cleaner temporary file handling for exploit execution with consistent path management via `exec_temp.py`.
+* **Module Execution Improvements:** Enhanced dynamic module loading with better file cleanup and metadata separation.
+
+### New Features
+* **Test Exploit Framework:** Added new test exploit (`exploits/test/test.py`) demonstrating the new metadata delimiter system for exploit documentation.
+
+### Bug Fixes
+* **Handler Initialization:** Fixed database initialization in exploit handler with proper `DatabaseManagment.get()` calls.
+* **Argument Parsing:** Improved argument parsing and shell command construction in Python exploit execution.
+
+---
+
 ## [version 1.2.1] - 2026-04-21
 ### Bug Fixes
 * **Missing Functions Resolution:** Fixed critical issues with missing functions that were causing execution failures.

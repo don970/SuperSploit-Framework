@@ -60,3 +60,27 @@
 --------------------------------------------------
 [2026-04-21 09:43:57] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
 [2026-04-21 09:44:22] [SESSION: None] TYPE: PYTHON-MODULE | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/chrome/chrome os sudo nopasswd.py | TARGET: 192.0.0.1 | SUCCESS: True
+--------------------------------------------------
+[2026-04-21 10:09:35] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 10:17:07] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 10:21:25] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 10:24:35] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-04-21 10:24:55] [SESSION: None] TYPE: PYTHON-SCRIPT | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/test/test.py | TARGET: 192.0.0.1 | SUCCESS: False
+--------------------------------------------------
+[2026-04-21 10:27:35] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-04-21 10:27:40] [SESSION: None] TYPE: PYTHON-SCRIPT | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/test/test.py | TARGET: 192.0.0.1 | SUCCESS: True
+--------------------------------------------------
+[2026-04-21 10:28:40] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 10:29:56] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+--------------------------------------------------
+[2026-04-21 10:31:04] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-04-21 10:31:13] [SESSION: None] TYPE: PYTHON-SCRIPT | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/test/test.py | TARGET: 192.0.0.1 | SUCCESS: False
+--------------------------------------------------
+[2026-04-21 10:31:48] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-04-21 10:31:56] [SESSION: None] TYPE: PYTHON-SCRIPT | EXPLOIT: /home/donaldford05091997/.SuperSploit/exploits/test/test.py | TARGET: 192.0.0.1 | SUCCESS: False
+--------------------------------------------------
+[2026-04-21 10:37:25] [SESSION: None] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
