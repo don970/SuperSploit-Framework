@@ -1,4 +1,67 @@
 
+Changes in version 1.2.0 - Logging Module Enhancements
+    * Implemented comprehensive activity logging system
+        - Added Logger class with centralized logging management
+        - Session tracking with unique session IDs for each framework launch
+        - Exploit execution logging with success/failure tracking
+    * Added session management features
+        - Auto-generated 8-character session IDs on framework startup
+        - Session initialization logging with timestamps and dividers
+        - Database integration for session state management
+    * Enhanced exploit execution logging
+        - Logs exploit type, target, and success status
+        - Verbose mode support for argument tracking
+        - Conditional argument logging based on VERBOSE_LOGGING database flag
+        - Supports multiple argument formats (lists and strings)
+    * Implemented log file management
+        - Automatic directory creation for log storage
+        - Persistent activity log at .data/.logs/activity.log
+        - Silent error handling to prevent framework interruption
+        - Log rotation feature to manage file sizes (5MB max per file)
+        - Automatic archival of rotated logs with timestamp suffixes
+    * Integration improvements
+        - Seamless integration with exploit handler for automatic execution logging
+        - Database-driven configuration for verbose logging levels
+        - Backward-compatible error handling with existing error reporting
+
+Changes in version 1.2.1 - Project-wide Improvements and Fixes
+    * MacOS Compatibility Enhancements
+        - Added dedicated MacOS setup scripts and requirements
+        - Created MacOS-Setup directory with executable.sh, setup.py, and start.c
+        - Updated aliases and configuration for MacOS environment
+        - Added MacOS-specific requirements.txt
+    * Exploit Handler Improvements
+        - Enhanced exploit execution with better error handling
+        - Added verbose argument logging to all exploit types (Python modules, scripts, C executables)
+        - Improved logging integration for exploit success/failure tracking
+        - Fixed various bugs in exploit handler logic
+    * Database Module Updates
+        - Added VERBOSE_LOGGING configuration support
+        - Enhanced key mapping for database operations
+        - Improved configuration management
+    * Code Quality and Bug Fixes
+        - Fixed typos in main.py, set.py, inputHandler.py, and other core files
+        - Corrected syntax and logic errors in exploit handler
+        - Updated error logging and history management
+    * External Tools and Dependencies
+        - Added proper citations for authors of external tools
+        - Updated checksums for external tool verification
+        - Enhanced encryption/decryption capabilities
+        - Improved external tool integration
+    * Documentation and UI Updates
+        - Multiple README.md updates for better documentation
+        - Updated help sections and banners
+        - Enhanced logo and branding elements
+    * Security and Stability Improvements
+        - Strengthened error handling across modules
+        - Improved session and history management
+        - Enhanced data persistence and recovery
+    * Development Environment Updates
+        - Added PyCharm project configuration
+        - Updated setup scripts for better cross-platform support
+        - Improved build and compilation processes
+
+
 Changes in version 1.1.1
     * Added blueDucky hid "Human interface device" attack script and payloads
     * Integrated blue-ducky so now it uses the dynamic PAYLOAD value

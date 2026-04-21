@@ -139,7 +139,7 @@ class Input:
                 "encrypt": Encrypter.encrypt_file,
                 "clean": clean,
                 "shells": Show.shells,
-                "help": Help.help,
+                "help": Help.display,
                 "show": Show.show,
                 "set": SetV.SetV,
                 "exploit": ExploitHandler,

@@ -1,62 +1,33 @@
 import os
-import subprocess
-import traceback
-from subprocess import PIPE
-
 from .ToStdOut import ToStdout
-from prompt_toolkit import PromptSession
-from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from .errors import Error
 
-installation = f'{os.getenv("HOME")}/.SuperSploit'
-history = InMemoryHistory()
-
+install_location = f'{os.getenv("HOME")}/.SuperSploit'
+help_dir = f"{install_location}/.data/.help"
+write = ToStdout.write
 
 class Help:
-    def __init__(self):
-        pass
+    @staticmethod
+    def display(topic=None):
+        topic = topic.split()[1]
+        """
+        Dynamically fetches and displays modular help text files.
+        If no topic is specified, loads the main overview.
+        """
+        if not topic:
+            topic = "main"
+            
+        # Sanitize input to prevent directory traversal
+        safe_topic = os.path.basename(topic).lower().strip()
+        help_file = os.path.join(help_dir, safe_topic)
 
-    @classmethod
-    def help(cls, data):
-        if "menu" in data:
-            a = data.split(" ")[1]
-            data = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
-            while True:
-                ToStdout.write('all - shows basic help page')
-                a = data.prompt("[Help]: ")
-                if "exit" in a or "back" in a:
-                    break
-                if a in os.listdir(f"{installation}/.data/.help"):
-                    with open(f"{installation}/.data/.help/{a}", "r") as file:
-                        ToStdout.write("\033[H\033[J")
-                        ToStdout.write(file.read())
-                        file.close()
-                    continue
-                try:
-                    if "clear" in a:
-                        ToStdout.write("\033[H\033[J")
-                    else:
-                        cmd = subprocess.Popen(a.split(" "), stdout=PIPE, stdin=PIPE, stderr=PIPE)
-                        output = cmd.communicate()[0], cmd.communicate()[1]
-                        for x in output:
-                            if len(x) > 0:
-                                ToStdout.write(x.decode())
-                        continue
-                except Exception:
-                    Error(traceback.format_exc())
-        try:
-            a = data.split(" ")[1]
-            if a in os.listdir(f"{installation}/.data/.help"):
-                with open(f"{installation}/.data/.help/{a}", "r") as file:
-                    ToStdout.write("\033[H\033[J")
-                    ToStdout.write(file.read())
-                    file.close()
-                    return
-        except Exception as e:
-            if "Index Error" in str(e):
-                pass
-            with open(f"{installation}/.data/.help/all", "r") as file:
-                ToStdout.write("\033[H\033[J")
-                ToStdout.write(file.read())
-                file.close()
+        if os.path.exists(help_file):
+            try:
+                with open(help_file, "r") as file:
+                    write(f"\n{file.read()}\n")
+            except Exception as e:
+                Error.silent(f"Failed to read help file {safe_topic}: {e}")
+                write(f"[-] Could not load help for '{safe_topic}'. Check error logs.")
+        else:
+            write(f"[-] No specific help documentation found for '{safe_topic}'.")
+            write("[*] Type 'help' to see the main command menu.\n")

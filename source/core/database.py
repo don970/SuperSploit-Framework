@@ -119,7 +119,9 @@ class DatabaseManagment:
                 "CVE": "CVE",
                 "exploit": "EXPLOIT",
                 "payload": "PAYLOAD",
-                "target": "R_HOST"
+                "target": "R_HOST",
+                "port": "R_PORT",
+                "verbose": "VERBOSE_LOGGING",
             }
 
             # Map the lowercase input request to the exact JSON key
