@@ -4,11 +4,6 @@
 ## 🛡️ Disclaimer
 *This program is fully capable of breaking the law depending on how it is used. Always ensure you have explicit, written permission from the owner of the device or network you are testing. The author assumes no liability for misuse. Use responsibly.*
 
-***Disclaimer***
-***Please use at your own risk, this program is fully capable of breaking the law depending on 
-how the program is used. Make sure you have permission from the owner of the device or network 
-this is being used against or on.***
-
 
 **Author SuperSploit core code: Donald Ford aka don970** https://github.com/don970/SuperSploit-updated
 
