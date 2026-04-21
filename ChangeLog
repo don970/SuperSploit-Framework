@@ -1,80 +1,26 @@
+# SuperSploit Framework - Changelog
+version 1.2.0
 
-Changes in version 1.2.0 - Logging Module Enhancements
-    * Implemented comprehensive activity logging system
-        - Added Logger class with centralized logging management
-        - Session tracking with unique session IDs for each framework launch
-        - Exploit execution logging with success/failure tracking
-    * Added session management features
-        - Auto-generated 8-character session IDs on framework startup
-        - Session initialization logging with timestamps and dividers
-        - Database integration for session state management
-    * Enhanced exploit execution logging
-        - Logs exploit type, target, and success status
-        - Verbose mode support for argument tracking
-        - Conditional argument logging based on VERBOSE_LOGGING database flag
-        - Supports multiple argument formats (lists and strings)
-    * Implemented log file management
-        - Automatic directory creation for log storage
-        - Persistent activity log at .data/.logs/activity.log
-        - Silent error handling to prevent framework interruption
-        - Log rotation feature to manage file sizes (5MB max per file)
-        - Automatic archival of rotated logs with timestamp suffixes
-    * Integration improvements
-        - Seamless integration with exploit handler for automatic execution logging
-        - Database-driven configuration for verbose logging levels
-        - Backward-compatible error handling with existing error reporting
+## [Core Updates & Refactoring]
+### I/O & Performance Optimizations (Bottleneck Fixes)
+* **Database I/O Reduction:** Updated `getCVE` in `database.py` to cache results locally. It now returns the CVE immediately if present, preventing redundant disk reads on the exploit file during subsequent calls.
+* **Streamlined Standard Output:** Refactored `ToStdOut.py` to write directly to `/dev/stdout` instead of using the standard `print()` function, handling formatting and decoding on the fly to prevent output-heavy payloads from lagging the terminal.
+* **Silent Error Handling:** Reworked `errors.py` to dump stack traces silently to `.data/.errors/error.log` without interfering with active program execution or disrupting the CLI flow.
 
-Changes in version 1.2.1 - Project-wide Improvements and Fixes
-    * MacOS Compatibility Enhancements
-        - Added dedicated MacOS setup scripts and requirements
-        - Created MacOS-Setup directory with executable.sh, setup.py, and start.c
-        - Updated aliases and configuration for MacOS environment
-        - Added MacOS-specific requirements.txt
-    * Exploit Handler Improvements
-        - Enhanced exploit execution with better error handling
-        - Added verbose argument logging to all exploit types (Python modules, scripts, C executables)
-        - Improved logging integration for exploit success/failure tracking
-        - Fixed various bugs in exploit handler logic
-    * Database Module Updates
-        - Added VERBOSE_LOGGING configuration support
-        - Enhanced key mapping for database operations
-        - Improved configuration management
-    * Code Quality and Bug Fixes
-        - Fixed typos in main.py, set.py, inputHandler.py, and other core files
-        - Corrected syntax and logic errors in exploit handler
-        - Updated error logging and history management
-    * External Tools and Dependencies
-        - Added proper citations for authors of external tools
-        - Updated checksums for external tool verification
-        - Enhanced encryption/decryption capabilities
-        - Improved external tool integration
-    * Documentation and UI Updates
-        - Multiple README.md updates for better documentation
-        - Updated help sections and banners
-        - Enhanced logo and branding elements
-    * Security and Stability Improvements
-        - Strengthened error handling across modules
-        - Improved session and history management
-        - Enhanced data persistence and recovery
-    * Development Environment Updates
-        - Added PyCharm project configuration
-        - Updated setup scripts for better cross-platform support
-        - Improved build and compilation processes
+### Execution Engine Enhancements (`exploithandler.py`)
+* **Dynamic Python Modules:** Added the ability to load and run Python exploits directly into memory as dynamic modules (`importlib.util`). This prevents polluting source folders or causing cache bugs, executing the `exploit()` function directly.
+* **Bash Return State Auditing:** Updated the `sh` execution handler to strictly evaluate shell return codes, properly distinguishing between successful runs and failures.
+* **C-Compilation Safety:** Added real-time GCC compilation for C exploits with an automatic, fail-safe cleanup mechanism. The compiled `./exploit_bin` is reliably removed after execution, even if a crash or interrupt occurs.
+* **Terminal Parsing:** Added `findTerm()` in the database manager to dynamically verify available terminal programs against `/bin` for the threaded exploit handlers.
 
+## [New Features]
+### Activity Logging System (`logger.py`)
+* **Operational Auditing:** Separated debugging errors from operational logs. Created a dedicated `activity.log` to track exactly which exploits were run, when, and against which targets.
+* **Session ID Tracking:** Integrated an 8-character hex Session ID (via `uuid`) generated upon framework launch. All exploit executions are tied to this ID, making it easy to track the flow of a single session.
+* **Staged Initialization:** Added a `start_session()` hook that prints a clear demarcation line in the log file every time the framework is booted up.
+* **Verbose Arguments Toggle:** Added a `VERBOSE_LOGGING` flag to the database key map. When toggled on, the framework securely dumps the exact command-line arguments and options passed to scripts and binaries into the log.
+* **Zero-Lock Log Rotation:** Implemented a native, footprint-conscious log rotation script. If `activity.log` exceeds 5MB, it is instantly archived with a timestamp using `os.rename`, preventing locking issues and keeping the tool lightweight.
 
-Changes in version 1.1.1
-    * Added blueDucky hid "Human interface device" attack script and payloads
-    * Integrated blue-ducky so now it uses the dynamic PAYLOAD value
-    * Organized .data folder better
-    * Added sha256-checksum verification for all external tools
-        including
-            - blue-ducky
-            - recon-ng
-            - blue-ranger
-            - nmap
-            - phoneinfoga
-    * Updated help sections
-    * Added the ability to encrypt and decrypt files
-
-To upgrade and test:
-    * save nmap sv scan fingerprints for reorganization later
+### Modular Help Architecture (`help.py`)
+* **File-Based Documentation:** Removed hardcoded help strings from the core logic. Help documentation is now pulled dynamically from modular text files stored in `.data/.help/` (e.g., `main`, `set`, `search`).
+* **Path Sanitization:** Integrated strict input sanitization (`os.path.basename`) on user topic requests to prevent directory traversal exploits when querying help files.
