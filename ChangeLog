@@ -1,5 +1,39 @@
 # SuperSploit Framework - Changelog
 
+## [version 1.20] - 2026-04-21
+### Enhancements
+* **Command Handler Refactoring:** Streamlined WiFi scanning commands by removing deprecated target management workflow. Unified scanning interface with simplified `scan` and `full-scan` commands.
+* **External Tools Modernization:** Updated external tool classes (`bettercap`, `namesearch`, `phoneinfoga`) with improved error handling, better prompt integration, and consistent code patterns.
+* **Debug and Info Commands:** Added new diagnostic commands `debugdb` (displays full database memory cache) and `update-info` (updates exploit cache) for enhanced troubleshooting.
+* **Input Handler Improvements:** Refactored input handler to use `NmapWrapper` directly instead of legacy nmap module imports with proper error handling.
+
+### New Features
+* **Diagnostic Commands:** Implemented `debugdb` command to print full database memory cache for debugging purposes.
+* **Cache Update Command:** Added `update-info` command to manually trigger exploit cache updates.
+* **Info Display Command:** Added `info` command for displaying current exploit details in the CLI.
+* **Enhanced NmapWrapper:** Improved network scanning with better target range formatting and verification.
+
+### Bug Fixes
+* **Database Method Signatures:** Fixed `DatabaseManagment.Debug()` method to properly accept optional data parameter.
+* **ExploitCache Update Method:** Fixed `ExploitCache.update()` to accept optional parameter for consistent API usage.
+* **External Tool Module Imports:** Cleaned up external tools module initialization by removing stale imports.
+* **Network Recon Import Issues:** Fixed NetworkRecon module initialization to use direct `NmapWrapper` import.
+* **Command Registration:** Fixed various command registrations in input handler that were failing due to incorrect method signatures.
+
+### Code Quality
+* **Removed Deprecated Features:** Eliminated old target management commands (`get-targets`, `import-targets`, `view-targets`, `view-targets-v`, `port-scan`, `scan-target`) that are now consolidated into simplified scanning interface.
+* **Module Cleanup:** Removed unused `wireshark.py` and cleaned up external tools `__init__.py` for better maintainability.
+* **Improved Error Handling:** Enhanced subprocess error handling and verification checks in network reconnaissance tools.
+* **Test Exploit Updates:** Updated test exploit metadata with proper CVE format and enhanced description.
+* **Payload Refinements:** Updated `exec_temp.py` with improved SQL injection test exploit demonstrating command injection payloads.
+
+### Maintenance
+* **Help Documentation:** Updated help files to reflect new command structure with `scan` and `full-scan` replacements.
+* **Code Refactoring:** Reorganized external tool implementations for consistency and maintainability.
+* **Activity Logging:** Continued operational logging and tracking of framework execution sessions.
+
+---
+
 ## [version 1.2.2] - 2026-04-21
 ### Enhancements
 * **Python Exploit Handler Refactoring:** Restructured `exploithandler.py` with improved metadata handling using delimiter-based parsing (`#!#!#!`).

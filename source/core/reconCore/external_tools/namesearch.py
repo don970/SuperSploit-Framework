@@ -1,80 +1,65 @@
-from prompt_toolkit import PromptSession
 import os
 import urllib.parse
-
-installation = f'{os.getenv("HOME")}/.SuperSploit'
+from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+
+installation = f'{os.getenv("HOME")}/.SuperSploit'
 history = FileHistory(f'{installation}/.data/.history/history')
-input = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
-input = input.prompt
+session = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
 
 class NameSearch:
     @staticmethod
-    def append(strs):
+    def append_log(data):
         with open(f"{installation}/.data/scans/personSearch", "a") as file:
-            file.write(strs)
-            file.close()
-
-    @staticmethod
-    def write(strs):
-        with open(f"{installation}/.data/scans/personSearch", "w") as file:
-            file.write(strs)
-            file.close()
+            file.write(data + "\n")
 
     @classmethod
-    def simpleNamesSearch(cls):
-        name = input("Enter the name to search: ")
-        sdb = ["facebook.com", "instagram.com", 'linkedin.com', "Avk.com", "twitter.com"]
-        list1 = [""]
-        print("Using site dictionary to perform a search return")
-        for site in sdb:
-            if len(name.split(" ")) > 1:
-                s = ""
-                n = name.split(" ")
-                for x in n:
-                    if n.index(x) < len(n) - 1:
-                        s += f"{x}%20"
-                    else:
-                        s += x
-                name = s
-                searchPhrase = f"https://www.google.com/search?q=site%3A%22{site}%22+%7C+intext%3A%22{name}%22"
-            else:
-                searchPhrase = f"https://www.google.com/search?q=site%3A%22{site}%22+%7C+intext%3A%22{name}%22"
-            list1.append(searchPhrase)
-        try:
-            for x in list1:
-                print(f"To search {sdb[list1.index(x)]} just copy the link and past it into a browser.")
-                print(x)
-        except IndexError:
+    def simple_names_search(cls):
+        name = session.prompt("Enter the name to search: ").strip()
+        if not name:
             return
+            
+        # Use urllib for safer URL encoding instead of manual string replacement
+        encoded_name = urllib.parse.quote(name)
+        sdb = ["facebook.com", "instagram.com", 'linkedin.com', "vk.com", "twitter.com"]
+        
+        print("[*] Generating site-specific Google Dorks...")
+        for site in sdb:
+            search_phrase = f"https://www.google.com/search?q=site%3A%22{site}%22+%7C+intext%3A%22{encoded_name}%22"
+            print(f"\n[*] {site.capitalize()}:")
+            print(search_phrase)
 
     @classmethod
-    def help(cls):
-        print("""[OSNIT Help Menu]
-help - Shows this help menu. 3
-dork - Returns a list of google dork links for the 
-        name and various social media site. 
+    def help_menu(cls):
+        print("""
+[OSINT Help Menu]
+help - Shows this help menu.
+dork - Returns a list of google dork links for the target across various social media sites.
+exit - Leave the OSINT tool.
 """)
-        pass
 
     @classmethod
-    def main(cls, args):
-        print("OSNIT Name Search Tool")
-        inputs = ["help", "dork"]
-        funs = [cls.help, cls.simpleNamesSearch]
-        print("\033[H\033[J")
+    def main(cls, args=None):
+        print("--- OSINT Name Search Tool ---")
+        
+        # Map string commands directly to their functions for O(1) routing
+        commands = {
+            "help": cls.help_menu,
+            "dork": cls.simple_names_search
+        }
+        
+        os.system("clear")
+        cls.help_menu()
+        
         while True:
             try:
-                data = input("[ONST]: ")
+                data = session.prompt("[ONST]: ").strip().lower()
                 if data == "exit":
-                    return
-                for x in funs:
-                    funs[inputs.index(data)]()
-                continue
+                    break
+                elif data in commands:
+                    commands[data]() # Execute the mapped function safely
+                else:
+                    print("[-] Unknown command. Type 'help' for options.")
             except Exception as e:
-                print(e)
-        return
-
-
-
+                print(f"[-] Error: {e}")

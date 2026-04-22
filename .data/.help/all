@@ -23,12 +23,10 @@ usage:
                 clean - Does a full clean. Clearing history, error log along with all scan and target data also clears passwd list
                 ducky - starts blueducky script
                 ranger - Starts blue ranger script
-                get-targets - Uses nmap to do a ping and os scan on every device on the network
-                import-targets - Imports saved targets
-                scan-target - custom nmap scan
-                view-targets - Shows current target list
-                view-targets-v - Shows detailed target list
-                port-scan - Starts doing
+                full-scan - Uses nmap to do a ping and os scan on every device on the network
+                scan - Starts doing a port scan on nmap
+                info - show exploit details
+                debugdb - print full database memory cache 
 
 ==============================================Command Line Info=========================================================
                 this imitates a command line interface by using prompt-toolkit for io

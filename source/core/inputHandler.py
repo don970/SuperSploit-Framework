@@ -23,8 +23,7 @@ from .exploithandler import ExploitHandler, ExploitCache
 from .reconCore.Bluetooth import bt
 from .reconCore.external_tools.namesearch import NameSearch
 from .reconCore.external_tools.phoneinfoga import Phone
-from .reconCore.external_tools.bettercap import bettercap
-from .reconCore.networkRecon import nmap as n
+from .reconCore.networkRecon.nmapWrapper import NmapWrapper
 from .security import validator
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
@@ -48,11 +47,7 @@ def get_network_info():
                 return addr.address, addr.netmask, host
     return None
 
-try:
-    n = n(get_network_info())
-except TypeError:
-    n = n(["0.0.0.0", "24", "0.0.0.0"])
-
+n = NmapWrapper(get_network_info())
 
 class Input:
 
@@ -148,24 +143,21 @@ class Input:
                 "search": Search.search,
                 "banner": Banners,
                 "add": DatabaseManagment.addVariableToDatabase,
-                "info": exploitDetails
+                "update-info": ExploitCache.update,
+                "info": exploitDetails,
+                "debugdb": DatabaseManagment.Debug
             }
 
             recon_cmds = {
                 "recon-ng": cls.recon_ng,
                 "name-search": NameSearch.main,
-                "bettercap": bettercap,
                 "phoneinfoga": Phone
             }
 
             wifi_cmds = {
-                "port-scan": n.getports,
-                "view-targets-v": n.show_detailed_target_list,
-                "get-targets": n.scan_whole_network,
-                "scan-target": n.targeted_scan,
-                "view-targets": n.show_target_list,
-                "import-targets": n.Import
-            }
+                "scan": n.build_ip_list,
+                "full-scan": n.scan_whole_network
+                }
 
             bt_cmds = {
                 "ducky": bt.ducky,

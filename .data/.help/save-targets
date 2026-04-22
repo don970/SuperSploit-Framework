@@ -1,6 +1,0 @@
-              Help section for wifi attack menu [save-targets] command
-      This exports the targets for use later on. saves them in a file sored at
-      .data/.targets this file is populated with the get-targets command
-
-      [Usage]:
-        save-targets

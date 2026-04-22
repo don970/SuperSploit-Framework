@@ -1,1 +1,0 @@
-from .nmapWrapper import nmap

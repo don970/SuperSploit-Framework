@@ -19,7 +19,7 @@ class ExploitCache:
     all_payloads = []
 
     @classmethod
-    def update(cls):
+    def update(cls, data=None):
         # 1. Update file lists
         cls.all_exploits = DatabaseManagment.getExploits()
         cls.all_payloads = DatabaseManagment.getPayloads()
@@ -120,20 +120,6 @@ class DatabaseManagment:
             except Exception:
                 pass
         return target_dict
-
-    @classmethod
-    def findShells(cls):
-        """Scans the system for available shells."""
-        shells = []
-        try:
-            with open("/etc/shells", "r") as file:
-                for line in file:
-                    line = line.strip()
-                    if line and not line.startswith("#"):
-                        shells.append(os.path.basename(line))
-            return shells
-        except Exception:
-            return []
 
     @classmethod
     def checkIntegration(cls) -> bool:
@@ -260,3 +246,16 @@ class DatabaseManagment:
         except Exception:
             pass
         return None
+    
+    @classmethod
+    def Debug(cls, data=None):
+        db = cls.get()
+        targets = cls.getTargets()
+        payloads = cls.getPayloads()
+        exploitdetails = ExploitCache.details
+        exploitcache = ExploitCache.metadata_index
+        print(json.dumps(db, indent=4))
+        print(json.dumps(targets, indent=4))
+        print(json.dumps(payloads, indent=4))
+        print(json.dumps(exploitdetails, indent=4))
+        print(json.dumps(exploitcache, indent=4))

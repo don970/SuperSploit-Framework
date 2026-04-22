@@ -1,8 +1,0 @@
-              Help section for wifi attack menu [scan-target] command
-      This starts a nmap scan that uses the -A option to preform  a OS detection scan,
-      version detection scan, script scanning and traceroute to get a detailed report
-      on the target.
-
-
-      [Usage]:
-        get-targets

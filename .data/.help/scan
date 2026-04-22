@@ -1,0 +1,8 @@
+Help section for scan command
+      
+        [Usage]:
+            scan
+        [Description]: 
+            starts a nmap port scan on local machine
+            and logs the results to .data/scans/portscan
+      

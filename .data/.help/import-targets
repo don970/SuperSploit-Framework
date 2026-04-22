@@ -1,6 +1,0 @@
-              Help section for wifi attack menu [import-targets] command
-      This imports the targets saved in the file sored at .data/.targets
-      this file is populated with the get-targets command
-
-      [Usage]:
-        save-targets

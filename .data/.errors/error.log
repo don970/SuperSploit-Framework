@@ -11,3 +11,71 @@ Traceback (most recent call last):
   File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
     raise child_exception_type(errno_num, err_msg, err_filename)
 PermissionError: [Errno 13] Permission denied: ''
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 152, in check
+    "debugdb": DatabaseManagment.debug_database
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DatabaseManagment' has no attribute 'debug_database'
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 152, in check
+    "debugdb": DatabaseManagment.debug
+               ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'DatabaseManagment' has no attribute 'debug'
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 182, in check
+    general_cmds[cmd_name](data)
+TypeError: DatabaseManagment.Debug() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 182, in check
+    general_cmds[cmd_name](data)
+TypeError: DatabaseManagment.Debug() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 183, in check
+    general_cmds[cmd_name](data)
+TypeError: ExploitCache.update() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 180, in check
+    print(wifi_cmds[cmd_name]())
+          ^^^^^^^^^^^^^^^^^^^^^
+TypeError: NmapWrapper.build_ip_list() missing 1 required positional argument: 'self'
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 182, in check
+    print(wifi_cmds[cmd_name]())
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/donaldford05091997/.SuperSploit/source/core/reconCore/networkRecon/nmapWrapper.py", line 75, in build_ip_list
+    result = run(["nmap", "-sn", target_range], capture_output=True, text=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 1024, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'nmap'
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 190, in check
+    cls.sys_call_Linux(data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 64, in sys_call_Linux
+    subprocess.run(dataList)
+  File "/usr/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 1024, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+PermissionError: [Errno 13] Permission denied: ''
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 190, in check
+    cls.sys_call_Linux(data)
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 64, in sys_call_Linux
+    subprocess.run(dataList)
+  File "/usr/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 1024, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+PermissionError: [Errno 13] Permission denied: ''

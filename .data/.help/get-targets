@@ -1,7 +1,0 @@
-              Help section for wifi attack menu [get-targets] command
-      This scans the whole network with a -sn scan to get the active clients. Then this
-      use the os scan on every client and saves the data to targets.json in the .data
-      file.
-
-      [Usage]:
-        get-targets

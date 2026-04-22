@@ -1,9 +1,9 @@
 {
     "BACKUP-PATH": "/tmp/passwd",
-    "CVE": "N/A",
+    "CVE": "CVE-2024-0000",
     "DURATION": "5",
     "EXE": "sudo",
-    "EXPLOIT": "/home/donaldford05091997/.SuperSploit/exploits/test/testjsonpickle.py",
+    "EXPLOIT": "/home/donaldford05091997/.SuperSploit/exploits/test/test.py",
     "L_HOST": "0.0.0.0",
     "L_PORT": "9999",
     "PAYLOAD": "/home/d/.SuperSploit/payloads/Linux Bluetooth/payload.dd",
