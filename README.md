@@ -58,7 +58,7 @@ SuperSploit commands are divided into tactical categories for ease of use.
 
 ---
 
-## 🗺️ Future Roadmap
+## 🗺️ Future Roadmap for framework core
 
 SuperSploit is continuously evolving to enhance its core exploitation capabilities. The following phases outline our path forward:
 
