@@ -28,11 +28,7 @@ class SuperSploit:
 
     def __init__(self):
         self.create_aliases()
-        self.install_dependencys()
-        # self.install_pybluez()
-        # self.install_phoneinfoga()
-        # self.install_recon_ng()
-        # self.xterm()
+        self.install_dependencys() 
         return
 
     def create_aliases(self):
