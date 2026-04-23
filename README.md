@@ -5,13 +5,7 @@
 *This program is fully capable of breaking the law depending on how it is used. Always ensure you have explicit, written permission from the owner of the device or network you are testing. The author assumes no liability for misuse. Use responsibly.*
 
 
-**Author SuperSploit core code: Donald Ford aka don970** https://github.com/don970/SuperSploit-updated
-
-**Author for phoneinfoga: Raphaël aka sundowndv** https://github.com/sundowndev/phoneinfoga
-
-**Author for recon-ng: Tim Tomes aka lanmaster53** https://github.com/lanmaster53/recon-ng
-
-**Author for Bettercap: Simone Margaritelli aka evilsocket** https://www.bettercap.org/
+**Author SuperSploit: Donald Ford aka don970** https://github.com/don970/SuperSploit-updated
 
 # SuperSploit Framework
 
