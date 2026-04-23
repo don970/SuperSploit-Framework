@@ -20,10 +20,6 @@ from .banners import Banners
 from .inputfixes import Input_fixes
 from .clean import clean
 from .exploithandler import ExploitHandler, ExploitCache
-from .reconCore.Bluetooth import bt
-from .reconCore.external_tools.namesearch import NameSearch
-from .reconCore.external_tools.phoneinfoga import Phone
-from .reconCore.networkRecon.nmapWrapper import NmapWrapper
 from .security import validator
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
@@ -47,7 +43,6 @@ def get_network_info():
                 return addr.address, addr.netmask, host
     return None
 
-n = NmapWrapper(get_network_info())
 
 class Input:
 
@@ -148,23 +143,7 @@ class Input:
                 "debugdb": DatabaseManagment.Debug
             }
 
-            recon_cmds = {
-                "recon-ng": cls.recon_ng,
-                "name-search": NameSearch.main,
-                "phoneinfoga": Phone
-            }
-
-            wifi_cmds = {
-                "scan": n.build_ip_list,
-                "full-scan": n.scan_whole_network
-                }
-
-            bt_cmds = {
-                "ducky": bt.ducky,
-                "ranger": bt.ranger,
-                "scan": bt.scan
-            }
-
+          
             # ==========================================
             # COMMAND EXECUTION ROUTER
             # ==========================================

@@ -1,13 +1,9 @@
-                   Help section for use command
-      use allows you to assign a value to the exploit and payload arguments
+Command: use
+Description: Selects a specific module or target for the session by its index.
 
-      [Usage]:
-        use [category] [int]
+Usage:
+    use exploit <index> - Select an exploit module from the search results.
+    use payload <index> - Select a payload module from the search results.
+    use target <index>  - Select a target from the saved targets list.
 
-      [Example]
-        use payload 8
-
-      [Category's]
-        - exploits
-        - payloads
-        - targets
+Note: Indices are retrieved by running the 'search' command first.

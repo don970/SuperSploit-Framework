@@ -1,8 +1,0 @@
-Help section for full-scan command
-      
-        [Usage]:
-            full-scan
-        [Description]: 
-            starts a nmap scan on local machine
-            and logs the results to .data/scans/portscan
-      

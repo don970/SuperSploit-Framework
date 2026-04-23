@@ -1,30 +1,71 @@
-********************************Exploit integration with SuperSploit***************************
+============================================================
+                EXPLOIT INTEGRATION GUIDE
+============================================================
+SuperSploit uses a modular Python-based architecture for 
+exploit integration. New exploits should be placed within 
+the 'exploits/' directory.
 
-To integrate a exploit simply copy one of the code snippets bellow in to your file. The exploit
-handler will automatically recognize the exploit and run as a integrated exploit, when a exploit
-is integrated the framework can better interact with the exploit by allowing the exploit to have
-accesses to the var database
-************************************* python files ********************************************
-# integrated = True
-#!#!#!
-# CVE: CVE-XXX-XXXX
-# Exploit description
-#
-# REQUIRED OPTIONS
-# this is gonna be target values and other
-#
-#!#!#!
-installation = f'{os.getenv("HOME")}/.SuperSploit'
-with open(f"{installation}/.data/data.json", 'r') as file:
-    di = json.load(file)
-    file.close()
-global di
+Core Components for Integration:
+    1. Metadata: Each exploit must define a dictionary containing
+       'name', 'cve', and 'desc' for the search engine.
+    2. ExploitHandler: Use the exploitDetails() function to 
+       register required variables (R_HOST, L_PORT, etc.).
+    3. Execution: The main logic should be contained within 
+       an execute() or run() method.
 
+Standard Variable Mapping:
+    R_HOST  - Remote Target IP
+    R_PORT  - Remote Target Port
+    L_HOST  - Local Listener IP
+    L_PORT  - Local Listener Port
+    PAYLOAD - Path to the selected payload
 
-************************************* c files ********************************************
-/* #!#!#!
-CVE: CVE-XXX-XXXX
-# exploit description
-#
-# REQUIRED OPTIONS
-#!#!#! */
+Integration Workflow:
+    - Place the .py file in exploits/<category>/
+    - Ensure it imports core.database for variable access.
+    - Test integration using 'search exploits' and 'show details'.
+
+See 'help use' or 'help set' for session management details.
+
+============================================================
+                EXAMPLE EXPLOIT MODULE
+============================================================
+Below is a template for a 'Direct Command Execution' module.
+Save this as: exploits/example/cmd_exec.py
+
+from core.database import DatabaseManagment
+from core.ToStdOut import ToStdout
+import socket
+
+# 1. Metadata for the search engine
+metadata = {
+    "name": "Example Command Execution",
+    "cve": "2024-XXXX",
+    "desc": "A template module demonstrating variable retrieval and socket usage."
+}
+
+def execute():
+    # 2. Retrieve variables from the central database
+    db = DatabaseManagment.get()
+    target = db.get("target")
+    r_port = db.get("R_PORT")
+    payload = db.get("payload")
+
+    if not target or not r_port:
+        ToStdout.write("[-] Error: R_HOST and R_PORT must be set.\n")
+        return
+
+    ToStdout.write(f"[*] Attacking {target}:{r_port}...\n")
+    
+    # 3. Exploitation Logic
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(5)
+        s.connect((target, int(r_port)))
+        s.send(payload.encode())
+        ToStdout.write("[+] Payload delivered successfully.\n")
+        s.close()
+    except Exception as e:
+        ToStdout.write(f"[-] Connection failed: {e}\n")
+
+============================================================

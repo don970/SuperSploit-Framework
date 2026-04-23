@@ -1,7 +1,0 @@
-              Help section for wifi attack menu [custom-scan] command
-      This starts a custom scan then saves the output to a file in .data
-      called custom_scan.
-
-
-      [Usage]:
-        custom-scan

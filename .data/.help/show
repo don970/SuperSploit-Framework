@@ -1,13 +1,9 @@
-                    Help section for show command
-      shows the values supplied in the arg position. The only
-      valid arguments are the program variables such as R_HOST,
-      L_HOST, ect. Can take more then one variable. show details
-      shows a full detail page for the exploit
+Command: show
+Description: Displays information about the current session and environment.
 
-      [Usage]:
-        show [arg-a] [arg-b]
-
-      [Example]:
-        show R_HOST L_HOST
-        show details
-        show aliases
+Usage:
+    show                - List all currently set dynamic variables.
+    show details        - Display specific details for the active exploit.
+    show aliases        - List all configured command aliases.
+    show shells         - Display available system shells from /etc/shells.
+    show <VAR1> <VAR2>  - Show the value of specific variables (e.g., 'show R_HOST').

@@ -1,5 +1,38 @@
 # SuperSploit Framework - Changelog
 
+## [version 1.21] - 2026-04-23
+### Major Changes
+* **Reconnaissance Module Deprecation:** Removed legacy `reconCore` module including Bluetooth utilities, external tool wrappers, and network reconnaissance functions. This component is deprecated in favor of future modular recon plugins.
+* **Command Simplification:** Eliminated command categories (recon_cmds, wifi_cmds, bt_cmds) from input handler to streamline core functionality and reduce complexity.
+* **Help System Redesign:** Completely restructured help documentation with ASCII art branding, organized command categories, and improved clarity for end-users.
+
+### New Features
+* **OS Fingerprinting Engine:** Introduced modular `OSFingerprintEngine` class for active OS detection via TCP fingerprinting with Scapy integration. Supports remote signature database queries and session-based logging.
+* **Enhanced Help Documentation:** Redesigned help system with structured command categories including Core Workspace, Execution Engine, System Utilities, and CLI Interface information.
+* **Integration Guide Enhancement:** Updated exploit integration documentation with complete working examples demonstrating variable retrieval, socket usage, and error handling patterns.
+
+### Removals
+* **Bluetooth Module:** Removed `BlueDucky.py` and all HID keyboard emulation utilities (magic_keyboard_hid.py, menu_functions.py, register_device.py).
+* **External Tool Wrappers:** Removed phoneinfoga, namesearch, and bettercap wrapper classes from external_tools module.
+* **Network Reconnaissance:** Removed NmapWrapper class and associated nmap scanning functionality.
+* **Legacy Data Files:** Removed nmap targets (target.json), security checksums (checksums.json), and deprecated help files (ducky, ranger, recon, scan, full-scan, custom-scan).
+
+### Code Quality
+* **Modular Architecture:** Refactored input handler to remove verbose command routing, enabling future plugin-based reconnaissance system.
+* **Documentation Cleanup:** Removed obsolete help files for deprecated commands, consolidating documentation into main help structure.
+* **Cache Cleanup:** Purged __pycache__ directories for removed modules to maintain clean repository state.
+
+### Maintenance
+* **Session Logging:** Continued session-based activity tracking with framework launch events logged to activity.log.
+* **Help Documentation:** Migrated all command documentation to centralized help system with improved readability and organization.
+* **Data Integrity:** Cleaned deprecated data files and security configuration artifacts.
+
+### Breaking Changes
+* **Removed Commands:** ducky, ranger, recon, scan, full-scan, custom-scan, get-targets, import-targets, view-targets, port-scan commands are no longer available.
+* **Removed Module Imports:** Framework no longer imports Bluetooth, external reconnaissance tools, or network scanning wrappers.
+
+---
+
 ## [version 1.20] - 2026-04-21
 ### Enhancements
 * **Command Handler Refactoring:** Streamlined WiFi scanning commands by removing deprecated target management workflow. Unified scanning interface with simplified `scan` and `full-scan` commands.

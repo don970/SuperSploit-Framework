@@ -1,35 +1,46 @@
-==============================================Help section==============================================================
+___               _      _     
+ / __|_  _ _ __ ___| |___ (_)___ 
+ \__ \ || | '_ \ -_) / -_)| / _ \
+ |___/\_,_| .__/\___|_\___|_\___/
+          |_|                    
+========================================================= =============
+                         HELP MENU [ALL]
+======================================================================
 
-usage:
-  help [command]
+USAGE:
+  help <command>       Get detailed help for a specific command
+                       Example: help exploit
 
-  [example]:
-    help exploit
+----------------------------------------------------------------------
+[1] CORE WORKSPACE & VARIABLES
+----------------------------------------------------------------------
+  add              Add a custom variable to the active database
+  set              Set a specific variable value (e.g., R_HOST, L_PORT)
+  show             Show dynamic variables, aliases, or exploit details
+  use              Select an exploit, payload, or target by index
+  info             Show exploit details and relative info
+  search           Search the database for exploits, payloads, or targets
 
-==============================================commands==================================================================
-     Main Menu:
+----------------------------------------------------------------------
+[2] EXECUTION ENGINE
+----------------------------------------------------------------------
+  exploit          Execute the currently loaded exploit or payload
+  
+----------------------------------------------------------------------
+[6] SYSTEM & UTILITIES
+----------------------------------------------------------------------
+  all              Display this main help menu
+  clean            Purge history, error logs, scan data, and passwords
+  debugdb          Dispays complete database stored in memory
+  update-info      updates exploit details and exploit cache
+  intergration     Dispays help with exploit intergration
 
-                all - Shows this page.
-                add - Adds a variable to the database
-                exploit - Runs the exploit
-                set - Set a value.
-                show - Shows value or values supplied to it.
-                search - Search for exploits, payloads and targets
-                use - Set the EXPLOIT or PAYLOAD value
-                phoneinfoga - starts phoneinfoga wrapper
-                recon-ng - Starts recon-ng v5.1.2, by Tim Tomes (@lanmaster53)
-                bettercap - starts bettercap
-                name-search - Gives a list of google dorks with that name
-                clean - Does a full clean. Clearing history, error log along with all scan and target data also clears passwd list
-                ducky - starts blueducky script
-                ranger - Starts blue ranger script
-                full-scan - Uses nmap to do a ping and os scan on every device on the network
-                scan - Starts doing a port scan on nmap
-                info - show exploit details
-                debugdb - print full database memory cache 
-
-==============================================Command Line Info=========================================================
-                this imitates a command line interface by using prompt-toolkit for io
-                control, input history, auto-suggestions if the supplied input is not
-                found in the inputs list the program will attempt to run as a command
-                all errors are logged in .data/.errors folder for debugging.
+======================================================================
+[i] CLI INTERFACE INFO
+======================================================================
+  SuperSploit utilizes prompt-toolkit for advanced I/O control. 
+  Features include persistent input history and dynamic auto-suggestions.
+  If an input does not match a framework command, it will attempt to 
+  execute it as a native system shell command. 
+  
+  All execution errors are logged to: .data/.errors/error.log

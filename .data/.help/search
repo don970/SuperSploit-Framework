@@ -1,14 +1,11 @@
-                    Help section for search command
-      Search allows you to search the local exploit and payload database
+Command: search
+Description: Searches the framework for exploits, payloads, or targets.
 
-      [Usage]:
-        search [category] [type]
+Usage:
+    search exploits [keyword] - Search modules by path, name, CVE, or description.
+    search payloads [keyword] - Search available payloads.
+    search targets            - List all configured targets and ports.
 
-      [Example]
-        search exploits android
-
-      [Category's]
-        - exploits
-        - payloads
-        - targets
-
+Example:
+    search exploits dirtypipe
+    search payloads windows

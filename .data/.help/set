@@ -1,11 +1,12 @@
-                    Help section for set command
-      Set allows you to set a local variable such as L_HOST, L_PORT.
-      These are the values used by the program to run exploits, payloads
-      ect.
+Command: set
+Description: Assigns a value to a session variable. Variables are saved to data.json.
 
-      [Usage]:
-        set [variable] [value]
+Usage:
+    set <VARIABLE> <VALUE>
 
-      [Example]
-        set R_HOST 0.0.0.0
+Examples:
+    set R_HOST 192.168.1.1
+    set VERBOSE true
+    set L_PORT 4444
 
+Note: Boolean values (true/false) are automatically type-cast.
