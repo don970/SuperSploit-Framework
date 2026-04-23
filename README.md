@@ -1,107 +1,98 @@
-🚀 Supersploit Framework
-**Supersploit** is an advanced, modular penetration testing and exploitation framework designed for security researchers, ethical hackers, and red team professionals. It provides a comprehensive suite of tools for vulnerability assessment, exploit development, payload delivery, and post-exploitation operations.
+🛡️ SuperSploit Framework
+
+![logo1](https://github.com/user-attachments/assets/02f43367-1b7e-42f0-b25c-6ed786079567)
+
 ## ⚠️ Disclaimer
-**Supersploit is created for educational purposes and authorized security auditing only.** The developers assume no liability and are not responsible for any misuse or damage caused by this program. It is the end user's responsibility to obey all applicable local, state, and federal laws. Never point this tool at a target you do not have explicit permission to test.
-## ✨ Features
- * **Modular Architecture:** Easily extendable. Write and integrate your own exploits, payloads, and auxiliary modules in Python.
- * **Extensive Payload Library:** Includes reverse shells, bind shells, staged payloads, and custom shellcode generators.
- * **Advanced Evasion:** Built-in encoders and obfuscators to help bypass modern endpoint detection and response (EDR) solutions.
- * **Automated Exploitation:** Scriptable interface for chaining exploits and automating routine penetration testing tasks.
- * **Post-Exploitation Suite:** Tools for privilege escalation, persistence, credential harvesting, and lateral movement.
- * **Sleek CLI:** An intuitive, Metasploit-like interactive console with autocomplete and session management.
-## 🛠️ Installation
-### Prerequisites
- * Python 3.8 or higher
- * Git
- * Dependencies listed in requirements.txt
-### Setup
- 1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/supersploit.git
-   cd supersploit
-   
-   ```
- 2. **Create a virtual environment (Recommended):**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
-   
-   ```
- 3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   
-   ```
- 4. **Run the setup script:**
-   ```bash
-   python setup.py install
-   
-   ```
-## 💻 Usage
-To start the Supersploit interactive console, simply run:
-```bash
-supersploit-console
+*This program is fully capable of breaking the law depending on how it is used. Always ensure you have explicit, written permission from the owner of the device or network you are testing. The author assumes no liability for misuse. Use responsibly.*
 
-```
-### Basic Commands
-Once inside the ssf > prompt, you can use the following core commands:
- * help - Display the help menu and list of available commands.
- * search [keyword] - Search for specific exploits, payloads, or auxiliary modules.
- * use [module_path] - Select a module to work with.
- * info - Display detailed information about the currently selected module.
- * show options - Display the configuration options for the selected module.
- * set [OPTION] [VALUE] - Configure a module option (e.g., set RHOSTS 192.168.1.100).
- * exploit or run - Execute the configured module.
- * sessions - Manage active payload sessions.
-### Example Workflow
-```text
-ssf > search eternalblue
-ssf > use exploit/windows/smb/ms17_010_eternalblue
-ssf exploit(ms17_010_eternalblue) > set RHOSTS 192.168.1.50
-ssf exploit(ms17_010_eternalblue) > set PAYLOAD windows/x64/meterpreter/reverse_tcp
-ssf exploit(ms17_010_eternalblue) > set LHOST 192.168.1.10
-ssf exploit(ms17_010_eternalblue) > exploit
+---
 
-[*] Started reverse TCP handler on 192.168.1.10:4444
-[*] Sending exploit...
-[+] Exploit successful!
-[*] Command shell session 1 opened
+## 📖 Overview
 
-```
-## 🧩 Module Development
-Supersploit encourages community contributions and custom module development. Modules are written in Python and follow a standard class structure.
-To create a new exploit module, place your script in the modules/exploits/ directory.
-**Basic Exploit Template:**
-```python
-from supersploit.core.module import Exploit
-from supersploit.core.options import OptIP, OptPort
+**SuperSploit** is a highly optimized, Python 3-based exploitation, reconnaissance, and payload management framework. Built as a lightweight, command-line alternative to heavier GUI-laden platforms, it prioritizes speed, reliability, and a minimal system footprint. 
 
-class SupersploitModule(Exploit):
-    __info__ = {
-        'Name': 'Example Exploit',
-        'Description': 'Demonstrates the module structure.',
-        'Author': ['Your Name'],
-        'References': ['CVE-XXXX-XXXX']
-    }
+With recent architectural upgrades, SuperSploit now features a **native, plug-and-play modular reconnaissance engine**, completely eliminating the need for heavy external dependencies like Nmap or Recon-ng. By offering granular control over modular payloads and integrating advanced staged deployment strategies, SuperSploit provides a highly efficient execution hub for interactive penetration testing and hardware-level attacks.
 
-    def register_options(self):
-        self.options.add(OptIP('RHOSTS', 'Target IP address', required=True))
-        self.options.add(OptPort('RPORT', 'Target port', default=80))
+---
 
-    def run(self):
-        target = self.options.get('RHOSTS')
-        self.print_status(f"Attempting to exploit {target}...")
-        # Exploit logic goes here
+## 🚀 Core Strengths & Features
 
-```
-For full documentation on API references and advanced payload generation, see our Developer Guide.
-## 🤝 Contributing
-We welcome contributions from the community! If you'd like to contribute, please follow these steps:
- 1. Fork the repository.
- 2. Create a new branch (git checkout -b feature/NewExploit).
- 3. Commit your changes (git commit -m 'Add new exploit for CVE-XXXX').
- 4. Push to the branch (git push origin feature/NewExploit).
- 5. Open a Pull Request.
-Please ensure your code follows the standard PEP-8 style guidelines and passes all integration tests. Do not submit malicious payloads that lack a legitimate testing purpose.
-## 📜 License
-This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
+### 1. Lightweight & Command-Line First
+Designed for speed and reliability, the framework avoids the overhead of a graphical user interface. Its terminal-based architecture utilizes `prompt-toolkit` to provide persistent input history, dynamic auto-suggestions, and a seamless environment that falls back to native system shell execution when a command is unrecognized.
+
+### 2. Performance-Optimized Routing
+* **O(1) Command Registry:** SuperSploit utilizes optimized dictionary mappings for command dispatching, ensuring instantaneous response times regardless of how many modules or custom tools are loaded.
+* **Intelligent Caching:** Database reads and CVE lookups are cached locally in memory to minimize redundant disk I/O, providing a fluid operator experience.
+
+### 3. Modular & Staged Execution Engine
+* **In-Memory Payload Loading:** Utilizing `importlib.util`, Python exploits are dynamically loaded into isolated memory namespaces. This ensures clean execution without permanently writing temporary modules to the source tree.
+* **Staged Deployment:** The framework accommodates staged execution logic, giving operators precise, granular control over payload delivery.
+* **Fail-Safe C Compilation:** C-based exploits are compiled in real-time (`gcc`). A rigid execution protocol ensures that all compiled binaries are safely purged from the disk after execution or upon interruption.
+* **Raw Socket Handlers:** Built-in context-managed native socket listeners for instantly catching reverse shells without relying on external tools like Netcat.
+
+### 4. Zero-Trust Security Validation
+* **Hybrid Integrity Checking:** The framework implements a strict zero-trust model. System packages (like Bettercap) are verified natively via `dpkg -V`, while internal scripts and downloaded custom binaries (e.g., Phoneinfoga) are validated using Python's SHA256 hashing.
+* **Deep Input Sanitization:** All user-provided shell arguments are tokenized using `shlex.split()`, mitigating arbitrary command injection during payload execution.
+
+### 5. Native Plug-and-Play Reconnaissance
+* **Dependency-Free Scanning:** SuperSploit utilizes a custom Python-native multi-threaded TCP scanner (`port-scan`), eliminating reliance on Nmap while maintaining high-speed host discovery.
+* **Extensible Module API:** A standardized Abstract Base Class (`ReconModule`) allows developers to drop new Python recon scripts into the `modules/` folder, and the framework will automatically register and load them at runtime.
+* **Hardware & OSINT Cores:** Features BlueDucky integration for turning the host into a malicious Bluetooth HID device, alongside tools for Google Dork generation (`name-search`).
+
+---
+
+## ⚙️ Command Layout & Usage
+
+SuperSploit commands are divided into tactical categories for ease of use.
+
+### [1] Core Workspace & Variables
+* `add <VAR> <VAL>` : Add a custom variable to the active database.
+* `set <VAR> <VAL>` : Set a specific variable value (e.g., `R_HOST`, `L_PORT`).
+* `show [TARGET]`   : Show dynamic variables, aliases, or exploit details.
+* `use <CAT> <IDX>` : Select an exploit, payload, or target by index.
+* `search <CAT>`    : Search the database for exploits, payloads, or targets.
+
+### [2] Execution Engine
+* `exploit`         : Execute the currently loaded exploit or payload. Handles Python, Bash, and C files.
+
+### [3] Network & Scanning (Native)
+* `port-scan <IP>`  : Run a native, highly-concurrent TCP port scan against a target.
+* `view-targets`    : List all currently discovered targets.
+* `import-targets`  : Import a saved target list from the database.
+
+### [4] OSINT & External Recon
+* `name-search`     : Generate a list of Google Dorks for a specific name across social platforms.
+* `phoneinfoga`     : Launch the verified Phoneinfoga wrapper to scan phone numbers.
+* `bettercap`       : Launch Bettercap for network manipulation (requires dpkg verification).
+
+### [5] Hardware & Bluetooth
+* `ducky`           : Launch the BlueDucky Bluetooth HID injection script.
+* `ranger`          : Start the Blue Ranger device tracking script.
+
+### [6] System & Utilities
+* `clean`           : Purge history, error logs, scan data, and passwords to reset the workspace safely.
+* `all`             : Display the main help menu.
+
+*(Type `help <command>` inside the framework for detailed usage instructions for any specific module).*
+
+---
+
+## 🗺️ Future Roadmap
+
+SuperSploit is continuously evolving. The following phases outline our path toward building an even more robust, scalable platform:
+
+### Phase 1: Persistence & Workspace Isolation
+* **Relational Database Migration:** Transitioning the flat JSON configurations to a lightweight, asynchronous SQLite backend to handle complex queries and larger target datasets.
+* **Multi-Tenant Workspaces:** Implementing secure, isolated workspaces to separate targets, environment variables, and activity logs across different engagements.
+
+### Phase 2: Execution Hardening
+* **Payload Sandboxing:** Integrating Linux namespaces and `seccomp` profiles to strictly limit the host-level permissions of running exploits, protecting the framework's host machine.
+* **Standardized Exploit API:** Extending the new recon ABC module architecture to the exploit engine, enforcing consistent `check()`, `run()`, and `cleanup()` interfaces across all attack payloads.
+
+### Phase 3: Intelligence & Automation
+* **Automated Vulnerability Mapping:** Building a correlation engine that automatically cross-references discovered service versions from the target database against local CVE lists to suggest viable exploits.
+* **Expanded HID Capabilities:** Enhancing the Bluetooth subsystem to support complex, multi-stage payloads and interactive feedback loops from compromised devices.
+
+### Phase 4: Interface & Extensibility
+* **Dynamic Tab Completion:** Real-time auto-suggest and tab completion for active IPs, exploit paths, and CVE numbers directly within the prompt.
+* **RESTful API Wrapper:** Developing a headless API mode to allow SuperSploit to be orchestrated remotely or integrated into automated CI/CD security pipelines.
