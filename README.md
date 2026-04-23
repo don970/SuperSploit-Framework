@@ -79,6 +79,30 @@ SuperSploit is continuously evolving to enhance its core exploitation capabiliti
 * **RESTful API Wrapper:** Developing a headless API mode to allow the execution engine to be orchestrated remotely, making SuperSploit a viable backend for CI/CD security testing pipelines.
 
 ---
+---
+
+## 🗺️ Future Roadmap for recon
+
+With the recent shift toward a dependency-free, plug-and-play reconnaissance engine, SuperSploit’s development is now heavily focused on expanding its native Python capabilities. The following phases outline our path forward:
+
+### Phase 1: Advanced Native Network Discovery
+* **Raw Socket Ping Sweeping:** Developing native ICMP and ARP sweepers using raw sockets to handle local subnet host discovery entirely within Python, fully replacing Nmap's `-sn` capabilities.
+* **Asynchronous Scanning Core:** Upgrading the threaded `port-scan` module to utilize Python's `asyncio` for non-blocking, hyper-fast concurrent network mapping and banner grabbing.
+
+### Phase 2: Pure-Python OSINT & Ecosystem Expansion
+* **Expanded `ReconModule` API:** Extending the Abstract Base Class to support standardized OSINT modules, credential scrapers, and directory fuzzers without relying on external GitHub clones.
+* **Threat Intelligence Integrations:** Building native, API-driven modules for passive reconnaissance using services like Shodan, Censys, and WHOIS databases directly into the SuperSploit database.
+
+### Phase 3: Automated Intelligence Correlation
+* **Service-to-Exploit Mapping:** Building a correlation engine that automatically parses the banners and open ports discovered by the native recon engine, cross-referencing them against local CVE lists to suggest viable framework exploits.
+* **Automated Attack Chains:** Allowing the framework to pipeline the output of a native discovery module directly into the execution engine for automated, zero-click testing environments.
+
+### Phase 4: Execution Hardening & Extensibility
+* **Payload Sandboxing:** Integrating Linux namespaces and `seccomp` profiles to strictly limit the host-level permissions of running exploits, ensuring the framework's host machine remains protected during active engagements.
+* **RESTful API Wrapper:** Developing a headless API mode to allow the native recon and execution engines to be orchestrated remotely, making SuperSploit a viable backend for CI/CD security pipelines.
+
+---
+
 
 ## 👥 Credits & Authors
 
