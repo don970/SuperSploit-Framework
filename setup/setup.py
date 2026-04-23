@@ -60,14 +60,6 @@ class SuperSploit:
         run(["sudo", "mv", "phoneinfoga", "/usr/local/bin/phoneinfoga"])
         return 0
 
-    def install_recon_ng(self):
-        cwd = getcwd()
-        chdir(f"{getenv('HOME')}/.SuperSploit/source/core/reconCore/external_tools/")
-        run(["git", "clone", "https://github.com/lanmaster53/recon-ng.git"])
-        chdir("recon-ng")
-        run(["pip", "install", "--break-system-packages", "-r", "REQUIREMENTS"])
-        chdir(cwd)
-        return 0
 
     def install_dependencys(self):
         apt_deps = ["adb", "fastboot", "pip", "python3-pydbus"]
@@ -81,23 +73,6 @@ class SuperSploit:
 
         # install the pip dependencys
         run(["sudo", "pip", "install", "--break-system-packages", "-r", f"{installation}/setup/requirements.txt"])
-
-    def install_pybluez(self):
-        chdir("setup")
-        run(["unzip", "pybluez-master.zip"])
-        chdir("pybluez-master")
-        run(["sudo", "python3", "setup.py", "install"])
-        chdir(installation)
-        return
-
-
-    def xterm(self):
-        cmd = Popen(["sudo", "apt-get", "install", "xterm", "-y"], stderr=pipe, stdin=pipe)
-        err = cmd.communicate()[1]
-        if err:
-            print(err)
-            return
-        return True
 
 
 SuperSploit()
