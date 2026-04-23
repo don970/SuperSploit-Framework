@@ -9,9 +9,9 @@
 
 ## 📖 Overview
 
-**SuperSploit** is a highly optimized, Python 3-based exploitation, reconnaissance, and payload management framework. Built as a lightweight, command-line alternative to heavier GUI-laden platforms, it prioritizes speed, reliability, and a minimal system footprint. 
+**SuperSploit** is a highly optimized, Python 3-based exploitation and payload management framework. Built as a lightweight, command-line alternative to heavier GUI-laden platforms, it prioritizes speed, reliability, and a minimal system footprint. 
 
-With recent architectural upgrades, SuperSploit now features a **native, plug-and-play modular reconnaissance engine**, completely eliminating the need for heavy external dependencies like Nmap or Recon-ng. By offering granular control over modular payloads and integrating advanced staged deployment strategies, SuperSploit provides a highly efficient execution hub for interactive penetration testing and hardware-level attacks.
+With a strict focus on attack execution rather than broad discovery, the framework eliminates bloat by offering granular control over modular payloads and advanced staged deployment strategies. SuperSploit provides a highly efficient execution hub for interactive penetration testing, privilege escalation, and direct hardware-level attacks.
 
 ---
 
@@ -28,16 +28,11 @@ Designed for speed and reliability, the framework avoids the overhead of a graph
 * **In-Memory Payload Loading:** Utilizing `importlib.util`, Python exploits are dynamically loaded into isolated memory namespaces. This ensures clean execution without permanently writing temporary modules to the source tree.
 * **Staged Deployment:** The framework accommodates staged execution logic, giving operators precise, granular control over payload delivery.
 * **Fail-Safe C Compilation:** C-based exploits are compiled in real-time (`gcc`). A rigid execution protocol ensures that all compiled binaries are safely purged from the disk after execution or upon interruption.
-* **Raw Socket Handlers:** Built-in context-managed native socket listeners for instantly catching reverse shells without relying on external tools like Netcat.
+* **Raw Socket Handlers:** Built-in context-managed native socket listeners for instantly catching reverse shells.
 
 ### 4. Zero-Trust Security Validation
-* **Hybrid Integrity Checking:** The framework implements a strict zero-trust model. System packages (like Bettercap) are verified natively via `dpkg -V`, while internal scripts and downloaded custom binaries (e.g., Phoneinfoga) are validated using Python's SHA256 hashing.
-* **Deep Input Sanitization:** All user-provided shell arguments are tokenized using `shlex.split()`, mitigating arbitrary command injection during payload execution.
-
-### 5. Native Plug-and-Play Reconnaissance
-* **Dependency-Free Scanning:** SuperSploit utilizes a custom Python-native multi-threaded TCP scanner (`port-scan`), eliminating reliance on Nmap while maintaining high-speed host discovery.
-* **Extensible Module API:** A standardized Abstract Base Class (`ReconModule`) allows developers to drop new Python recon scripts into the `modules/` folder, and the framework will automatically register and load them at runtime.
-* **Hardware & OSINT Cores:** Features BlueDucky integration for turning the host into a malicious Bluetooth HID device, alongside tools for Google Dork generation (`name-search`).
+* **Strict Integrity Checking:** Internal scripts and execution environments are validated using Python's SHA256 hashing to ensure the framework has not been tampered with.
+* **Deep Input Sanitization:** All user-provided shell arguments are tokenized using `shlex.split()`, completely mitigating arbitrary command injection during payload execution.
 
 ---
 
@@ -49,54 +44,43 @@ SuperSploit commands are divided into tactical categories for ease of use.
 * `add <VAR> <VAL>` : Add a custom variable to the active database.
 * `set <VAR> <VAL>` : Set a specific variable value (e.g., `R_HOST`, `L_PORT`).
 * `show [TARGET]`   : Show dynamic variables, aliases, or exploit details.
-* `use <CAT> <IDX>` : Select an exploit, payload, or target by index.
-* `search <CAT>`    : Search the database for exploits, payloads, or targets.
+* `use <CAT> <IDX>` : Select an exploit or payload by index.
+* `search <CAT>`    : Search the database for exploits or payloads.
 
 ### [2] Execution Engine
-* `exploit`         : Execute the currently loaded exploit or payload. Handles Python, Bash, and C files.
+* `exploit`         : Execute the currently loaded exploit or payload. Handles Python, Bash, and C files natively.
 
-### [3] Network & Scanning (Native)
-* `port-scan <IP>`  : Run a native, highly-concurrent TCP port scan against a target.
-* `view-targets`    : List all currently discovered targets.
-* `import-targets`  : Import a saved target list from the database.
-
-### [4] OSINT & External Recon
-* `name-search`     : Generate a list of Google Dorks for a specific name across social platforms.
-* `phoneinfoga`     : Launch the verified Phoneinfoga wrapper to scan phone numbers.
-* `bettercap`       : Launch Bettercap for network manipulation (requires dpkg verification).
-
-### [5] Hardware & Bluetooth
-* `ducky`           : Launch the BlueDucky Bluetooth HID injection script.
-* `ranger`          : Start the Blue Ranger device tracking script.
-
-### [6] System & Utilities
-* `clean`           : Purge history, error logs, scan data, and passwords to reset the workspace safely.
+### [3] System & Utilities
+* `clean`           : Purge history, error logs, and temporary payload data to reset the workspace safely.
 * `all`             : Display the main help menu.
 
 *(Type `help <command>` inside the framework for detailed usage instructions for any specific module).*
 
 ---
 
----
-
 ## 🗺️ Future Roadmap
 
-With the recent shift toward a dependency-free, plug-and-play reconnaissance engine, SuperSploit’s development is now heavily focused on expanding its native Python capabilities. The following phases outline our path forward:
+SuperSploit is continuously evolving to enhance its core exploitation capabilities. The following phases outline our path forward:
 
-### Phase 1: Advanced Native Network Discovery
-* **Raw Socket Ping Sweeping:** Developing native ICMP and ARP sweepers using raw sockets to handle local subnet host discovery entirely within Python, fully replacing Nmap's `-sn` capabilities.
-* **Asynchronous Scanning Core:** Upgrading the threaded `port-scan` module to utilize Python's `asyncio` for non-blocking, hyper-fast concurrent network mapping and banner grabbing.
+### Phase 1: Persistence & Workspace Isolation
+* **Relational Database Migration:** Transitioning the flat JSON configurations to a lightweight, asynchronous SQLite backend to handle complex payload configurations.
+* **Multi-Tenant Workspaces:** Implementing secure, isolated workspaces to separate targets, environment variables, and activity logs across different engagements.
 
-### Phase 2: Pure-Python OSINT & Ecosystem Expansion
-* **Expanded `ReconModule` API:** Extending the Abstract Base Class to support standardized OSINT modules, credential scrapers, and directory fuzzers without relying on external GitHub clones.
-* **Threat Intelligence Integrations:** Building native, API-driven modules for passive reconnaissance using services like Shodan, Censys, and WHOIS databases directly into the SuperSploit database.
+### Phase 2: Execution Hardening
+* **Payload Sandboxing:** Integrating Linux namespaces and `seccomp` profiles to strictly limit the host-level permissions of running exploits, protecting the framework's host machine.
+* **Standardized Exploit API:** Enforcing consistent `check()`, `run()`, and `cleanup()` interfaces across all attack payloads through an Abstract Base Class (ABC).
 
-### Phase 3: Automated Intelligence Correlation
-* **Service-to-Exploit Mapping:** Building a correlation engine that automatically parses the banners and open ports discovered by the native recon engine, cross-referencing them against local CVE lists to suggest viable framework exploits.
-* **Automated Attack Chains:** Allowing the framework to pipeline the output of a native discovery module directly into the execution engine for automated, zero-click testing environments.
+### Phase 3: Automated Attack Chains
+* **Execution Pipelining:** Allowing the framework to pipeline the output of one exploit module directly into the execution engine of another for automated, multi-stage privilege escalation environments.
+* **Dynamic Feedback Loops:** Enhancing the socket listeners to support complex interactive feedback loops from compromised devices.
 
-### Phase 4: Execution Hardening & Extensibility
-* **Payload Sandboxing:** Integrating Linux namespaces and `seccomp` profiles to strictly limit the host-level permissions of running exploits, ensuring the framework's host machine remains protected during active engagements.
-* **RESTful API Wrapper:** Developing a headless API mode to allow the native recon and execution engines to be orchestrated remotely, making SuperSploit a viable backend for CI/CD security pipelines.
+### Phase 4: Interface & Extensibility
+* **Dynamic Tab Completion:** Real-time auto-suggest and tab completion for active IPs, exploit paths, and CVE numbers directly within the prompt.
+* **RESTful API Wrapper:** Developing a headless API mode to allow the execution engine to be orchestrated remotely, making SuperSploit a viable backend for CI/CD security testing pipelines.
 
 ---
+
+## 👥 Credits & Authors
+
+* **Author (Supersploit Framework):** Donald Ford aka don970 https://github.com/don970/Supersploit-updated
+
