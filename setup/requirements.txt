@@ -1,12 +1,6 @@
 psutil
 cryptography
 pyfiglet
-dbus-python
-PyBluez
-pycairo
-pydbus
-PyGObject
-pyobjc
-pybluez
-setuptools
 pure-python-adb
+Prompt-toolkit
+PyYAML
