@@ -70,8 +70,7 @@ class SuperSploit:
         return 0
 
     def install_dependencys(self):
-        apt_deps = ["bettercap", "wireshark", "python3-pyfiglet", "netcat-traditional", "adb", "fastboot", "pip",
-                    "python3-pydbus", "libbluetooth-dev"]
+        apt_deps = ["adb", "fastboot", "pip", "python3-pydbus"]
 
         # install the apt dependencys
         for x in apt_deps:
