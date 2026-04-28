@@ -1,10 +1,13 @@
 psutil
 cryptography
 pyfiglet
-pybluez
+dbus-python
+PyBluez
 pycairo
+pydbus
 PyGObject
 pyobjc
+pybluez
 setuptools
 pure-python-adb
 scapy>=2.5.0

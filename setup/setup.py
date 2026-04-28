@@ -56,18 +56,9 @@ class SuperSploit:
         run(["sudo", "mv", "phoneinfoga", "/usr/local/bin/phoneinfoga"])
         return 0
 
-    def install_recon_ng(self):
-        cwd = getcwd()
-        chdir(f"{getenv('HOME')}/.SuperSploit/source/core/reconCore/external_tools/")
-        run(["git", "clone", "https://github.com/lanmaster53/recon-ng.git"])
-        chdir("recon-ng")
-        run(["pip", "install", "--break-system-packages", "-r", "REQUIREMENTS"])
-        chdir(cwd)
-        return 0
 
     def install_dependencys(self):
-        apt_deps = ["bettercap", "wireshark", "python3-pyfiglet", "netcat-traditional", "adb", "fastboot", "pip",
-                    "python3-pydbus", "libbluetooth-dev"]
+        apt_deps = ["adb", "fastboot", "pip", "python3-pydbus"]
 
         # install the apt dependencys
         for x in apt_deps:
