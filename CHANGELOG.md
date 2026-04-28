@@ -1,0 +1,162 @@
+# Changelog
+
+## [version 1.21] - 2026-04-28
+### Added
+- **Development**: Added basic support for mac-os development.
+- **Security**: Added system package integrity verification for `recon-ng` using the `validator` module (`inputHandler.py`).
+- **Development**: Introduced a `DEVMODE` toggle in `start.sh` to allow running the application directly from the source directory.
+
+### Fixed
+- **Input Handling**: Fixed an issue where trailing spaces were not properly removed from user input by changing `lstrip` to `rstrip` (`inputHandler.py`).
+- # SuperSploit Framework - Changelog
+
+## [version 1.21] - 2026-04-23
+### Major Changes
+* **Reconnaissance Module Deprecation:** Removed legacy `reconCore` module including Bluetooth utilities, external tool wrappers, and network reconnaissance functions. This component is deprecated in favor of future modular recon plugins.
+* **Command Simplification:** Eliminated command categories (recon_cmds, wifi_cmds, bt_cmds) from input handler to streamline core functionality and reduce complexity.
+* **Help System Redesign:** Completely restructured help documentation with ASCII art branding, organized command categories, and improved clarity for end-users.
+
+### New Features
+* **OS Fingerprinting Engine:** Introduced modular `OSFingerprintEngine` class for active OS detection via TCP fingerprinting with Scapy integration. Supports remote signature database queries and session-based logging.
+* **Enhanced Help Documentation:** Redesigned help system with structured command categories including Core Workspace, Execution Engine, System Utilities, and CLI Interface information.
+* **Integration Guide Enhancement:** Updated exploit integration documentation with complete working examples demonstrating variable retrieval, so cket usage, and error handling patterns.
+
+### Removals
+* **Bluetooth Module:** Removed `BlueDucky.py` and all HID keyboard emulation utilities (magic_keyboard_hid.py, menu_functions.py, register_device.py).
+* **External Tool Wrappers:** Removed phoneinfoga, namesearch, and bettercap wrapper classes from external_tools module.
+* **Network Reconnaissance:** Removed NmapWrapper class and associated nmap scanning functionality.
+* **Legacy Data Files:** Removed nmap targets (target.json), security checksums (checksums.json), and deprecated help files (ducky, ranger, recon, scan, full-scan, custom-scan).
+
+### Code Quality
+* **Modular Architecture:** Refactored input handler to remove verbose command routing, enabling future plugin-based reconnaissance system.
+* **Documentation Cleanup:** Removed obsolete help files for deprecated commands, consolidating documentation into main help structure.
+* **Cache Cleanup:** Purged __pycache__ directories for removed modules to maintain clean repository state.
+
+### Maintenance
+* **Session Logging:** Continued session-based activity tracking with framework launch events logged to activity.log.
+* **Help Documentation:** Migrated all command documentation to centralized help system with improved readability and organization.
+* **Data Integrity:** Cleaned deprecated data files and security configuration artifacts.
+
+### Breaking Changes
+* **Removed Commands:** ducky, ranger, recon, scan, full-scan, custom-scan, get-targets, import-targets, view-targets, port-scan commands are no longer available.
+* **Removed Module Imports:** Framework no longer imports Bluetooth, external reconnaissance tools, or network scanning wrappers.
+
+---
+
+## [version 1.20] - 2026-04-21
+### Enhancements
+* **Command Handler Refactoring:** Streamlined WiFi scanning commands by removing deprecated target management workflow. Unified scanning interface with simplified `scan` and `full-scan` commands.
+* **External Tools Modernization:** Updated external tool classes (`bettercap`, `namesearch`, `phoneinfoga`) with improved error handling, better prompt integration, and consistent code patterns.
+* **Debug and Info Commands:** Added new diagnostic commands `debugdb` (displays full database memory cache) and `update-info` (updates exploit cache) for enhanced troubleshooting.
+* **Input Handler Improvements:** Refactored input handler to use `NmapWrapper` directly instead of legacy nmap module imports with proper error handling.
+
+### New Features
+* **Diagnostic Commands:** Implemented `debugdb` command to print full database memory cache for debugging purposes.
+* **Cache Update Command:** Added `update-info` command to manually trigger exploit cache updates.
+* **Info Display Command:** Added `info` command for displaying current exploit details in the CLI.
+* **Enhanced NmapWrapper:** Improved network scanning with better target range formatting and verification.
+
+### Bug Fixes
+* **Database Method Signatures:** Fixed `DatabaseManagment.Debug()` method to properly accept optional data parameter.
+* **ExploitCache Update Method:** Fixed `ExploitCache.update()` to accept optional parameter for consistent API usage.
+* **External Tool Module Imports:** Cleaned up external tools module initialization by removing stale imports.
+* **Network Recon Import Issues:** Fixed NetworkRecon module initialization to use direct `NmapWrapper` import.
+* **Command Registration:** Fixed various command registrations in input handler that were failing due to incorrect method signatures.
+
+### Code Quality
+* **Removed Deprecated Features:** Eliminated old target management commands (`get-targets`, `import-targets`, `view-targets`, `view-targets-v`, `port-scan`, `scan-target`) that are now consolidated into simplified scanning interface.
+* **Module Cleanup:** Removed unused `wireshark.py` and cleaned up external tools `__init__.py` for better maintainability.
+* **Improved Error Handling:** Enhanced subprocess error handling and verification checks in network reconnaissance tools.
+* **Test Exploit Updates:** Updated test exploit metadata with proper CVE format and enhanced description.
+* **Payload Refinements:** Updated `exec_temp.py` with improved SQL injection test exploit demonstrating command injection payloads.
+
+### Maintenance
+* **Help Documentation:** Updated help files to reflect new command structure with `scan` and `full-scan` replacements.
+* **Code Refactoring:** Reorganized external tool implementations for consistency and maintainability.
+* **Activity Logging:** Continued operational logging and tracking of framework execution sessions.
+
+---
+
+## [version 1.2.2] - 2026-04-21
+### Enhancements
+* **Python Exploit Handler Refactoring:** Restructured `exploithandler.py` with improved metadata handling using delimiter-based parsing (`#!#!#!`).
+* **Temporary File Execution:** Implemented cleaner temporary file handling for exploit execution with consistent path management via `exec_temp.py`.
+* **Module Execution Improvements:** Enhanced dynamic module loading with better file cleanup and metadata separation.
+* **Network Information Gathering:** Replaced subprocess-based network detection in `inputHandler.py` with efficient `psutil` library integration for improved reliability and cross-platform compatibility.
+
+### New Features
+* **Test Exploit Framework:** Added new test exploit (`exploits/test/test.py`) demonstrating the new metadata delimiter system for exploit documentation.
+* **Enhanced Network Detection:** Implemented smarter IPv4 address detection that filters out loopback addresses and properly retrieves network interface information.
+
+### Bug Fixes
+* **Handler Initialization:** Fixed database initialization in exploit handler with proper `DatabaseManagment.get()` calls.
+* **Argument Parsing:** Improved argument parsing and shell command construction in Python exploit execution.
+* **Network Information Retrieval:** Fixed `get_network_info()` in `inputHandler.py` to reliably detect non-loopback IPv4 addresses across different system configurations.
+
+---
+
+## [version 1.2.1] - 2026-04-21
+### Bug Fixes
+* **Missing Functions Resolution:** Fixed critical issues with missing functions that were causing execution failures.
+* **Code Refactoring:** Optimized `search.py` and `exploithandler.py` with streamlined logic and reduced redundancy.
+* **Input Handler Improvements:** Enhanced `inputHandler.py` with better error handling and validation.
+
+### Code Quality
+* **Database Optimization:** Further refined `database.py` with improved caching mechanisms and reduced complexity (225 lines refactored).
+* **Exploit Cleanup:** Removed obsolete exploit files for Windows, routers, and deprecated Android tools that were no longer maintained.
+* **Chrome Exploit Updates:** Updated Chrome OS privilege escalation exploit with refined execution logic.
+
+### Maintenance
+* **Asset Cleanup:** Removed outdated PDF and image assets from the assets folder for better repository hygiene.
+* **Activity Logging:** Enhanced operational logging in `activity.log` to track framework execution more reliably.
+* **Configuration Updates:** Updated `.data/.config/data.json` with improved settings management.
+
+---
+
+version 1.2.0
+
+## [Core Updates & Refactoring]
+### I/O & Performance Optimizations (Bottleneck Fixes)
+* **Database I/O Reduction:** Updated `getCVE` in `database.py` to cache results locally. It now returns the CVE immediately if present, preventing redundant disk reads on the exploit file during subsequent calls.
+* **Streamlined Standard Output:** Refactored `ToStdOut.py` to write directly to `/dev/stdout` instead of using the standard `print()` function, handling formatting and decoding on the fly to prevent output-heavy payloads from lagging the terminal.
+* **Silent Error Handling:** Reworked `errors.py` to dump stack traces silently to `.data/.errors/error.log` without interfering with active program execution or disrupting the CLI flow.
+
+### Centralized Caching & Data Management (`database.py`)
+* **In-Memory Exploit Location Cache:** Implemented centralized in-memory caching system for exploit locations and payloads to eliminate redundant file system traversals and significantly improve lookup performance across framework operations.
+* **Central Database Architecture:** Transitioned to a unified central database for managing all exploit metadata, locations, and associated payloads. This centralized approach ensures consistency across the framework and reduces data fragmentation.
+* **Optimized Cache Invalidation:** Integrated smart cache invalidation mechanisms that maintain data freshness while minimizing disk I/O operations.
+
+### Execution Engine Enhancements (`exploithandler.py`)
+* **Dynamic Python Modules:** Added the ability to load and run Python exploits directly into memory as dynamic modules (`importlib.util`). This prevents polluting source folders or causing cache bugs, executing the `exploit()` function directly.
+* **Bash Return State Auditing:** Updated the `sh` execution handler to strictly evaluate shell return codes, properly distinguishing between successful runs and failures.
+* **C-Compilation Safety:** Added real-time GCC compilation for C exploits with an automatic, fail-safe cleanup mechanism. The compiled `./exploit_bin` is reliably removed after execution, even if a crash or interrupt occurs.
+* **Terminal Parsing:** Added `findTerm()` in the database manager to dynamically verify available terminal programs against `/bin` for the threaded exploit handlers.
+
+## [New Features]
+### Activity Logging System (`logger.py`)
+* **Operational Auditing:** Separated debugging errors from operational logs. Created a dedicated `activity.log` to track exactly which exploits were run, when, and against which targets.
+* **Session ID Tracking:** Integrated an 8-character hex Session ID (via `uuid`) generated upon framework launch. All exploit executions are tied to this ID, making it easy to track the flow of a single session.
+* **Staged Initialization:** Added a `start_session()` hook that prints a clear demarcation line in the log file every time the framework is booted up.
+* **Verbose Arguments Toggle:** Added a `VERBOSE_LOGGING` flag to the database key map. When toggled on, the framework securely dumps the exact command-line arguments and options passed to scripts and binaries into the log.
+* **Zero-Lock Log Rotation:** Implemented a native, footprint-conscious log rotation script. If `activity.log` exceeds 5MB, it is instantly archived with a timestamp using `os.rename`, preventing locking issues and keeping the tool lightweight.
+
+### Modular Help Architecture (`help.py`)
+* **File-Based Documentation:** Removed hardcoded help strings from the core logic. Help documentation is now pulled dynamically from modular text files stored in `.data/.help/` (e.g., `main`, `set`, `search`).
+* **Path Sanitization:** Integrated strict input sanitization (`os.path.basename`) on user topic requests to prevent directory traversal exploits when querying help files.
+* **Improved Topic Handling:** Added error handling for missing help topics, defaulting to "all" help file when no topic is specified. Updated help directory path for consistency.
+
+## [Bug Fixes]
+### Execution Engine Enhancements (`exploithandler.py`)
+* **Method Reordering:** Corrected the order of `sh` and `c` handler methods to match their intended functionality.
+* **Enhanced Return Code Auditing:** Updated bash and Python script execution to properly evaluate return codes, distinguishing between successful runs and failures.
+* **Improved C Compilation Logging:** Separated logging for C compilation and execution phases, with better error reporting using the Error class.
+* **Dynamic Module Execution:** Enhanced Python module loading with proper success/failure logging based on return codes.
+
+### Security and Stability Updates
+* **Comprehensive Security Review:** Conducted full framework security audit and implemented stability improvements across all core modules.
+* **Input Validation:** Strengthened input sanitization and validation throughout the codebase.
+* **Error Handling:** Improved error logging and handling mechanisms to prevent crashes and improve user experience.
+
+### General Improvements
+* **Typo Corrections:** Fixed typos in `main.py`, `set.py`, `exploitHandler.py`, and other files.
+* **Author Attribution:** Added proper citations for external tool authors (phoneinfoga, recon-ng, Bettercap) in documentation and code comments.

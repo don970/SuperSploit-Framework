@@ -1,14 +1,7 @@
 psutil
 cryptography
 pyfiglet
-dbus-python
-PyBluez
-pycairo
-pydbus
-PyGObject
-pyobjc
-pybluez
-setuptools
 pure-python-adb
 scapy>=2.5.0
 requests>=2.31.0
+PyYAML

@@ -65,7 +65,10 @@ class Input:
     def sys_call_other(cls, data):
         try:
             cmd = subprocess.Popen(data.split(" "), stdout=PIPE, stdin=PIPE, stderr=PIPE)
-            output = cmd.communicate()[0], cmd.communicate()[2]
+            try:
+                output = cmd.communicate()[0], cmd.communicate()[2]
+            except IndexError:
+                output = cmd.communicate()[0]
             for x in output:
                 if len(x) > 0:
                     ToStdout.write(x.decode())
