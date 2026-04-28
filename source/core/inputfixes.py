@@ -2,7 +2,6 @@ import os
 import sys
 import subprocess
 import shlex
-import traceback
 from .ToStdOut import ToStdout
 
 true = True
@@ -10,6 +9,7 @@ false = False
 print = ToStdout.write
 
 class Input_fixes:
+
     def __init__(self, dataList: list):
         self.list = dataList
         

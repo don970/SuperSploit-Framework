@@ -9,7 +9,7 @@
 ### New Features
 * **OS Fingerprinting Engine:** Introduced modular `OSFingerprintEngine` class for active OS detection via TCP fingerprinting with Scapy integration. Supports remote signature database queries and session-based logging.
 * **Enhanced Help Documentation:** Redesigned help system with structured command categories including Core Workspace, Execution Engine, System Utilities, and CLI Interface information.
-* **Integration Guide Enhancement:** Updated exploit integration documentation with complete working examples demonstrating variable retrieval, socket usage, and error handling patterns.
+* **Integration Guide Enhancement:** Updated exploit integration documentation with complete working examples demonstrating variable retrieval, so cket usage, and error handling patterns.
 
 ### Removals
 * **Bluetooth Module:** Removed `BlueDucky.py` and all HID keyboard emulation utilities (magic_keyboard_hid.py, menu_functions.py, register_device.py).

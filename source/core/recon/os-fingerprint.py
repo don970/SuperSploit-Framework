@@ -1,3 +1,17 @@
+"""This is a modular engine designed for integration into SuperSploit's 
+reconnaissance Framework. It performs active OS fingerprinting by sending 
+crafted TCP probes to target hosts analyzing TCP SYN/ACK responses against 
+a centralized online signature database. It includes session tracking, detailed 
+logging, and a heuristic matching algorithm for accurate OS identification. 
+
+
+It still need to be able to read targets from the cached database and run 
+against them, and also needs to be able to update the database with new 
+signatures. along with fuzzy searching and weightings for more accurate 
+matching. also this is the para link for nmaps os db 
+https://github.com/nmap/nmap/blob/4085d78e3dddf96719b4b7569a450a14c894e93a/nmap-os-db
+"""
+
 import logging
 import requests
 import uuid
@@ -57,7 +71,7 @@ class OSFingerprintEngine:
         """
         Estimates the initial TTL before network hops decremented it.
         Common starting TTLs are 64 (Linux), 128 (Windows), and 255 (Cisco/Solaris).
-        """
+        """   
         for base in [64, 128, 255]:
             if received_ttl <= base:
                 return base
@@ -69,7 +83,7 @@ class OSFingerprintEngine:
         
         # Craft a TCP SYN packet
         probe_pkt = IP(dst=target_ip)/TCP(dport=port, flags="S")
-        
+         
         # Send and wait for a single response
         resp = sr1(probe_pkt, timeout=3)
 

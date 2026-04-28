@@ -29,10 +29,6 @@ class SuperSploit:
     def __init__(self):
         self.create_aliases()
         self.install_dependencys()
-        self.install_pybluez()
-        self.install_phoneinfoga()
-        self.install_recon_ng()
-        self.xterm()
         return
 
     def create_aliases(self):
@@ -90,15 +86,6 @@ class SuperSploit:
         run(["sudo", "python3", "setup.py", "install"])
         chdir(installation)
         return
-
-
-    def xterm(self):
-        cmd = Popen(["sudo", "apt-get", "install", "xterm", "-y"], stderr=pipe, stdin=pipe)
-        err = cmd.communicate()[1]
-        if err:
-            print(err)
-            return
-        return True
 
 
 SuperSploit()

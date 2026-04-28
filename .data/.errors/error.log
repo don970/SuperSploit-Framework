@@ -79,3 +79,15 @@ Traceback (most recent call last):
   File "/usr/lib/python3.11/subprocess.py", line 1901, in _execute_child
     raise child_exception_type(errno_num, err_msg, err_filename)
 PermissionError: [Errno 13] Permission denied: ''
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 155, in check
+    elif cmd_name in recon_cmds:
+                     ^^^^^^^^^^
+NameError: name 'recon_cmds' is not defined
+Traceback (most recent call last):
+  File "/home/donaldford05091997/.SuperSploit/source/core/inputHandler.py", line 155, in check
+    elif cmd_name in recon_cmds:
+                     ^^^^^^^^^^
+NameError: name 'recon_cmds' is not defined
+[!] Program not found: gh
+[!] Program not found: htop

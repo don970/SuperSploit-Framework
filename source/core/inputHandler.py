@@ -152,19 +152,6 @@ class Input:
                     general_cmds[cmd_name](data)
                     return True
                 
-                elif cmd_name in recon_cmds:
-                    recon_cmds[cmd_name](data)
-                    return True
-                
-                elif cmd_name in wifi_cmds:
-                    # Wifi commands print their output and take no 'data' argument
-                    print(wifi_cmds[cmd_name]())
-                    return True
-                
-                elif cmd_name in bt_cmds:
-                    bt_cmds[cmd_name](data)
-                    return True
-                
                 elif "Linux" in os.uname():
                     cls.sys_call_Linux(data)
                     return True
