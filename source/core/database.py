@@ -235,6 +235,7 @@ class DatabaseManagment:
                 "target": "R_HOST",
                 "port": "R_PORT",
                 "verbose": "VERBOSE_LOGGING",
+                "DEV_MODE": False
             }
 
             # Update the mapped key if it matches the first item in the input data
@@ -250,8 +251,10 @@ class DatabaseManagment:
 
     @classmethod
     def getInstall(cls):
-        """Returns the framework's base installation path."""
-        return install_location
+        if not cls.get()["DEV_MODE"]:
+            """Returns the framework's base installation path."""
+            return install_location
+        return cls.get()["DEV_DICT"]
     
     @classmethod
     def addVariableToDatabase(cls, data):

@@ -2,11 +2,8 @@ import json
 import os
 import traceback
 import subprocess
-from encodings.aliases import aliases
-
 import psutil
 import socket
-from subprocess import PIPE
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -21,19 +18,18 @@ from .search import Search
 from .banners import Banners
 from .inputfixes import Input_fixes
 from .clean import clean
-from .exploithandler import ExploitHandler, ExploitCache
 from .security import validator
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
 import shlex
 
+# set global variables
 installation = DatabaseManagment.getInstall()
 history = FileHistory(f'{installation}/.data/.history/history')
 path = os.getenv("PATH").split(":")
-true, false = True, False
 env = os.environ
-
 Aliases = DatabaseManagment._UpdateAliases()
+
 
 def get_network_info():
     host = socket.gethostname()
@@ -117,6 +113,10 @@ class Input:
         inputFixList = ["cd", "clear", "exit", "cat"]
 
         try:
+            # Handle empty inputs (hitting Enter) gracefully
+            if not dataList:
+                return
+
             if "&&" in data:
                 fix = Input_fixes.continues(data)
                 if fix == 0:

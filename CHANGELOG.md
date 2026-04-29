@@ -2,14 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-
 ## [1.2.4] - 2026-04-29
 ### Added
-- Comprehensive module, class, and method docstrings to `source/core/database.py`.
-- Inline comments to clarify YAML metadata extraction, file traversals, and JSON database modifications.
+- **Development**: Introduced a `DEVMODE` toggle in `start.sh` to allow running the application directly from the source directory.
 - **Development**: Added basic support for mac-os development.
 - **Security**: Added system package integrity verification for `recon-ng` using the `validator` module (`inputHandler.py`).
-- **Development**: Introduced a `DEVMODE` toggle in `start.sh` to allow running the application directly from the source directory.
+- Corrected the `except` block syntax in `exploithandler.py`'s `python` method from `except Exception or KeyboardInterrupt:` to `except (Exception, KeyboardInterrupt):`.
+- Implemented cleanup for the temporary `exec_temp.py` file in `exploithandler.py` to prevent leftover files after Python exploit execution.
+- Comprehensive module, class, and method docstrings to `source/core/database.py`.
+- Inline comments to clarify YAML metadata extraction, file traversals, and JSON database modifications.
 
 ### Changed
 - Refactored boolean conditional prompts in `source/core/exploithandler.py` to be more Pythonic.

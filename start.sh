@@ -19,6 +19,7 @@ if [ "$(id -u)" = "0" ] || [ -n "$SUDO_USER" ]; then
     exit 77
 fi
 
+
 # Installation Check: Verify that the SuperSploit directory exists in the user's home folder.
 if [ ! -d "$HOME/.SuperSploit" ]; then
     if [ ! $DEVMODE ]; then
