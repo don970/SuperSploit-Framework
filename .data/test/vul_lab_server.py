@@ -1,4 +1,5 @@
-"""Warning: Never run this server on a public-facing network. 
+#!/usr/bin/env python3
+"""Warning: Never run this server on a public-facing network.
 It is designed to be exploited and provides a direct path for 
 an attacker to compromise the host machine. Run it only in a local,
 isolated virtual environment."""

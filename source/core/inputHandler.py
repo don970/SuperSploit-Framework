@@ -30,7 +30,7 @@ path = os.getenv("PATH").split(":")
 true, false = True, False
 env = os.environ
 
-with open(".data/.config/Aliases.json") as file:
+with open(f"{installation}/.data/.config/Aliases.json") as file:
     aliases = json.load(file)
 
 def get_network_info():

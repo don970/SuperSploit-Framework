@@ -12,7 +12,7 @@ class Banners:
         os.system("clear")
         try:
             # this will open the fun facts or osnit fact file and save it to a variable
-            with open(f"{installation}/.data/.banners/{random.choice(os.listdir('.data/.banners/'))}") as file:
+            with open(f"{installation}/.data/.banners/{random.choice(os.listdir(f'{installation}/.data/.banners/'))}") as file:
                 data = file.read()
                 file.close()
             # first we make a list out of the data each entry in the list contains a fact about computers

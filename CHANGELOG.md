@@ -1,5 +1,23 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+
+## [version 1.21] - 2026-04-29
+### Added
+- Comprehensive module, class, and method docstrings to `source/core/database.py`.
+- Inline comments to clarify YAML metadata extraction, file traversals, and JSON database modifications.
+
+### Changed
+- Refactored boolean conditional prompts in `source/core/exploithandler.py` to be more Pythonic.
+
+### Fixed
+- Critical Python module caching bug in `source/core/exploithandler.py` by implementing dynamic module loading (`importlib.util`) to bypass `sys.modules` cache retention.
+- Redundant `file.close()` calls inside `with` statement context managers.
+- Unnecessary `chmod +x` subprocess call after `gcc` compilation for C exploits.
+- Cleaned up logic for executing dynamically loaded Python exploit modules with and without arguments.
+- 
+
 ## [version 1.21] - 2026-04-28
 ### Added
 - **Development**: Added basic support for mac-os development.
