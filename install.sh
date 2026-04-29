@@ -12,3 +12,6 @@ sudo cp -r  $HOME/PycharmProjects/SuperSploit-updated ~/.SuperSploit
 # change ownership
 printf "[*] Changing ownership to $USER \n"
 sudo chown -R $USER ~/.SuperSploit
+
+# start application
+supersploit

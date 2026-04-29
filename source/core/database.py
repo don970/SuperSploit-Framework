@@ -115,6 +115,7 @@ class exploitDetails:
             write(f"{opt} = {value}")
 
 class DatabaseManagment:
+    aliases = {}
     """
     Centralized utility for reading/writing configuration state
     and mapping module paths across the framework.
@@ -311,3 +312,21 @@ class DatabaseManagment:
         print(json.dumps(payloads, indent=4))
         print(json.dumps(exploitdetails, indent=4))
         print(json.dumps(exploitcache, indent=4))
+
+    @classmethod
+    def _UpdateAliases(cls):
+        if len(cls.aliases) > 0:
+            write("[*] Using cached aliases database")
+            return cls.aliases
+        try:
+            write("[*] initial launch loading database in to memory")
+            with open(f"{install_location}/.data/.config/Aliases.json", "rb") as f:
+                cls.aliases = json.load(f)
+                return cls.aliases
+        except FileNotFoundError:
+            write("[!] Error: Aliases.json not found.")
+            return 1
+
+    @classmethod
+    def _getAliases(cls):
+        return cls.aliases

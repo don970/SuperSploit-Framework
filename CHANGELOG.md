@@ -3,10 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
-## [version 1.21] - 2026-04-29
+## [1.2.4] - 2026-04-29
 ### Added
 - Comprehensive module, class, and method docstrings to `source/core/database.py`.
 - Inline comments to clarify YAML metadata extraction, file traversals, and JSON database modifications.
+- **Development**: Added basic support for mac-os development.
+- **Security**: Added system package integrity verification for `recon-ng` using the `validator` module (`inputHandler.py`).
+- **Development**: Introduced a `DEVMODE` toggle in `start.sh` to allow running the application directly from the source directory.
 
 ### Changed
 - Refactored boolean conditional prompts in `source/core/exploithandler.py` to be more Pythonic.
@@ -16,19 +19,9 @@ All notable changes to this project will be documented in this file.
 - Redundant `file.close()` calls inside `with` statement context managers.
 - Unnecessary `chmod +x` subprocess call after `gcc` compilation for C exploits.
 - Cleaned up logic for executing dynamically loaded Python exploit modules with and without arguments.
-- 
-
-## [version 1.21] - 2026-04-28
-### Added
-- **Development**: Added basic support for mac-os development.
-- **Security**: Added system package integrity verification for `recon-ng` using the `validator` module (`inputHandler.py`).
-- **Development**: Introduced a `DEVMODE` toggle in `start.sh` to allow running the application directly from the source directory.
-
-### Fixed
+- Fixed invalid exception handling syntax and exception-swallowing `return` statements in the Python exploit module runner's `finally` block.
 - **Input Handling**: Fixed an issue where trailing spaces were not properly removed from user input by changing `lstrip` to `rstrip` (`inputHandler.py`).
-- # SuperSploit Framework - Changelog
 
-## [version 1.21] - 2026-04-23
 ### Major Changes
 * **Reconnaissance Module Deprecation:** Removed legacy `reconCore` module including Bluetooth utilities, external tool wrappers, and network reconnaissance functions. This component is deprecated in favor of future modular recon plugins.
 * **Command Simplification:** Eliminated command categories (recon_cmds, wifi_cmds, bt_cmds) from input handler to streamline core functionality and reduce complexity.
@@ -61,7 +54,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [version 1.20] - 2026-04-21
+## [version 1.2.3] - 2026-04-21
 ### Enhancements
 * **Command Handler Refactoring:** Streamlined WiFi scanning commands by removing deprecated target management workflow. Unified scanning interface with simplified `scan` and `full-scan` commands.
 * **External Tools Modernization:** Updated external tool classes (`bettercap`, `namesearch`, `phoneinfoga`) with improved error handling, better prompt integration, and consistent code patterns.

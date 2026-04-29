@@ -1,8 +1,9 @@
-___               _      _     
- / __|_  _ _ __ ___| |___ (_)___ 
- \__ \ || | '_ \ -_) / -_)| / _ \
- |___/\_,_| .__/\___|_\___|_\___/
-          |_|                    
+ ____                                  _       _ _
+/ ___| _   _ _ __   ___ _ __ ___ _ __ | | ___ (_) |_
+\___ \| | | | '_ \ / _ \ '__/ __| '_ \| |/ _ \| | __|
+ ___) | |_| | |_) |  __/ |  \__ \ |_) | | (_) | | |_
+|____/ \__,_| .__/ \___|_|  |___/ .__/|_|\___/|_|\__|
+            |_|                 |_|
 ========================================================= =============
                          HELP MENU [ALL]
 ======================================================================
@@ -32,8 +33,8 @@ USAGE:
   all              Display this main help menu
   clean            Purge history, error logs, scan data, and passwords
   debugdb          Dispays complete database stored in memory
-  update-info      updates exploit details and exploit cache
-  intergration     Dispays help with exploit intergration
+  update-info      Updates exploit details and exploit cache
+  integrate        Dispays help with exploit intergration
 
 ======================================================================
 [i] CLI INTERFACE INFO

@@ -2,6 +2,8 @@ import json
 import os
 import traceback
 import subprocess
+from encodings.aliases import aliases
+
 import psutil
 import socket
 from subprocess import PIPE
@@ -23,6 +25,7 @@ from .exploithandler import ExploitHandler, ExploitCache
 from .security import validator
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
+import shlex
 
 installation = DatabaseManagment.getInstall()
 history = FileHistory(f'{installation}/.data/.history/history')
@@ -30,8 +33,7 @@ path = os.getenv("PATH").split(":")
 true, false = True, False
 env = os.environ
 
-with open(f"{installation}/.data/.config/Aliases.json") as file:
-    aliases = json.load(file)
+Aliases = DatabaseManagment._UpdateAliases()
 
 def get_network_info():
     host = socket.gethostname()
@@ -47,36 +49,37 @@ def get_network_info():
 class Input:
 
     @classmethod
+    def _update(cls, data=None):
+        ExploitCache.update()
+        DatabaseManagment._UpdateAliases()
+        return
+
+    @classmethod
     def sys_call_Linux(cls, data):
-        dataList = data.split(' ')
-        with open(f"{installation}/.data/.config/Aliases.json") as file:
-            Aliases = json.load(file)
         for k, v in Aliases.items():
-            if k in dataList:
-                dataList[dataList.index(k)] = v
+            if k in data:
+                data[data.index(k)] = v
+
         for x in path:
-            if os.path.exists(f"{x}/{dataList[0]}"):
-                subprocess.run(dataList)
+            if os.path.exists(f"{x}/{data[0]}"):
+                subprocess.run(data)
                 return True
-        Error(f"[!] Program not found: {dataList[0]}")
+
+        Error(f"[!] Program not found: {data[0]}")
         return False
 
     @classmethod
     def sys_call_other(cls, data):
         try:
-            cmd = subprocess.Popen(data.split(" "), stdout=PIPE, stdin=PIPE, stderr=PIPE)
-            try:
-                output = cmd.communicate()[0], cmd.communicate()[2]
-            except IndexError:
-                output = cmd.communicate()[0]
-            for x in output:
-                if len(x) > 0:
-                    ToStdout.write(x.decode())
-                return True
-        except Exception:
-            Error(traceback.format_exc())
-            return False
+            for x in path:
+                if os.path.exists(f"{x}/{data[0]}"):
+                    subprocess.run(data)
+                    return True
 
+            Error(f"[!] Program not found: {data[0]}")
+            return False
+        except OSError:
+            ToStdout.write(traceback.format_exc())
     def __init__(self):
         """This handles all the input"""
         pass
@@ -96,12 +99,19 @@ class Input:
 
     @classmethod
     def check(cls, data):
-        # create a list copy of supplied data
-        dataList = data.split(" ")
-        for k, v in aliases.items():
-            if k in data.split(" "):
-                dataList = data.split(' ')[0:len(data.split(" ")) - 1]
-                dataList.append(v)
+        # create a list copy of supplied data for iteration
+        cmd = shlex.split(data)
+        rebuilt_cmd = ""
+        for x in cmd:
+            for k, v in Aliases.items():
+                if x == k:
+                    cmd[cmd.index(k)] = v
+
+        for i in cmd:
+            rebuilt_cmd += f"{i} "
+
+        rebuilt_cmd = rebuilt_cmd.rstrip()
+        dataList = shlex.split(rebuilt_cmd)
 
         # create a list to check for input fixes
         inputFixList = ["cd", "clear", "exit", "cat"]
@@ -123,7 +133,7 @@ class Input:
             if data.endswith(" "):
                 data = data.rstrip(" ") # NOTE: Changed lstrip to rstrip to fix trailing spaces properly
 
-            cmd_name = data.split(" ")[0]
+            cmd_name = shlex.split(data)[0]
 
             # ==========================================
             # COMMAND REGISTRIES
@@ -141,7 +151,7 @@ class Input:
                 "search": Search.search,
                 "banner": Banners,
                 "add": DatabaseManagment.addVariableToDatabase,
-                "update-info": ExploitCache.update,
+                "update-info": cls._update,
                 "info": exploitDetails,
                 "debugdb": DatabaseManagment.Debug
             }
@@ -156,10 +166,12 @@ class Input:
                     return True
                 
                 elif "Linux" in os.uname():
+                    data = dataList
                     cls.sys_call_Linux(data)
                     return True
                 
                 else:
+                    data = dataList
                     cls.sys_call_other(data)
                     return True
 
