@@ -4,54 +4,43 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.4] - 2026-04-29
 ### Added
+- **OS Fingerprinting Engine:** Introduced modular `OSFingerprintEngine` class for active OS detection via TCP fingerprinting with Scapy integration. Supports remote signature database queries and session-based logging.
 - **Development**: Introduced a `DEVMODE` toggle in `start.sh` to allow running the application directly from the source directory.
 - **Development**: Added basic support for mac-os development.
-- **Security**: Added system package integrity verification for `recon-ng` using the `validator` module (`inputHandler.py`).
-- Corrected the `except` block syntax in `exploithandler.py`'s `python` method from `except Exception or KeyboardInterrupt:` to `except (Exception, KeyboardInterrupt):`.
-- Implemented cleanup for the temporary `exec_temp.py` file in `exploithandler.py` to prevent leftover files after Python exploit execution.
-- Comprehensive module, class, and method docstrings to `source/core/database.py`.
-- Inline comments to clarify YAML metadata extraction, file traversals, and JSON database modifications.
+- **Documentation**: Added comprehensive module, class, and method docstrings to `source/core/database.py`.
+- **Documentation**: Added inline comments to clarify YAML metadata extraction, file traversals, and JSON database modifications.
+- **Documentation**: Updated exploit integration documentation with complete working examples demonstrating variable retrieval, socket usage, and error handling patterns.
 
 ### Changed
-- Refactored boolean conditional prompts in `source/core/exploithandler.py` to be more Pythonic.
+- **Help System Redesign:** Completely restructured help documentation with ASCII art branding, organized command categories, and improved clarity for end-users.
+- **Command Simplification:** Eliminated command categories (`recon_cmds`, `wifi_cmds`, `bt_cmds`) from the input handler to streamline core functionality and reduce complexity.
+- **Architecture:** Refactored the input handler to remove verbose command routing, enabling a future plugin-based reconnaissance system.
+- **Code Style**: Refactored boolean conditional prompts in `source/core/exploithandler.py` to be more Pythonic.
+- **Session Logging:** Continued session-based activity tracking with framework launch events logged to `activity.log`.
+
+### Deprecated
+- **Reconnaissance Module:** The legacy `reconCore` module is deprecated in favor of future modular recon plugins. This includes Bluetooth utilities, external tool wrappers, and network reconnaissance functions.
+
+### Removed
+- **BREAKING**: The following commands are no longer available: `ducky`, `ranger`, `recon`, `scan`, `full-scan`, `custom-scan`, `get-targets`, `import-targets`, `view-targets`, `port-scan`.
+- **Bluetooth Module:** Removed `BlueDucky.py` and all HID keyboard emulation utilities.
+- **External Tool Wrappers:** Removed `phoneinfoga`, `namesearch`, and `bettercap` wrapper classes.
+- **Network Reconnaissance:** Removed `NmapWrapper` class and associated nmap scanning functionality.
+- **Legacy Data Files:** Removed nmap targets (`target.json`), security checksums (`checksums.json`), and deprecated help files.
+- Purged `__pycache__` directories for removed modules to maintain a clean repository state.
 
 ### Fixed
-- Critical Python module caching bug in `source/core/exploithandler.py` by implementing dynamic module loading (`importlib.util`) to bypass `sys.modules` cache retention.
-- Redundant `file.close()` calls inside `with` statement context managers.
-- Unnecessary `chmod +x` subprocess call after `gcc` compilation for C exploits.
-- Cleaned up logic for executing dynamically loaded Python exploit modules with and without arguments.
+- **Critical Bug:** Fixed a Python module caching bug in `source/core/exploithandler.py` by implementing dynamic module loading (`importlib.util`) to bypass `sys.modules` cache retention.
+- Corrected the `except` block syntax in `exploithandler.py` from `except Exception or KeyboardInterrupt:` to `except (Exception, KeyboardInterrupt):`.
 - Fixed invalid exception handling syntax and exception-swallowing `return` statements in the Python exploit module runner's `finally` block.
-- **Input Handling**: Fixed an issue where trailing spaces were not properly removed from user input by changing `lstrip` to `rstrip` (`inputHandler.py`).
+- Implemented cleanup for the temporary `exec_temp.py` file in `exploithandler.py` to prevent leftover files.
+- Removed redundant `file.close()` calls within `with` statement context managers.
+- Removed an unnecessary `chmod +x` subprocess call after `gcc` compilation for C exploits.
+- Cleaned up logic for executing dynamically loaded Python exploit modules with and without arguments.
+- **Input Handling**: Fixed an issue where trailing spaces were not properly removed from user input by changing `lstrip` to `rstrip` in `inputHandler.py`.
 
-### Major Changes
-* **Reconnaissance Module Deprecation:** Removed legacy `reconCore` module including Bluetooth utilities, external tool wrappers, and network reconnaissance functions. This component is deprecated in favor of future modular recon plugins.
-* **Command Simplification:** Eliminated command categories (recon_cmds, wifi_cmds, bt_cmds) from input handler to streamline core functionality and reduce complexity.
-* **Help System Redesign:** Completely restructured help documentation with ASCII art branding, organized command categories, and improved clarity for end-users.
-
-### New Features
-* **OS Fingerprinting Engine:** Introduced modular `OSFingerprintEngine` class for active OS detection via TCP fingerprinting with Scapy integration. Supports remote signature database queries and session-based logging.
-* **Enhanced Help Documentation:** Redesigned help system with structured command categories including Core Workspace, Execution Engine, System Utilities, and CLI Interface information.
-* **Integration Guide Enhancement:** Updated exploit integration documentation with complete working examples demonstrating variable retrieval, so cket usage, and error handling patterns.
-
-### Removals
-* **Bluetooth Module:** Removed `BlueDucky.py` and all HID keyboard emulation utilities (magic_keyboard_hid.py, menu_functions.py, register_device.py).
-* **External Tool Wrappers:** Removed phoneinfoga, namesearch, and bettercap wrapper classes from external_tools module.
-* **Network Reconnaissance:** Removed NmapWrapper class and associated nmap scanning functionality.
-* **Legacy Data Files:** Removed nmap targets (target.json), security checksums (checksums.json), and deprecated help files (ducky, ranger, recon, scan, full-scan, custom-scan).
-
-### Code Quality
-* **Modular Architecture:** Refactored input handler to remove verbose command routing, enabling future plugin-based reconnaissance system.
-* **Documentation Cleanup:** Removed obsolete help files for deprecated commands, consolidating documentation into main help structure.
-* **Cache Cleanup:** Purged __pycache__ directories for removed modules to maintain clean repository state.
-
-### Maintenance
-* **Session Logging:** Continued session-based activity tracking with framework launch events logged to activity.log.
-* **Help Documentation:** Migrated all command documentation to centralized help system with improved readability and organization.
-* **Data Integrity:** Cleaned deprecated data files and security configuration artifacts.
-
-### Breaking Changes
-* **Removed Commands:** ducky, ranger, recon, scan, full-scan, custom-scan, get-targets, import-targets, view-targets, port-scan commands are no longer available.
-* **Removed Module Imports:** Framework no longer imports Bluetooth, external reconnaissance tools, or network scanning wrappers.
+### Security
+- Added system package integrity verification for `recon-ng` using the `validator` module (`inputHandler.py`).
 
 ---
 

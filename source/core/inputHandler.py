@@ -48,66 +48,42 @@ class Input:
     def _update(cls, data=None):
         ExploitCache.update()
         DatabaseManagment._UpdateAliases()
-        return
 
     @classmethod
-    def sys_call_Linux(cls, data):
-        for k, v in Aliases.items():
-            if k in data:
-                data[data.index(k)] = v
-
-        for x in path:
-            if os.path.exists(f"{x}/{data[0]}"):
-                subprocess.run(data)
-                return True
-
-        Error(f"[!] Program not found: {data[0]}")
-        return False
-
-    @classmethod
-    def sys_call_other(cls, data):
+    def _system_call(cls, cmd_list):
+        """Executes a command by searching for it in the system's PATH."""
         try:
-            for x in path:
-                if os.path.exists(f"{x}/{data[0]}"):
-                    subprocess.run(data)
+            command_name = cmd_list[0]
+            for directory in path:
+                if os.path.exists(os.path.join(directory, command_name)):
+                    subprocess.run(cmd_list)
                     return True
 
-            Error(f"[!] Program not found: {data[0]}")
+            Error(f"[!] Program not found: {command_name}")
             return False
-        except OSError:
-            ToStdout.write(traceback.format_exc())
-    def __init__(self):
-        """This handles all the input"""
-        pass
-
-    @staticmethod
-    def recon_ng(args):
-        # UPDATED TO USE SYSTEM PACKAGE VERIFICATION
-        if not validator.verify_system_package("recon-ng"):
-            print(f"[!] Integrity verification Failed! 'recon-ng' package modified.")
-            if not input("[*] Would you still like to proceed [y/n]: ").lower().endswith("y"):
-                return
-        else:
-            print(f"[*] Integrity verified via dpkg for recon-ng.")
-            
-        subprocess.run(["sudo", "recon-ng"])
-        return
+        except OSError as e:
+            ToStdout.write(f"OS Error during system call: {e}\n{traceback.format_exc()}")
+            return False
 
     @classmethod
     def check(cls, data):
-        # create a list copy of supplied data for iteration
-        cmd = shlex.split(data)
-        rebuilt_cmd = ""
-        for x in cmd:
-            for k, v in Aliases.items():
-                if x == k:
-                    cmd[cmd.index(k)] = v
+        # Sanitize and handle empty input
+        clean_data = data.strip()
+        if not clean_data:
+            return
 
-        for i in cmd:
-            rebuilt_cmd += f"{i} "
+        # Tokenize and apply aliases
+        try:
+            dataList = shlex.split(clean_data)
+            if not dataList:
+                return
 
-        rebuilt_cmd = rebuilt_cmd.rstrip()
-        dataList = shlex.split(rebuilt_cmd)
+            for i, token in enumerate(dataList):
+                if token in Aliases:
+                    dataList[i] = Aliases[token]
+        except ValueError as e:
+            Error(f"Failed to parse command: {e}")
+            return
 
         # create a list to check for input fixes
         inputFixList = ["cd", "clear", "exit", "cat"]
@@ -117,23 +93,21 @@ class Input:
             if not dataList:
                 return
 
-            if "&&" in data:
-                fix = Input_fixes.continues(data)
+            if "&&" in clean_data:
+                fix = Input_fixes.continues(clean_data)
                 if fix == 0:
                     return
                 else:
                     data = fix[len(fix) - 1]
                     dataList = data.split(' ')
-            if ">" in data:
-                Input_fixes.out(data)
+            if ">" in clean_data:
+                Input_fixes.out(clean_data)
                 return
-            if dataList[0] in inputFixList:
+
+            cmd_name = dataList[0]
+            if cmd_name in inputFixList:
                 if Input_fixes(dataList):
                     return
-            if data.endswith(" "):
-                data = data.rstrip(" ") # NOTE: Changed lstrip to rstrip to fix trailing spaces properly
-
-            cmd_name = shlex.split(data)[0]
 
             # ==========================================
             # COMMAND REGISTRIES
@@ -164,16 +138,9 @@ class Input:
                 if cmd_name in general_cmds:
                     general_cmds[cmd_name](data)
                     return True
-                
-                elif "Linux" in os.uname():
-                    data = dataList
-                    cls.sys_call_Linux(data)
-                    return True
-                
                 else:
-                    data = dataList
-                    cls.sys_call_other(data)
-                    return True
+                    # If not an internal command, treat as a system call
+                    return cls._system_call(dataList)
 
             except Exception:
                 Error(traceback.format_exc())
@@ -192,9 +159,12 @@ class Input:
             ExploitCache.update() 
             
             try:
-                data = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
-                inp = data.prompt(f"[SuperSploit]: ")
-                cls().check(inp)
+                session = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
+                inp = session.prompt(f"[SuperSploit]: ")
+                cls.check(inp)
+            except (KeyboardInterrupt, EOFError):
+                ToStdout.write("\n[*] Exiting SuperSploit...\n")
+                break
             except Exception:
                 Error(traceback.format_exc())
                 continue

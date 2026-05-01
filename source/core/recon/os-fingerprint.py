@@ -55,7 +55,6 @@ class OSFingerprintEngine:
             # response = requests.get(self.db_endpoint, timeout=10)
             # response.raise_for_status()
             # return response.json()
-            
             # Simulated JSON response for demonstration purposes
             return {
                 "Linux 3.x/4.x": {"base_ttl": 64, "window": 5840, "mss": 1460},
