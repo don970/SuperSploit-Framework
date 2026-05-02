@@ -1,0 +1,5 @@
+Command: recon
+Description: Execute the currently loaded recon module
+
+Usage:
+    recon - Execute the currently loaded recon module

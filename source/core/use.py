@@ -1,6 +1,7 @@
 import os
 from .database import DatabaseManagment
 from .ToStdOut import ToStdout
+from .help import write
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
 print = ToStdout.write
@@ -48,5 +49,14 @@ class use:
                 print(f"[*] Set payload to {payloads[index]}\n")
             else:
                 print("[-] Invalid payload index.\n")
+
+        elif category == "recon":
+            recondb, paths = DatabaseManagment.UpdateReconDB()
+            if 0 < len(paths):
+                name = paths[int(index)].split("/")[-1]
+                write(f"[*] Set RECON_NAME to {name}")
+                DatabaseManagment.directlyModify(["recon_name", name])
+                write(f"[*] Set RECON_PATH to {paths[int(index)]}")
+                DatabaseManagment.directlyModify(["recon_path", paths[int(index)]])
         else:
             print(f"[-] Unknown category: {category}\n")

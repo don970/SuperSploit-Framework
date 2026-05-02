@@ -4,8 +4,9 @@ Description: Searches the framework for exploits, payloads, or targets.
 Usage:
     search exploits [keyword] - Search modules by path, name, CVE, or description.
     search payloads [keyword] - Search available payloads.
-    search targets            - List all configured targets and ports.
+    search recon [keyword] - List all configured targets and ports.
 
 Example:
     search exploits dirtypipe
     search payloads windows
+    search recon fingerprint

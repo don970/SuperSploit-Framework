@@ -1,19 +1,21 @@
 {
     "BACKUP-PATH": "/tmp/passwd",
     "CVE": "CVE-2024-0000",
+    "DEV_DICT": "/User/donald/PycharmProjects/SuperSploit-updated",
+    "DEV_MODE": false,
     "DURATION": "5",
     "EXE": "sudo",
     "EXPLOIT": "/home/donald/.SuperSploit/exploits/test/test.py",
     "L_HOST": "0.0.0.0",
     "L_PORT": "9999",
     "PAYLOAD": "user?id=1 OR 1=1",
+    "RECON_NAME": "os-fingerprint.py",
+    "RECON_PATH": "/Users/donald/.SuperSploit/recon/os-fingerprinting/os-fingerprint.py",
     "R_HOST": "http://127.0.0.1",
     "R_PORT": "5000",
     "SESSION_ID": "None",
     "SHELL": "/bin/python3",
     "STAGED": false,
     "TARGET": "/etc/passwd",
-    "verbose": false,
-    "DEV_MODE": false,
-    "DEV_DICT": "/User/donald/PycharmProjects/SuperSploit-updated"
+    "verbose": false
 }

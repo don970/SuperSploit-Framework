@@ -26,6 +26,7 @@ USAGE:
 [2] EXECUTION ENGINE
 ----------------------------------------------------------------------
   exploit          Execute the currently loaded exploit or payload
+  recon            Execute the currently loaded recon module
   
 ----------------------------------------------------------------------
 [6] SYSTEM & UTILITIES

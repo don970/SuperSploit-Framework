@@ -1,15 +1,34 @@
 import os
 import datetime
+import pathlib
+import uuid
 from .database import DatabaseManagment
+
 
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
 log_dir = f"{install_location}/.data/.logs"
 log_path = f"{log_dir}/activity.log"
+recon_path = f"{log_dir}/recon_activity.log"
+
 
 # Set max file size to 5MB to keep the system footprint small
-MAX_LOG_SIZE = 5 * 1024 * 1024  
+MAX_LOG_SIZE = 5 * 1024 * 1024
+
+
 
 class Logger:
+    @classmethod
+    def initializeReconMoodle(cls, moduleName, path, error):
+        db = {
+            "SessionID": str(uuid.uuid4()),
+            "moduleName": str(moduleName),
+            "modulePath": pathlib.Path(path)}
+
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        entry = f"[{timestamp}] [SessionID: {db["SessionID"]}] Name: {db["moduleName"]} | Path: {db["modulePath"]} | {error}"
+        cls._write_recon_log(entry)
+        return db
+
     @staticmethod
     def _rotate_logs():
         """Checks log size and archives it if it exceeds the maximum allowed size."""
@@ -50,6 +69,21 @@ class Logger:
         divider = "-" * 50
         entry = f"{divider}\n[{timestamp}] [SESSION: {session_id}] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---"
         Logger._write_log(entry)
+
+    @staticmethod
+    def _write_recon_log(entry):
+        """Internal method to handle file I/O safely."""
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+
+            # Check if rotation is needed before writing
+            Logger._rotate_logs()
+
+            with open(recon_path, "a") as f:
+                f.write(entry + "\n")
+        except Exception as e:
+            from .errors import Error
+            Error.silent(f"Logging Failed: {e}")
 
     @staticmethod
     def log_execution(exploit_type, success=True, args=None):

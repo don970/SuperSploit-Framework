@@ -12,13 +12,28 @@ matching. also this is the para link for nmaps os db
 https://github.com/nmap/nmap/blob/4085d78e3dddf96719b4b7569a450a14c894e93a/nmap-os-db
 """
 
+
+import json
 import logging
 import requests
 import uuid
+import os
+from urllib.parse import urlparse
 from scapy.all import IP, TCP, sr1, conf
+from scapy.error import Scapy_Exception
+
+install_location = f'{os.getenv("HOME")}/.SuperSploit'
+# Absolute path to the main configuration/session JSON database
+path_to_database = f"{install_location}/.data/.config/data.json"
+
+# load database directly
+with open(path_to_database) as f:
+    db = json.load(f)
+
 
 # Suppress Scapy's default routing warnings for cleaner console output
 conf.verb = 0 
+
 
 class OSFingerprintEngine:
     """
@@ -52,15 +67,17 @@ class OSFingerprintEngine:
         self.logger.info(f"Fetching OS signature database from: {self.db_endpoint}")
         try:
             # In a production environment, this queries your centralized API:
-            # response = requests.get(self.db_endpoint, timeout=10)
-            # response.raise_for_status()
-            # return response.json()
-            # Simulated JSON response for demonstration purposes
+            #response = requests.get(self.db_endpoint, timeout=10)
+            #response.raise_for_status()
+            #input(response.json())
+            #return response.json()
+            #Simulated JSON response for demonstration purposes
             return {
                 "Linux 3.x/4.x": {"base_ttl": 64, "window": 5840, "mss": 1460},
                 "Windows 10/11": {"base_ttl": 128, "window": 8192, "mss": 1460},
                 "FreeBSD 12.x": {"base_ttl": 64, "window": 65535, "mss": 1460},
-                "Cisco IOS": {"base_ttl": 255, "window": 4128, "mss": 536}
+                "Cisco IOS": {"base_ttl": 255, "window": 4128, "mss": 536},
+                "linux_router/gateway": {'received_ttl': 64, 'base_ttl': 64, 'window': 64240, 'mss': 1460}
             }
         except requests.RequestException as e:
             self.logger.error(f"Failed to retrieve online database: {e}")
@@ -80,11 +97,18 @@ class OSFingerprintEngine:
         """Sends a crafted TCP SYN packet and records the response characteristics."""
         self.logger.info(f"Initiating active probe against {target_ip}:{port}")
         
-        # Craft a TCP SYN packet
-        probe_pkt = IP(dst=target_ip)/TCP(dport=port, flags="S")
-         
-        # Send and wait for a single response
-        resp = sr1(probe_pkt, timeout=3)
+        try:
+            # Craft a TCP SYN packet
+            probe_pkt = IP(dst=target_ip)/TCP(dport=port, flags="S")
+             
+            # Send and wait for a single response
+            resp = sr1(probe_pkt, timeout=3)
+        except (PermissionError, Scapy_Exception):
+            self.logger.error("Permission denied: Raw socket access requires root privileges. Please run SuperSploit with sudo.")
+            return None
+        except Exception as e:
+            self.logger.error(f"Network error during probe execution: {e}")
+            return None
 
         if resp is None:
             self.logger.warning(f"Timeout: No response from {target_ip}:{port}")
@@ -95,17 +119,52 @@ class OSFingerprintEngine:
             ip_layer = resp.getlayer(IP)
             tcp_layer = resp.getlayer(TCP)
             
-            # Extract Maximum Segment Size (MSS) from TCP options
-            mss = None
+            # Parse all TCP options dynamically
+            tcp_options_dict = {}
+            tcp_options_order = []
             for opt in tcp_layer.options:
-                if opt[0] == 'MSS':
-                    mss = opt[1]
+                opt_name = opt[0]
+                opt_val = opt[1] if len(opt) > 1 else None
+                
+                tcp_options_order.append(opt_name)
+                
+                # Handle options with no specific value (like SAckOK)
+                if opt_val == '' or opt_val is None:
+                    tcp_options_dict[opt_name] = True
+                else:
+                    tcp_options_dict[opt_name] = opt_val
 
             fingerprint = {
+                # Standard Core Fields
                 "received_ttl": ip_layer.ttl,
                 "base_ttl": self._guess_base_ttl(ip_layer.ttl),
                 "window": tcp_layer.window,
-                "mss": mss
+                "mss": tcp_options_dict.get('MSS', None),
+                
+                # Extended IP Characteristics
+                "ip_layer": {
+                    "version": ip_layer.version,
+                    "ihl": ip_layer.ihl,            # Internet Header Length
+                    "tos": ip_layer.tos,            # Type of Service
+                    "len": ip_layer.len,            # Total Length
+                    "id": ip_layer.id,              # Identification
+                    "flags": str(ip_layer.flags),   # e.g., 'DF' (Don't Fragment)
+                    "frag": ip_layer.frag,          # Fragment Offset
+                    "chksum": ip_layer.chksum,      # IP Checksum
+                },
+                
+                # Extended TCP Characteristics
+                "tcp_layer": {
+                    "seq": tcp_layer.seq,           # Sequence Number
+                    "ack": tcp_layer.ack,           # Acknowledgment Number
+                    "dataofs": tcp_layer.dataofs,   # Data Offset
+                    "reserved": tcp_layer.reserved, # Reserved bits
+                    "flags": str(tcp_layer.flags),  # e.g., 'SA' (SYN/ACK)
+                    "urgptr": tcp_layer.urgptr,     # Urgent Pointer
+                    "chksum": tcp_layer.chksum,     # TCP Checksum
+                    "options_order": tcp_options_order, # Order of options is a key OS identifier
+                    "options_parsed": tcp_options_dict
+                }
             }
             
             self.logger.debug(f"Captured network fingerprint: {fingerprint}")
@@ -133,17 +192,42 @@ class OSFingerprintEngine:
         
         return f"Unknown OS (Unmatched Fingerprint: TTL={fp['base_ttl']}, Win={fp['window']})"
 
-if __name__ == "__main__":
-    # Example Framework Execution Workflow
-    ENGINE_API_URL = "https://api.threat-intelligence.local/v1/os-signatures"
-    TARGET_IP = "192.168.1.1" # Replace with a valid target
-    
-    # Initialize the engine handler with debugging toggled on
-    os_engine = OSFingerprintEngine(
-        db_endpoint=ENGINE_API_URL, 
-        debug_mode=True
-    )
-    
-    # Execute the module
-    result = os_engine.identify_os(TARGET_IP, port=80)
-    print(f"\n[+] Final Result: {result}")
+class Start:
+
+    def __init__(self):
+        # Example Framework Execution Workflow
+        ENGINE_API_URL = "https://api.threat-intelligence.local/v1/os-signatures"
+        
+        # Clean up the target IP in case it was stored as a URL or includes a port
+        raw_target = str(db.get("R_HOST", ""))
+        if "://" in raw_target:
+            TARGET_IP = urlparse(raw_target).hostname
+        else:
+            TARGET_IP = raw_target.split(":")[0]
+            
+        if not TARGET_IP:
+            print("[-] No valid R_HOST set in the database.")
+            return
+
+        # Initialize the engine handler with debugging toggled on
+        os_engine = OSFingerprintEngine(
+            db_endpoint=ENGINE_API_URL,
+            debug_mode=True
+        )
+
+        # Execute the module
+        result = os_engine.identify_os(TARGET_IP, port=80)
+        print(f"\n[+] Final Result: {result}")
+
+
+#!#!#!
+name: "Native python OS fingerprint service"
+category: "FingerPrinter"
+desc: """This is a modular engine designed for integration into SuperSploit's 
+reconnaissance Framework. It performs active OS fingerprinting by sending 
+crafted TCP probes to target hosts analyzing TCP SYN/ACK responses against 
+a centralized online signature database. It includes session tracking, detailed 
+logging, and a heuristic matching algorithm for accurate OS identification. 
+"""
+author: "Donald Ford"
+#!#!#!

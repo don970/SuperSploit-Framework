@@ -18,10 +18,11 @@ from .search import Search
 from .banners import Banners
 from .inputfixes import Input_fixes
 from .clean import clean
-from .security import validator
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
 import shlex
+from .recon_engien import Recon
+
 
 # set global variables
 installation = DatabaseManagment.getInstall()
@@ -127,7 +128,8 @@ class Input:
                 "add": DatabaseManagment.addVariableToDatabase,
                 "update-info": cls._update,
                 "info": exploitDetails,
-                "debugdb": DatabaseManagment.Debug
+                "debugdb": DatabaseManagment.Debug,
+                "recon": Recon
             }
 
           

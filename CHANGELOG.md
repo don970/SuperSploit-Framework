@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.6] - 2026-05-08
+### Added
+- **Recon Commands in Help:** Added the `recon` command to `.data/.help/all` and created `.data/.help/recon` help documentation.
+- **Recon Support in Search:** Added the `recon` category to the `search` command to search for recon modules in `source/core/search.py`.
+- **Recon Selection in Use:** Updated the `use` command in `source/core/use.py` to allow selecting and setting `RECON_NAME` and `RECON_PATH` when using recon modules.
+- **Port Scanner Recon Module:** Added a new native port scanner module in `recon/native-portscan/port_scanner.py`.
+- **Recon Logging:** Created a new `recon_activity.log` file with rotation logic for reconnaissance sessions in `source/core/logger.py`.
+- **Recon Engine Execution:** Implemented the actual execution capability using a dynamically loaded Python module for recon scripts in `source/core/recon_engien.py` and linked it via the `Input` handler.
+
+### Changed
+- **Database Recon Management:** Extended `DatabaseManagment` in `source/core/database.py` with `UpdateReconDB` and `_reconDB` to map and parse recon directories.
+- **Configuration Schema:** Added `dev_mode`, `sessionId`, `recon_name`, and `recon_path` variables to the main DB configuration loader.
+- **OS Fingerprint Script:** Migrated `os-fingerprint.py` from `source/core/recon/` to `recon/os-fingerprinting/` and enhanced the start script implementation.
+
+### Fixed
+- **Python Module Loader Issue:** Corrected typos (`biypass` -> `bypass`, `spec_from_fle_location` -> `spec_from_file_location`) when executing Python payloads dynamically via `importlib` in `source/core/exploithandler.py`.
+- **Installer Script Fix:** Corrected an issue where `supersploit` would fail directly without `sudo` in `install.sh` and `start.sh` due to permission checks.
+
+## [1.2.5] - 2026-05-02
+### Added
+- **Advanced OS Fingerprinting:** Expanded the network fingerprint dictionary in `os-fingerprint.py` to capture deep IP and TCP layer metrics (TOS, IHL, fragmentation, seq/ack numbers) and explicit TCP option ordering (`options_order`) for improved identification accuracy.
+
+### Changed
+- **Documentation:** Added comprehensive docstrings and inline comments to the `Recon` class in `source/core/recon_engien.py` to improve maintainability and clarify dynamic execution logic.
+
+### Fixed
+- **Target Parsing:** Integrated `urllib.parse.urlparse` in the OS fingerprint module to safely sanitize URLs and strip ports from `R_HOST` before executing Scapy network probes.
+- **Graceful Error Handling:** Added explicit exception catching for `PermissionError` and `Scapy_Exception` in `os-fingerprint.py` to warn users about missing root privileges instead of crashing the engine with stack traces.
+
 ## [1.2.4] - 2026-04-29
 ### Added
 - **OS Fingerprinting Engine:** Introduced modular `OSFingerprintEngine` class for active OS detection via TCP fingerprinting with Scapy integration. Supports remote signature database queries and session-based logging.

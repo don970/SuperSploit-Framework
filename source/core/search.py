@@ -17,9 +17,18 @@ class Search:
 
         category, search_terms = parts[1], [t.lower() for t in parts[2:]]
         
-        if category == "targets":
-            for i, (t, p) in enumerate(DatabaseManagment.getTargets().items()):
-                write(f"{i}: {t}:{p}")
+        if category == "recon":
+            db, path_list = DatabaseManagment.UpdateReconDB()
+            source_list = path_list
+            for i, path in enumerate(source_list):
+                meta = ExploitCache.metadata_index.get(path, {})
+
+                # Match against Path, Name, CVE, or Description
+                match_pool = f"{path} {meta.get('name')} | {meta.get('desc')}".lower()
+
+                if not search_terms or any(term in match_pool for term in search_terms):
+                    cve_str = f" [{meta.get('cat')}]" if meta.get('cat') != "N/A" else ""
+                    write(f"{i}: {path}{cve_str}")
             return
 
         source_list = ExploitCache.all_exploits if category == "exploits" else ExploitCache.all_payloads

@@ -4,6 +4,7 @@ Handles file system traversals, YAML metadata extraction, and JSON configuration
 """
 import json
 import os
+import pathlib
 import traceback
 from .errors import Error as error
 from .ToStdOut import ToStdout
@@ -116,6 +117,7 @@ class exploitDetails:
 
 class DatabaseManagment:
     aliases = {}
+    db = {}
     """
     Centralized utility for reading/writing configuration state
     and mapping module paths across the framework.
@@ -235,7 +237,10 @@ class DatabaseManagment:
                 "target": "R_HOST",
                 "port": "R_PORT",
                 "verbose": "VERBOSE_LOGGING",
-                "DEV_MODE": False
+                "dev_mode": "DEV_MODE" ,
+                "sessionId": "SESSION_ID",
+                "recon_name": "RECON_NAME",
+                "recon_path": "RECON_PATH"
             }
 
             # Update the mapped key if it matches the first item in the input data
@@ -333,3 +338,19 @@ class DatabaseManagment:
     @classmethod
     def _getAliases(cls):
         return cls.aliases
+
+    @classmethod
+    def UpdateReconDB(cls):
+        db = cls.db
+        allfiles = []
+        for x in os.listdir(f"{install_location}/recon"):
+            files = []
+            for i in os.listdir(f"{install_location}/recon/{x}"):
+                allfiles.append(f"{install_location}/recon/{x}/{i}")
+                files.append(f"{install_location}/recon/{x}/{i}")
+            db[x] = files
+        return db, allfiles
+
+    @classmethod
+    def _reconDB(cls):
+        return cls.db
