@@ -43,6 +43,7 @@ Designed for speed and reliability, the framework avoids the overhead of a graph
 <img width="1536" height="2752" alt="Pen Test Framework Architecture Overview" src="https://github.com/user-attachments/assets/28c8f736-c48e-4362-8dc8-8833598c2381" />
 
 ---
+<img width="2816" height="1536" alt="Gemini_Generated_Image_2gy5kb2gy5kb2gy5" src="https://github.com/user-attachments/assets/8164368d-2228-438b-912e-e81ab8bcf24b" />
 
 ## ⚙️ Command Layout & Usage
 
@@ -89,6 +90,7 @@ SuperSploit is continuously evolving to enhance its core exploitation capabiliti
 
 ---
 ---
+<img width="2816" height="1536" alt="roadmap" src="https://github.com/user-attachments/assets/8c279643-5aa2-4149-bd0f-2db5b1ef0f05" />
 
 ## 🗺️ Future Roadmap for recon
 
