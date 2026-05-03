@@ -1,5 +1,5 @@
 🛡️ SuperSploit Framework
-
+**SuperSploit Module Development Guide https://github.com/don970/SuperSploit-Framework/blob/version-1.1/docs/SuperSploit_Module_Development_Guide.md**
 ![logo1](https://github.com/user-attachments/assets/02f43367-1b7e-42f0-b25c-6ed786079567)
 
 ## ⚠️ Disclaimer
