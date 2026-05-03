@@ -1,5 +1,40 @@
-Command: recon
-Description: Execute the currently loaded recon module
+# 🔍 SUPERSPLOIT RECONNAISSANCE (RECON) GUIDE
 
-Usage:
-    recon - Execute the currently loaded recon module
+Welcome to the Reconnaissance help page. This document outlines how to search for, utilize, and understand recon modules within the SuperSploit framework.
+
+---
+
+## 1. OVERVIEW
+Reconnaissance modules are designed to enumerate, scan, and gather intelligence on potential targets before exploitation. The framework automatically parses recon results and updates the global `targets.json` database.
+
+---
+
+## 2. LOCATING RECON MODULES
+Search the internal database for available reconnaissance modules using the `search` command. 
+
+### 🔎 Search Syntax
+`search recon [keyword1] [keyword2] ...`
+
+### 💡 Examples
+  • `search recon`                  -> Lists all available recon modules.
+  • `search recon portscan`         -> Finds recon modules related to port scanning.
+  • `search recon smb enumerate`    -> Finds recon modules matching 'smb' or 'enumerate'.
+
+---
+
+## 3. EXECUTING RECON MODULES
+After running a search, use the returned index number to load the module.
+
+### 🚀 Execution Flow
+  1. `use recon <index>`   : Loads the recon module into the active session.
+  2. `show options`        : Displays configurable parameters (e.g., target IP, thread count).
+  3. `set target <IP>`     : Configures the target for scanning.
+  4. `run`                 : Executes the module.
+
+Any newly discovered assets or open ports will be automatically logged to your target database.
+
+---
+
+## 4. NEW AUTOMATION FEATURES
+SuperSploit now includes automated post-recon hooks! When a recon module successfully identifies a specific service (like SMB, HTTP, or SSH), you can optionally configure the framework to automatically suggest relevant exploits.
+  • `set auto_suggest true` : Enable post-recon exploit suggestions.

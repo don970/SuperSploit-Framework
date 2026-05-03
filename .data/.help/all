@@ -4,45 +4,41 @@
  ___) | |_| | |_) |  __/ |  \__ \ |_) | | (_) | | |_
 |____/ \__,_| .__/ \___|_|  |___/ .__/|_|\___/|_|\__|
             |_|                 |_|
-========================================================= =============
+======================================================================
                          HELP MENU [ALL]
 ======================================================================
 
 USAGE:
   help <command>       Get detailed help for a specific command
-                       Example: help exploit
+                       Example: help search, help set
 
 ----------------------------------------------------------------------
 [1] CORE WORKSPACE & VARIABLES
 ----------------------------------------------------------------------
-  add              Add a custom variable to the active database
-  set              Set a specific variable value (e.g., R_HOST, L_PORT)
-  show             Show dynamic variables, aliases, or exploit details
-  use              Select an exploit, payload, or target by index
-  info             Show exploit details and relative info
-  search           Search the database for exploits, payloads, or targets
+  show             Display variables, loaded module options, or targets
+  set              Set a specific variable or framework feature
+  use              Select an exploit, payload, recon module, or target
+  info             Show module metadata, author, and description
+  search           Search exploits, payloads, recon tools, and targets
 
 ----------------------------------------------------------------------
 [2] EXECUTION ENGINE
 ----------------------------------------------------------------------
-  exploit          Execute the currently loaded exploit or payload
-  recon            Execute the currently loaded recon module
+  run / exploit    Execute the currently loaded module
+  recon            Execute the currently loaded recon tool
   
 ----------------------------------------------------------------------
-[6] SYSTEM & UTILITIES
+[3] SYSTEM & UTILITIES
 ----------------------------------------------------------------------
   all              Display this main help menu
   clean            Purge history, error logs, scan data, and passwords
-  debugdb          Dispays complete database stored in memory
-  update-info      Updates exploit details and exploit cache
-  integrate        Dispays help with exploit intergration
+  update-info      Update exploit metadata and refresh the cache
+  integrate        View the module development & integration guide
 
 ======================================================================
-[i] CLI INTERFACE INFO
+[i] FRAMEWORK FEATURES & CLI INFO
 ======================================================================
-  SuperSploit utilizes prompt-toolkit for advanced I/O control. 
-  Features include persistent input history and dynamic auto-suggestions.
-  If an input does not match a framework command, it will attempt to 
-  execute it as a native system shell command. 
-  
-  All execution errors are logged to: .data/.errors/error.log
+  • Auto-Suggestions: The CLI uses prompt-toolkit for dynamic hints.
+  • Native Execution: Non-framework commands run in your system shell.
+  • Background Listener: Start a native shell catcher via `set listener true`.
+  • Recon Automation: Enable `set auto_suggest true` for smart exploit hints.

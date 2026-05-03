@@ -1,12 +1,18 @@
-Command: set
-Description: Assigns a value to a session variable. Variables are saved to data.json.
+# ⚙️ COMMAND: set
+Description: Assigns a value to a session variable, configures module options, or enables framework features. Variables are saved to data.json.
 
 Usage:
     set <VARIABLE> <VALUE>
 
-Examples:
-    set R_HOST 192.168.1.1
-    set VERBOSE true
-    set L_PORT 4444
+Core Variables & Features:
+    set R_HOST <IP>          - Set the remote target IP address.
+    set L_PORT <PORT>        - Set the local port for reverse shells.
+    set auto_suggest true    - Enable post-recon automated exploit suggestions.
+    set listener true        - Enable the native background raw TCP listener.
+    set target <index>       - Quickly set R_HOST from your target database.
 
-Note: Boolean values (true/false) are automatically type-cast.
+Examples:
+    set R_HOST 192.168.1.100
+    set VERBOSE true 
+
+Note: Boolean values (true/false) are automatically type-cast by the engine.

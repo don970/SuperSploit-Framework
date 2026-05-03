@@ -1,4 +1,18 @@
 {
+    "ss": "/Users/donald/.SuperSploit",
+    "~": "/Users/donald",
+    "config": "/Users/donald/.SuperSploit/.data/.config",
+    "db": "/Users/donald/.SuperSploit/.data/.config/data.json",
+    "history": "/Users/donald/.SuperSploit/.data/.history/history",
     "install_dir": "/Users/donald/.SuperSploit",
-    "~": "/Users/donald"
+    "logs": "/Users/donald/.SuperSploit/.data/.logs",
+    "nmapDb": "/Users/donald/.SuperSploit/.data/.config/nmap-os-db.txt",
+    "aliases": "/Users/donald/.SuperSploit/.data/.config/aliases.json",
+    "exploits": "/Users/donald/.SuperSploit/exploits",
+    "recon": "/Users/donald/.SuperSploit/recon",
+    "assets": "/Users/donald/.SuperSploit/.data/.config/.assets/",
+    "activity": "/Users/donald/.SuperSploit/.data/.config/.activity/",
+    "targets": "/Users/donald/.SuperSploit/.data/.config/targets.json",
+    "templates":"/Users/donald/.SuperSploit/templates",
+    "payloads": "/Users/donald/.SuperSploit/payloads"
 }

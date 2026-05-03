@@ -1,9 +1,11 @@
-Command: show
-Description: Displays information about the current session and environment.
+# 🖥️ COMMAND: show
+Description: Displays information about the current session, environment, and loaded modules.
 
 Usage:
-    show                - List all currently set dynamic variables.
-    show details        - Display specific details for the active exploit.
+    show                - List all currently set dynamic session variables.
+    show options        - Display required and optional parameters for the loaded module.
+    show targets        - Display the internal target database and discovered assets.
+    show details        - Display specific metadata/details for the active exploit.
     show aliases        - List all configured command aliases.
     show shells         - Display available system shells from /etc/shells.
-    show <VAR1> <VAR2>  - Show the value of specific variables (e.g., 'show R_HOST').
+    show <VAR>          - Show the value of a specific variable (e.g., 'show R_HOST').

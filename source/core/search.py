@@ -1,8 +1,6 @@
 from .database import DatabaseManagment, ExploitCache
 import os
 
-class Search: 
-    from .database import DatabaseManagment, ExploitCache
 from .ToStdOut import ToStdout
 
 write = ToStdout.write
@@ -21,6 +19,9 @@ class Search:
             db, path_list = DatabaseManagment.UpdateReconDB()
             source_list = path_list
             for i, path in enumerate(source_list):
+                if "__pycache__" in path:
+                    continue
+
                 meta = ExploitCache.metadata_index.get(path, {})
 
                 # Match against Path, Name, CVE, or Description
@@ -41,6 +42,9 @@ class Search:
         source_list = ExploitCache.all_exploits if category == "exploits" else ExploitCache.all_payloads
         
         for i, path in enumerate(source_list):
+            if "__pycache__" in path:
+                continue
+
             meta = ExploitCache.metadata_index.get(path, {})
             
             # Match against Path, Name, CVE, or Description

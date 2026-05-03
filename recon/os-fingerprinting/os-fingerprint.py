@@ -32,8 +32,98 @@ with open(path_to_database) as f:
 
 
 # Suppress Scapy's default routing warnings for cleaner console output
-conf.verb = 0 
+conf.verb = 0
 
+class NmapProbeCrafter:
+    def __init__(self, target_ip, open_port, closed_port):
+        self.target_ip = target_ip
+        self.open_port = open_port
+        self.closed_port = closed_port
+
+    def probe_t1(self):
+        """
+        T1: Sends a SYN packet with a specific window size and a full
+        suite of TCP options to an OPEN port.
+        """
+        pkt = IP(dst=self.target_ip) / TCP(
+            dport=self.open_port,
+            flags="S",
+            window=32768,
+            options=[
+                ('WScale', 10),
+                ('NOP', None),
+                ('MSS', 1460),
+                ('Timestamp', (0xFFFFFFFF, 0)),
+                ('SAckOK', '')
+            ]
+        )
+        return sr1(pkt, timeout=2, verbose=0)
+
+    def probe_t2(self):
+        """
+        T2: Sends a NULL packet (no flags) with the Don't Fragment (DF)
+        bit set to an OPEN port.
+        """
+        pkt = IP(dst=self.target_ip, flags="DF") / TCP(
+            dport=self.open_port,
+            flags="",  # NULL
+            window=128
+        )
+        return sr1(pkt, timeout=2, verbose=0)
+
+    def probe_t5(self):
+        """
+        T5: Sends a SYN packet to a CLOSED port to analyze the RST response.
+        """
+        pkt = IP(dst=self.target_ip) / TCP(
+            dport=self.closed_port,
+            flags="S",
+            window=31337
+        )
+        return sr1(pkt, timeout=2, verbose=0)
+
+
+def parse_nmap_options(tcp_layer):
+    """
+    Translates Scapy's TCP options list into Nmap's 'O' string format.
+    Example output: 'M5B4NW0NNT11S'
+    """
+    if not tcp_layer.options:
+        return ""
+
+    nmap_opt_string = ""
+
+    for opt in tcp_layer.options:
+        name = opt[0]
+        val = opt[1] if len(opt) > 1 else None
+
+        if name == 'MSS':
+            # Nmap expects 'M' followed by the MSS value in Hex
+            nmap_opt_string += f"M{val:X}"
+        elif name == 'WScale':
+            # Nmap expects 'W' followed by the scale value
+            nmap_opt_string += f"W{val}"
+        elif name == 'NOP':
+            # Nmap expects 'N'
+            nmap_opt_string += "N"
+        elif name == 'SAckOK':
+            # Nmap expects 'S'
+            nmap_opt_string += "S"
+        elif name == 'Timestamp':
+            # Nmap expects 'T' followed by 0 or 1 for the two timestamp values
+            ts_val, ts_ecr = val
+            v1 = "1" if ts_val != 0 else "0"
+            v2 = "1" if ts_ecr != 0 else "0"
+            nmap_opt_string += f"T{v1}{v2}"
+
+    return nmap_opt_string
+
+
+# --- Example Usage ---
+# response = crafter.probe_t1()
+# if response and response.haslayer(TCP):
+#     nmap_o_string = parse_nmap_options(response.getlayer(TCP))
+#     print(f"TCP Options formatted for Nmap DB: {nmap_o_string}")
 
 class OSFingerprintEngine:
     """
@@ -191,6 +281,8 @@ class OSFingerprintEngine:
                 return f"Match Found: {os_name}"
         
         return f"Unknown OS (Unmatched Fingerprint: TTL={fp['base_ttl']}, Win={fp['window']})"
+
+
 
 class Start:
 

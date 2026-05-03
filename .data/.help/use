@@ -1,9 +1,10 @@
-Command: use
-Description: Selects a specific module or target for the session by its index.
+# 🎯 COMMAND: use
+Description: Selects and loads a specific module or target into the active session by its search index.
 
 Usage:
-    use exploit <index> - Select an exploit module from the search results.
-    use payload <index> - Select a payload module from the search results.
+    use exploit <index> - Load an exploit module from your previous search results.
+    use payload <index> - Load a payload module from your previous search results.
+    use recon <index>   - Load a reconnaissance module from your previous search results.
     use target <index>  - Select a target from the saved targets list.
 
-Note: Indices are retrieved by running the 'search' command first.
+Note: Indices are dynamically generated. You must run the 'search' command first to obtain the correct index number before using this command.

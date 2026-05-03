@@ -1,7 +1,6 @@
 #!/bin/python3
 import json
 import os
-import subprocess
 from os import getenv
 from subprocess import run
 import pathlib
@@ -28,7 +27,24 @@ class SuperSploit:
     def create_aliases(self):
         cwd = pathlib.Path(os.getcwd())
         # lets create the base dictionary
-        a = {"~": getenv("HOME"), "install_dir": f"{getenv('HOME')}/.SuperSploit"}
+        a = {
+    "ss": f"{installation}.SuperSploit",
+    "~": f"{home}",
+    "config": f"{installation}/.data/.config",
+    "db": f"{installation}/.data/.config/data.json",
+    "history": f"{installation}/.data/.history/history",
+    "install_dir": F"{installation}",
+    "logs": f"{installation}/.data/.logs",
+    "nmapDb": f"{installation}/.data/.config/nmap-os-db.txt",
+    "aliases": f"{installation}/.data/.config/aliases.json",
+    "exploits": f"{installation}/exploits",
+    "recon": f"{installation}recon",
+    "assets": f"{installation}/.data/.config/.assets/",
+    "activity": f"{installation}/.data/.config/.activity/",
+    "targets": f"{installation}/.data/.config/targets.json",
+    "templates": f"{installation}/templates",
+    "payloads": f"{installation}/payloads"
+        }
         # write the dictionary to a json file using the json libary
         with open(f"{installation}/.data/.config/Aliases.json", "w") as file:
             # create the json dump

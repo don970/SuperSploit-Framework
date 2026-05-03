@@ -1,12 +1,13 @@
-Command: search
-Description: Searches the framework for exploits, payloads, or targets.
+# 🔎 COMMAND: search
+Description: Searches the framework's internal database for exploits, payloads, recon modules, or targets. Matches keywords against path, name, CVE, category, or description.
 
 Usage:
-    search exploits [keyword] - Search modules by path, name, CVE, or description.
-    search payloads [keyword] - Search available payloads.
-    search recon [keyword] - List all configured targets and ports.
+    search exploits [keyword] - Search exploit modules.
+    search payloads [keyword] - Search available payload generators.
+    search recon [keyword]    - Search reconnaissance and enumeration modules.
+    search targets [keyword]  - Search the internal targets database.
 
-Example:
+Examples:
     search exploits dirtypipe
-    search payloads windows
-    search recon fingerprint
+    search recon smb
+    search targets 192.168.1.0/24
