@@ -21,19 +21,26 @@ With a strict focus on attack execution rather than broad discovery, the framewo
 ### 1. Lightweight & Command-Line First
 Designed for speed and reliability, the framework avoids the overhead of a graphical user interface. Its terminal-based architecture utilizes `prompt-toolkit` to provide persistent input history, dynamic auto-suggestions, and a seamless environment that falls back to native system shell execution when a command is unrecognized.
 
+<img width="1536" height="2752" alt="SuperSploit Command Routing Engine Overview" src="https://github.com/user-attachments/assets/acd2826d-84d6-4c33-ac2c-a58eeb4a459a" />
+
 ### 2. Performance-Optimized Routing
 * **O(1) Command Registry:** SuperSploit utilizes optimized dictionary mappings for command dispatching, ensuring instantaneous response times regardless of how many modules or custom tools are loaded.
 * **Intelligent Caching:** Database reads and CVE lookups are cached locally in memory to minimize redundant disk I/O, providing a fluid operator experience.
 
+
 ### 3. Modular & Staged Execution Engine
 * **In-Memory Payload Loading:** Utilizing `importlib.util`, Python exploits are dynamically loaded into isolated memory namespaces. This ensures clean execution without permanently writing temporary modules to the source tree.
 * **Staged Deployment:** The framework accommodates staged execution logic, giving operators precise, granular control over payload delivery.
+<img width="2752" height="1536" alt="SuperSploit Python Exploit Lifecycle" src="https://github.com/user-attachments/assets/16e84cc6-eb9e-47ba-a3f3-3c11cefd2cea"/>
 * **Fail-Safe C Compilation:** C-based exploits are compiled in real-time (`gcc`). A rigid execution protocol ensures that all compiled binaries are safely purged from the disk after execution or upon interruption.
 * **Raw Socket Handlers:** Built-in context-managed native socket listeners for instantly catching reverse shells.
+<img width="2752" height="1536" alt="System Exploitation Framework Workflow" src="https://github.com/user-attachments/assets/4d8d8d14-618a-48f2-9c96-03c67843ecfd" />
+
 
 ### 4. Zero-Trust Security Validation
 * **Strict Integrity Checking:** Internal scripts and execution environments are validated using Python's SHA256 hashing to ensure the framework has not been tampered with.
 * **Deep Input Sanitization:** All user-provided shell arguments are tokenized using `shlex.split()`, completely mitigating arbitrary command injection during payload execution.
+<img width="1536" height="2752" alt="Pen Test Framework Architecture Overview" src="https://github.com/user-attachments/assets/28c8f736-c48e-4362-8dc8-8833598c2381" />
 
 ---
 
@@ -58,6 +65,7 @@ SuperSploit commands are divided into tactical categories for ease of use.
 *(Type `help <command>` inside the framework for detailed usage instructions for any specific module).*
 
 ---
+<img width="2816" height="1536" alt="Gemini_Generated_Image_e5x2fxe5x2fxe5x2" src="https://github.com/user-attachments/assets/03d8fbcf-6fdd-4f14-9c8f-50f1b2880fda" />
 
 ## 🗺️ Future Roadmap for framework core
 
