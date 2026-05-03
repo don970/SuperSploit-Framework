@@ -34,9 +34,9 @@ Designed for speed and reliability, the framework avoids the overhead of a graph
 ### 3. Modular & Staged Execution Engine
 * **In-Memory Payload Loading:** Utilizing `importlib.util`, Python exploits are dynamically loaded into isolated memory namespaces. This ensures clean execution without permanently writing temporary modules to the source tree.
 * **Staged Deployment:** The framework accommodates staged execution logic, giving operators precise, granular control over payload delivery.
-<img width="2752" height="1536" alt="SuperSploit Python Exploit Lifecycle" src="https://github.com/user-attachments/assets/16e84cc6-eb9e-47ba-a3f3-3c11cefd2cea"/>
 * **Fail-Safe C Compilation:** C-based exploits are compiled in real-time (`gcc`). A rigid execution protocol ensures that all compiled binaries are safely purged from the disk after execution or upon interruption.
 * **Raw Socket Handlers:** Built-in context-managed native socket listeners for instantly catching reverse shells.
+* <img width="2752" height="1536" alt="SuperSploit Python Exploit Lifecycle" src="https://github.com/user-attachments/assets/16e84cc6-eb9e-47ba-a3f3-3c11cefd2cea"/>
 <img width="2752" height="1536" alt="System Exploitation Framework Workflow" src="https://github.com/user-attachments/assets/4d8d8d14-618a-48f2-9c96-03c67843ecfd" />
 
 
@@ -93,7 +93,6 @@ SuperSploit is continuously evolving to enhance its core exploitation capabiliti
 
 ---
 ---
-<img width="2816" height="1536" alt="roadmap" src="https://github.com/user-attachments/assets/8c279643-5aa2-4149-bd0f-2db5b1ef0f05" />
 
 ## 🗺️ Future Roadmap for recon
 
