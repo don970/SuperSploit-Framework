@@ -16,6 +16,7 @@ With a strict focus on attack execution rather than broad discovery, the framewo
 ---
 
 ## 🚀 Core Strengths & Features
+<img width="2752" height="1536" alt="unnamed" src="https://github.com/user-attachments/assets/c53c02a0-52e2-414a-8127-67e24e904012" />
 
 ### 1. Lightweight & Command-Line First
 Designed for speed and reliability, the framework avoids the overhead of a graphical user interface. Its terminal-based architecture utilizes `prompt-toolkit` to provide persistent input history, dynamic auto-suggestions, and a seamless environment that falls back to native system shell execution when a command is unrecognized.
