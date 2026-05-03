@@ -32,11 +32,13 @@ class use:
                 
         elif category == "target":
             try:
-                with open(f"{installation}/.data/.targets", "r") as file:
-                    targetList = [x for x in file.read().split("\n") if x]
+                targets = DatabaseManagment.getTargets()
+                targetList = []
+                for k, v in enumerate(targets):
+                    targetList.append(v)
                 if 0 <= index < len(targetList):
                     DatabaseManagment.directlyModify(["target", targetList[index]])
-                    print(f"[*] Set target to {targetList[index]}\n")
+                    print(f"[*] Set R_HOST to {targetList[index]}\n")
                 else:
                     print("[-] Invalid target index.\n")
             except FileNotFoundError:

@@ -15,6 +15,8 @@ import yaml
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
 # Absolute path to the main configuration/session JSON database
 path_to_database = f"{install_location}/.data/.config/data.json"
+# Absolute path to the dedicated targets database
+path_to_targets = f"{install_location}/.data/.config/targets.json"
 # Alias for the standard output writing function
 write = ToStdout.write
 
@@ -124,6 +126,14 @@ class DatabaseManagment:
     """
 
     @classmethod
+    def _update(cls, data):
+        try:
+            with open(path_to_database, "w") as file:
+                file.write(json.dumps(data))
+        except FileNotFoundError as e:
+            return e
+
+    @classmethod
     def getCVE(cls):
         """Retrieves the CVE from the current memory cache and syncs it to the JSON database."""
         cache = ExploitCache.details
@@ -136,23 +146,36 @@ class DatabaseManagment:
 
     @classmethod
     def getTargets(cls):
-        """Safely retrieves target list for the search module."""
-        target_dict = {}
-        target_file = f"{install_location}/.data/.nmap/.targets"
-        if os.path.exists(target_file):
+        """Safely retrieves target list from the dedicated targets JSON database."""
+        if os.path.exists(path_to_targets):
             try:
-                with open(target_file, "r") as file:
-                    for line in file.read().splitlines():
-                        # Handle targets defined with specific ports (e.g., IP:PORT)
-                        if ":" in line:
-                            target, port = line.split(":", 1)
-                            target_dict[target.strip()] = port.strip()
-                        # Handle targets defined without ports
-                        elif line.strip():
-                            target_dict[line.strip()] = "N/A"
+                with open(path_to_targets, "r") as file:
+                    return json.load(file).get("TARGETS", {})
             except Exception:
                 pass
-        return target_dict
+        return {}
+
+    @classmethod
+    def saveTargets(cls, targets_dict: dict):
+        """Saves a dictionary of targets to the dedicated targets database."""
+        try:
+            db_data = {"TARGETS": {}}
+            if os.path.exists(path_to_targets):
+                try:
+                    with open(path_to_targets, "r") as file:
+                        db_data = json.load(file)
+                except Exception:
+                    pass
+            
+            # Merge new targets with any existing ones
+            existing = db_data.get("TARGETS", {})
+            existing.update(targets_dict)
+            db_data["TARGETS"] = existing
+            
+            with open(path_to_targets, "w") as file:
+                json.dump(db_data, file, sort_keys=True, indent=4)
+        except Exception:
+            error(traceback.format_exc())
 
     @classmethod
     def checkIntegration(cls) -> bool:

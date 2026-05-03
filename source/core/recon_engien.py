@@ -7,7 +7,6 @@ from .database import DatabaseManagment
 import importlib
 
 install = DatabaseManagment.getInstall()
-db = DatabaseManagment.get()
 
 class Recon:
     """
@@ -17,11 +16,14 @@ class Recon:
     """
 
     def __init__(self, args=None):
+        # Fetch the absolute latest database state on every initialization
+        self.db = DatabaseManagment.get()
+
         # Prompt the user to determine the execution method
         self.module = False if input("[*] Run as a module in python [y/n]: ").lower().startswith("n") else True
 
         # Fetch the recon name from the database (Note: this variable is currently unused)
-        name = db["RECON_NAME"]
+        name = self.db["RECON_NAME"]
 
         # Clean the raw file of metadata and create a buffer for execution
         self.buffer, self.metadata = self.createBuffer()
@@ -29,17 +31,22 @@ class Recon:
         # If the user chose not to run as a module, execute it via subprocess immediately
         if not self.module:
             self.exec_with_sub(self.buffer)
+            DatabaseManagment._update(self.db)
             return
         self.run()
+        DatabaseManagment._update(self.db)
+        return
+
+
 
 
     def run(self):
         """Dynamically loads the recon script into memory as a module and executes its Start() method."""
         print("[*] Running as a python module")
-        args = input(f'[*] Enter arguments for {db["RECON_PATH"]}: ').split(" ")
+        args = input(f'[*] Enter arguments for {self.db["RECON_PATH"]}: ').split(" ")
 
         # Dynamically load the python file from the path specified in the database
-        spec = importlib.util.spec_from_file_location("recon_module", db["RECON_PATH"])
+        spec = importlib.util.spec_from_file_location("recon_module", self.db["RECON_PATH"])
         recon_module = importlib.util.module_from_spec(spec)
         sys.modules["recon_module"] = recon_module
         spec.loader.exec_module(recon_module)
@@ -51,16 +58,15 @@ class Recon:
             recon_module.Start(args)
         except Exception:
             # Log the exception if the module fails to run
-            Logger.initializeReconMoodle(db["RECON_NAME"], db["RECON_PATH"], traceback.format_exc())
+            Logger.initializeReconMoodle(self.db["RECON_NAME"], self.db["RECON_PATH"], traceback.format_exc())
             print(traceback.format_exc())
         finally:
             del sys.modules["recon_module"]
             print("clean up complete")
 
-    @staticmethod
-    def createBuffer():
+    def createBuffer(self):
         """Reads the recon file and strips out the metadata section delimited by '#!#!#!'."""
-        with open(db["RECON_PATH"], "r") as file:
+        with open(self.db["RECON_PATH"], "r") as file:
             raw_data = file.read().split("#!#!#!")
 
         # The metadata is expected to be in the second section (index 1)
@@ -75,8 +81,7 @@ class Recon:
             clean_buffer = raw_data[0]
         return clean_buffer, metadata
 
-    @classmethod
-    def exec_with_sub(cls,clean_buffer):
+    def exec_with_sub(self, clean_buffer):
         """Writes the cleaned module to a temporary file and executes it via a separate subprocess."""
         # Define a consistent temporary path for execution
         temp_exec_path = f"{install}/source/core/exploit/recon_module.py"
@@ -85,7 +90,7 @@ class Recon:
                 file1.write(clean_buffer)
                 # Subprocess execution using the CLEANED file
                 # Note: db["EXPLOIT"] is used here. Double-check if this shouldn't be db["RECON_NAME"] instead
-                args = input(f'[*] Enter arguments for {db["EXPLOIT"]}: ').split(" ")
+                args = input(f'[*] Enter arguments for {self.db["RECON_NAME"]}: ').split(" ")
 
                 # Build the command array for the subprocess
                 cmd = [f"python3", temp_exec_path]
@@ -93,7 +98,7 @@ class Recon:
                     if len(x) > 0:
                         cmd.append(x)
 
-                print(f"[*] Executing {db['EXPLOIT']} via subprocess...")
+                print(f"[*] Executing {self.db['RECON_NAME']} via subprocess...")
                 subprocess.run(cmd)
             except OSError:
                 return traceback.format_exc()

@@ -1,105 +1,125 @@
 """
-Native TCP Port Scanner Module
-Provides fast, concurrent port scanning without external dependencies.
+Native Async Port Scanner Engine
+Replaces threaded scanning with asyncio for non-blocking, high-speed 
+network mapping and banner grabbing.
 """
 
-import socket
-import concurrent.futures
-from typing import List, Tuple
+import asyncio
 import json
 import os
+from urllib.parse import urlparse
 
+install_location = f'{os.getenv("HOME")}/.SuperSploit'
+path_to_database = f"{install_location}/.data/.config/data.json"
 
-class PortScanner:
+# Load database directly
+try:
+    with open(path_to_database) as f:
+        db = json.load(f)
+except FileNotFoundError:
+    db = {}
+
+class AsyncPortScanner:
     """
-    A fast, native Python TCP port scanner utilizing ThreadPoolExecutor.
-    Ideal for replacing external dependencies like Nmap for basic reconnaissance.
+    Asynchronous port scanner utilizing Python's asyncio event loop.
+    Handles concurrent connections and passive/active banner grabbing.
     """
-
-    # A predefined list of common ports for rapid scanning
-    COMMON_PORTS = [
-        21, 22, 23, 25, 53, 80, 110, 111, 135, 139, 143, 443, 445, 
-        993, 995, 1723, 3306, 3389, 5900, 8080, 8443
-    ]
-
-    def __init__(self, timeout: float = 1.0, max_workers: int = 100):
-        """
-        Initializes the PortScanner.
-        
-        :param timeout: Time in seconds before giving up on a connection.
-        :param max_workers: Maximum number of concurrent threads to use.
-        """
+    def __init__(self, target: str, ports: list, timeout: float = 1.5, max_concurrency: int = 500):
+        self.target = target
+        self.ports = ports
         self.timeout = timeout
-        self.max_workers = max_workers
+        # Semaphore prevents "Too many open files" OS-level crashes
+        self.semaphore = asyncio.Semaphore(max_concurrency)
+        self.open_ports = []
 
-    def _scan_single_port(self, ip: str, port: int) -> Tuple[int, bool]:
-        """
-        Attempts to connect to a specific TCP port on the target IP.
-        
-        :param ip: Target IP address.
-        :param port: Target port number.
-        :return: A tuple containing the port number and a boolean indicating if it's open.
-        """
+    async def grab_banner(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, port: int) -> str:
+        """Attempts to read the service banner. Sends a probe for HTTP services."""
+        banner = ""
         try:
-            # Use IPv4 (AF_INET) and TCP (SOCK_STREAM)
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.settimeout(self.timeout)
-                # connect_ex returns 0 if the connection was successful
-                result = sock.connect_ex((ip, port))
-                return port, (result == 0)
+            # Send a generic probe for web ports to trigger an immediate response
+            if port in [80, 443, 8080, 8443]:
+                writer.write(b"HEAD / HTTP/1.0\r\n\r\n")
+                await writer.drain()
+            
+            # Wait for data to arrive on the socket
+            data = await asyncio.wait_for(reader.read(1024), timeout=self.timeout)
+            if data:
+                # Decode, ignoring strict errors since some services send raw bytes
+                banner = data.decode('utf-8', errors='ignore').strip()
+                # Clean up newlines for a cleaner console output
+                banner = banner.replace('\r', '').replace('\n', ' ')
         except Exception:
-            # Catching general exceptions (e.g., socket creation errors, routing issues)
-            return port, False
-
-    def scan_target(self, ip: str, ports: List[int] = None) -> List[int]:
-        """
-        Scans a list of ports concurrently on the specified IP.
-        
-        :param ip: Target IP address to scan.
-        :param ports: List of ports to scan. Defaults to COMMON_PORTS if None.
-        :return: A sorted list of open ports.
-        """
-        if ports is None:
-            ports = self.COMMON_PORTS
+            pass
+        finally:
+            # Always cleanly close the socket
+            writer.close()
+            await writer.wait_closed()
             
-        open_ports = []
-        
-        # ThreadPoolExecutor manages a pool of threads for concurrent execution
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            # Map the target IP and ports to the thread pool
-            future_to_port = {
-                executor.submit(self._scan_single_port, ip, port): port 
-                for port in ports
-            }
-            
-            # Process results as they complete
-            for future in concurrent.futures.as_completed(future_to_port):
-                port, is_open = future.result()
-                if is_open:
-                    open_ports.append(port)
-                    
-        return sorted(open_ports)
+        return banner
 
+    async def scan_port(self, port: int):
+        """Attempts an async connection to the port. If successful, initiates banner grab."""
+        async with self.semaphore:
+            try:
+                # Attempt non-blocking connection
+                reader, writer = await asyncio.wait_for(
+                    asyncio.open_connection(self.target, port), 
+                    timeout=self.timeout
+                )
+                
+                # If we get here, the TCP handshake succeeded (Port is OPEN)
+                banner = await self.grab_banner(reader, writer, port)
+                
+                self.open_ports.append({"port": port, "banner": banner})
+                
+                # Print results to the console dynamically as they are found
+                banner_disp = f" | Banner: {banner[:50]}..." if banner else ""
+                print(f"[+] Port {port:<5} is OPEN{banner_disp}")
+                
+            except (asyncio.TimeoutError, ConnectionRefusedError, OSError):
+                # Port is closed, filtered, or unreachable
+                pass
+
+    async def run_scan(self):
+        """Gathers and executes all port scanning tasks concurrently."""
+        print(f"[*] Starting Async Port Scan on {self.target} ({len(self.ports)} ports)")
+        print("[*] Concurrency Limit: 500 tasks | Timeout: 1.5s\n")
+        
+        # Create a task for every port
+        tasks = [self.scan_port(port) for port in self.ports]
+        
+        # Execute all tasks concurrently on the event loop
+        await asyncio.gather(*tasks)
+        
+        return sorted(self.open_ports, key=lambda x: x["port"])
 
 class Start:
-    def __init__(self):
-        install_location = f'{os.getenv("HOME")}/.SuperSploit'
-        # Absolute path to the main configuration/session JSON database
-        path_to_database = f"{install_location}/.data/.config/data.json"
-
-        # load database directly
-        with open(path_to_database) as f:
-            db = json.load(f)
-
-        # Example Usage / CLI Runner
-        target_ip = db["R_HOST"]
-        scanner = PortScanner(timeout=0.5, max_workers=50)
-
-        print(f"[*] Starting native scan on {target_ip}...")
-        results = scanner.scan_target(target_ip)
-
-        print(f"[*] Scan complete.")
-        if results:
-            print(f"[+] Open ports found: {results}")
+    def __init__(self, args=None):
+        raw_target = str(db.get("R_HOST", ""))
+        if "://" in raw_target:
+            target_ip = urlparse(raw_target).hostname
         else:
-            print("[-] No open ports found.")
+            target_ip = raw_target.split(":")[0]
+            
+        if not target_ip:
+            print("[-] No valid R_HOST set in the database.")
+            return
+
+        # Scan the standard well-known ports (1-1024)
+        ports_to_scan = list(range(1, 1025))
+        
+        scanner = AsyncPortScanner(target_ip, ports_to_scan)
+        
+        # Enter the asyncio event loop
+        results = asyncio.run(scanner.run_scan())
+        
+        print(f"\n[+] Scan Complete. Found {len(results)} open ports.")
+
+#!#!#!
+name: "Async Port Scanner"
+category: "Scanner"
+desc: """Performs hyper-fast concurrent network mapping and banner grabbing.
+Utilizes Python's asyncio event loop to bypass threading limits and scan hundreds 
+of ports simultaneously."""
+author: "Donald Ford"
+#!#!#!

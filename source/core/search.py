@@ -31,6 +31,13 @@ class Search:
                     write(f"{i}: {path}{cve_str}")
             return
 
+        if category == "targets":
+            targets = DatabaseManagment.getTargets()
+            for k, v in enumerate(targets):
+                print(f"{k}: {v}")
+            return
+
+
         source_list = ExploitCache.all_exploits if category == "exploits" else ExploitCache.all_payloads
         
         for i, path in enumerate(source_list):

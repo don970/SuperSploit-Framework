@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.7] - 2026-05-10
+### Added
+- **Native Host Discovery:** Implemented `recon/native-discovery/host_discovery.py` using raw sockets and Scapy to perform hyper-fast asynchronous Layer 2 (ARP) and Layer 3 (ICMP) ping sweeps, completely replacing Nmap's `-sn` capabilities.
+- **Async Port Scanner:** Upgraded the native port scanner in `recon/native-portscan/port_scanner.py` to utilize Python's `asyncio` and `Semaphore` for non-blocking, concurrent network mapping and dynamic active banner grabbing.
+
+### Changed
+- **Dedicated Targets Database:** Separated discovered network targets from the main framework configuration (`data.json`) into a dedicated `targets.json` database. Updated `DatabaseManagment` in `source/core/database.py` and the host discovery module to seamlessly read from and write to this new structure.
+
+### Fixed
+- **Recon Module Caching Bug:** Fixed an issue in `source/core/recon_engien.py` where switching recon modules would execute the previously loaded module. The database configuration fetch (`DatabaseManagment.get()`) was moved inside the `Recon.__init__` method to guarantee the latest module path is pulled on every execution.
+
 ## [1.2.6] - 2026-05-08
 ### Added
 - **Recon Commands in Help:** Added the `recon` command to `.data/.help/all` and created `.data/.help/recon` help documentation.
