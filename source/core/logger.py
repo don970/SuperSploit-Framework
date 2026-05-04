@@ -25,7 +25,7 @@ class Logger:
             "modulePath": pathlib.Path(path)}
 
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        entry = f"[{timestamp}] [SessionID: {db["SessionID"]}] Name: {db["moduleName"]} | Path: {db["modulePath"]} | {error}"
+        entry = f"[{timestamp}] [SessionID: {db['SessionID']}] Name: {db['moduleName']} | Path: {db['modulePath']} | {error}"
         cls._write_recon_log(entry)
         return db
 
