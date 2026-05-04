@@ -29,7 +29,11 @@ conf.verb = 0
 class HostDiscoveryEngine:
     """
     A modular host discovery engine designed for SuperSploit.
-    Utilizes raw sockets to fire off concurrent ARP and ICMP packets across CIDR ranges.
+    Utilizes raw sockets to craft and fire off custom ARP and ICMP packets across CIDR ranges.
+    
+    By operating at the raw socket level with Scapy, this engine completely bypasses the 
+    need for external binaries like Nmap, while simultaneously dodging standard OS-level 
+    socket restrictions to allow for high-speed packet injection.
     """
     def __init__(self, session_id: str | None = None, debug_mode: bool = False):
         self.session_id = session_id or str(uuid.uuid4())
@@ -53,15 +57,22 @@ class HostDiscoveryEngine:
     def arp_sweep(self, target_cidr: str) -> list[dict]:
         """
         Layer 2 Host Discovery.
-        Extremely fast and bypasses local OS firewalls. Only works on the local subnet.
+        Operates directly on the Data Link Layer (OSI Layer 2) using the Address Resolution Protocol.
+        
+        Why ARP?
+        ARP requests ask "Who has this IP?" by broadcasting a frame to the FF:FF:FF:FF:FF:FF MAC address.
+        Because this happens below the IP routing layer (Layer 3), local host firewalls (like Windows Defender) 
+        typically do not block it. It is extremely fast and accurate, but it ONLY works on the local subnet.
         """
         self.logger.info(f"Initiating Layer 2 (ARP) sweep against {target_cidr}...")
         live_hosts = []
         try:
-            # Craft Ethernet broadcast + ARP request for the entire CIDR
+            # Craft the packet: Ethernet broadcast destination + ARP request.
+            # Scapy automatically expands the target_cidr (e.g. 192.168.1.0/24) into individual IP addresses.
             packet = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=target_cidr)
             
-            # srp (send and receive at Layer 2)
+            # srp (Send and Receive at Layer 2). 
+            # Timeout dictates how long we wait for straggling responses after all packets are fired.
             ans, unans = srp(packet, timeout=2, retry=1)
             
             for snd, rcv in ans:
@@ -82,15 +93,19 @@ class HostDiscoveryEngine:
     def icmp_sweep(self, target_cidr: str) -> list[dict]:
         """
         Layer 3 Host Discovery.
-        Standard 'ping' sweep. Required if scanning routable IPs outside the local subnet.
+        Operates on the Network Layer (OSI Layer 3) using Internet Control Message Protocol (ICMP).
+        
+        This is essentially a standard 'ping' sweep. While it is highly likely to be dropped by 
+        modern host-based firewalls, it is strictly necessary if we are scanning routable IPs 
+        outside of our local subnet (since ARP cannot cross routers).
         """
         self.logger.info(f"Initiating Layer 3 (ICMP) sweep against {target_cidr}...")
         live_hosts = []
         try:
-            # IP layer automatically parses CIDR strings in Scapy
+            # Craft the packet: The IP layer encapsulates an empty ICMP Echo Request.
             packet = IP(dst=target_cidr) / ICMP()
             
-            # sr (send and receive at Layer 3)
+            # sr (Send and Receive at Layer 3). Notice we don't need the Ethernet layer here.
             ans, unans = sr(packet, timeout=2, retry=1)
             
             for snd, rcv in ans:
@@ -111,7 +126,8 @@ class HostDiscoveryEngine:
 
 class Start:
     def __init__(self):
-        # Fetch the target from the database (e.g., 192.168.1.0/24)
+        # Fetch the target IP or Subnet from the SuperSploit database.
+        # This value was previously set by the user (e.g., `set R_HOST 192.168.1.0/24`).
         target_cidr = str(db.get("R_HOST", ""))
         
         if not target_cidr:
@@ -121,13 +137,14 @@ class Start:
         engine = HostDiscoveryEngine(debug_mode=True)
         print(f"[*] Starting Native Host Discovery on {target_cidr}")
 
-        # Execute Both Sweeps
-        # ARP will catch local machines even if they block ICMP (like Windows Defender)
-        # ICMP will catch everything else across routers
+        # Execute Both Sweeps Sequentially
+        # 1. ARP catches completely stealthy local machines that drop ICMP.
+        # 2. ICMP catches segmented/routed machines outside of the local switch.
         arp_results = engine.arp_sweep(target_cidr)
         icmp_results = engine.icmp_sweep(target_cidr)
 
-        # Merge results, prioritizing ARP data (since it contains MAC addresses)
+        # Merge results into a deduplicated dictionary.
+        # We prioritize ARP data over ICMP because ARP physically provides the remote host's MAC address.
         discovered = {host['ip']: host for host in arp_results}
         for host in icmp_results:
             if host['ip'] not in discovered:
@@ -141,7 +158,9 @@ class Start:
             print(f"    - {ip}{mac_str} (via {data['protocol']})")
             target_updates[ip] = "N/A"
 
-        # Save discovered hosts to the central database
+        # Target Database Persistence
+        # Automatically saves newly discovered live hosts to targets.json.
+        # This allows the user to immediately run `use target <index>` to begin exploiting them.
         if target_updates:
             print(f"[*] Saving {len(target_updates)} hosts to the targets database...")
             try:
