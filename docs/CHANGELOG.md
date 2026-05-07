@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.10] - 2026-05-25
+### Added
+- **Extended Port Scope Configuration:** Added support for the `PORT_RANGE` flag in the async port scanner. The scanner now intelligently merges the `PORTS` and `PORT_RANGE` database variables to allow for simultaneous custom lists and specific ranges.
+- **Advanced Diagnostic Commentary:** Injected extensive inline debugging notes (`# DEBUG TIP:`) throughout the async port scanner detailing `asyncio` file descriptor constraints, TCP handshake bottlenecks, and socket exception triage.
+
+### Changed
+- **Port Boundary Expansion:** Updated the async port scanner's boundary calculation to support scanning port `0`, officially spanning the entire `0-65535` range.
+- **Stale Cache Elimination:** Refactored `host_discovery.py` and `os-fingerprint.py` to load the `data.json` database dynamically at execution time (within `Start.__init__`) rather than at global module import time.
+- **Dynamic Port Targeting:** Updated the native `os-fingerprint.py` module to fetch the target port from the database (`R_PORT`) dynamically instead of enforcing a hardcoded port 80 check.
+- **JSON Dictionary Optimization:** Simplified target appending logic in both the port scanner and Custom Nmap OS Lookup modules using Python's native `dict.setdefault()`, significantly reducing verbosity and eliminating the risk of `KeyError` crashes.
+
+### Fixed
+- **Input Fallback Safety:** Hardened the async port scanner's scope generation block. If an invalid or malformed port range is provided, it now gracefully defaults to well-known privileged ports (`1-1024`) instead of crashing or executing an empty scan.
+
+## [1.2.9] - 2026-05-20
+### Added
+- **Advanced Nmap OS Fingerprinting:** Implemented a highly accurate, pure-Python OS fingerprinting engine (`Custom_nmap_db_Lookup.py`) using Scapy. Replicates Nmap's 13 specific probes (SEQ, OPS, WIN, ECN, T1-T7, U1, IE) and correlates raw responses against `nmap-os-db.txt` using official generation match points and weight formulas.
+- **Concurrent Network Probing:** Upgraded the OS fingerprinting engine to utilize `asyncio` combined with a `ThreadPoolExecutor` to execute blocking Scapy network probes concurrently, drastically accelerating OS detection.
+- **Heuristic Service Detection:** Introduced a `ServiceDetector` class to the native async port scanner, providing active protocol signature matching (e.g., `SSH-2.0`, `HTTP/1.1`) and intelligent standard-port fallbacks.
+- **Custom Port Scopes:** Added support for specifying custom port sweeps in the async port scanner utilizing the `PORTS` global variable (supports comma-separated lists and ranges like `80,443,8000-8080`).
+
+### Changed
+- **Dynamic Variable Loading:** Refactored the async port scanner to load `data.json` dynamically at execution time rather than at module import time, eliminating stale memory cache bugs when users update global variables.
+- **Centralized Target Persistence:** Upgraded both the port scanner and OS fingerprinting modules to natively append their findings (open ports, detected services, and matched OS fingerprints) directly to the nested `TARGETS` dictionary in `targets.json` without destroying or overwriting existing host entries.
+- **Educational Code Documentation:** Added deep, technically rigorous inline docstrings across `host_discovery.py`, `port_scanner.py`, and `Custom_nmap_db_Lookup.py` explaining raw socket behavior, OSI network layers, `asyncio` limitations, and packet formulation logic.
+
+### Fixed
+- **Module Metadata Integration:** Fixed a critical `IndexError` crash in the `recon_engien.py` loader by injecting the missing `#!#!#!` framework metadata block into the new OS fingerprint module.
+- **Scapy Parsing Exception:** Resolved a `Layer [IP] not found` exception in the OS fingerprint module's ICMP Echo (IE) probe by validating packet request IDs directly instead of improperly digging into Echo Reply payloads.
+- **Connection Reset Handling:** Added `ConnectionResetError` catching in the port scanner to prevent mid-handshake firewall `RST` packets from crashing the asynchronous event loop.
+
+## [1.2.8] - 2026-05-15
+### Added
+- **Recon Documentation:** Created a dedicated and highly detailed help page for reconnaissance modules (`.data/.help/recon`).
+- **Feature Documentation:** Documented new core framework features in the help files, including automated post-recon exploit suggestions (`auto_suggest`), native background raw TCP listeners (`listener`), and comprehensive target database management.
+
+### Changed
+- **Help System Overhaul:** Completely rewrote and stylized the core help files (`all`, `show`, `search`, `use`, `set`, and `modules`). Introduced cleaner visual formatting, emoji headers, better sectioning, and more detailed command usage examples.
+
+### Fixed
+- **Search Output Clutter:** Updated `source/core/search.py` to correctly filter out and hide `__pycache__` directories when searching for exploits, payloads, and recon modules.
+- **Code Cleanup:** Fixed a malformed and duplicate class definition/import statement at the top of `source/core/search.py`.
+
 ## [1.2.7] - 2026-05-10
 ### Added
 - **Native Host Discovery:** Implemented `recon/native-discovery/host_discovery.py` using raw sockets and Scapy to perform hyper-fast asynchronous Layer 2 (ARP) and Layer 3 (ICMP) ping sweeps, completely replacing Nmap's `-sn` capabilities.

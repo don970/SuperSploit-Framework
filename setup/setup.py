@@ -38,7 +38,7 @@ class SuperSploit:
     "nmapDb": f"{installation}/.data/.config/nmap-os-db.txt",
     "aliases": f"{installation}/.data/.config/aliases.json",
     "exploits": f"{installation}/exploits",
-    "recon": f"{installation}recon",
+    "reconDb": f"{installation}recon",
     "assets": f"{installation}/.data/.config/.assets/",
     "activity": f"{installation}/.data/.config/.activity/",
     "targets": f"{installation}/.data/.config/targets.json",
@@ -54,7 +54,7 @@ class SuperSploit:
 
     def install_dependencies(self):
         # install the pip dependencys
-        run(["pip3", "install", "-r", f"{installation}/setup/requirements.txt"])
+        run(["pip3", "install", "-r", "--break-system-packages", f"{installation}/setup/requirements.txt"])
 
 
 

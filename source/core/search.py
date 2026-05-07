@@ -34,8 +34,12 @@ class Search:
 
         if category == "targets":
             targets = DatabaseManagment.getTargets()
-            for k, v in enumerate(targets):
-                print(f"{k}: {v}")
+            print("-" * 50)
+            for i, (k, v) in enumerate(targets.items()):
+                print(f"Target {i}: {k}")
+                for x, y in v.items():
+                    print(f"   {x}: {y}")
+                print("-" * 50)
             return
 
 

@@ -1,4 +1,3 @@
-import json
 import os
 import traceback
 import subprocess
@@ -23,6 +22,7 @@ from .exploithandler import ExploitHandler
 import shlex
 from .recon_engien import Recon
 
+# TODO: create a dictionary mapping for modules that need to run as root and handle them with subprocess.run using sudo
 
 # set global variables
 installation = DatabaseManagment.getInstall()
@@ -109,7 +109,6 @@ class Input:
             if cmd_name in inputFixList:
                 if Input_fixes(dataList):
                     return
-
             # ==========================================
             # COMMAND REGISTRIES
             # ==========================================
@@ -132,13 +131,13 @@ class Input:
                 "recon": Recon
             }
 
-          
             # ==========================================
             # COMMAND EXECUTION ROUTER
             # ==========================================
             try:
                 if cmd_name in general_cmds:
                     general_cmds[cmd_name](data)
+                    DatabaseManagment._update(DatabaseManagment.get())
                     return True
                 else:
                     # If not an internal command, treat as a system call
@@ -147,7 +146,6 @@ class Input:
             except Exception:
                 Error(traceback.format_exc())
                 return False
-                
         except Exception:
             Error(traceback.format_exc())
             return False
@@ -159,12 +157,13 @@ class Input:
             DatabaseManagment.getCVE()
             # Refresh the memory cache from the database module
             ExploitCache.update() 
-            
+            data = DatabaseManagment.get()
             try:
                 session = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
                 inp = session.prompt(f"[SuperSploit]: ")
                 cls.check(inp)
             except (KeyboardInterrupt, EOFError):
+                DatabaseManagment._update(data)
                 ToStdout.write("\n[*] Exiting SuperSploit...\n")
                 break
             except Exception:

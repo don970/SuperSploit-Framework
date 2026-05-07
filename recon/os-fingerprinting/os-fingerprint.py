@@ -1,4 +1,6 @@
-"""This is a modular engine designed for integration into SuperSploit's 
+"""
+TODO: test
+This is a modular engine designed for integration into SuperSploit's
 reconnaissance Framework. It performs active OS fingerprinting by sending 
 crafted TCP probes to target hosts analyzing TCP SYN/ACK responses against 
 a centralized online signature database. It includes session tracking, detailed 
@@ -25,11 +27,6 @@ from scapy.error import Scapy_Exception
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
 # Absolute path to the main configuration/session JSON database
 path_to_database = f"{install_location}/.data/.config/data.json"
-
-# load database directly
-with open(path_to_database) as f:
-    db = json.load(f)
-
 
 # Suppress Scapy's default routing warnings for cleaner console output
 conf.verb = 0
@@ -290,6 +287,13 @@ class Start:
         # Example Framework Execution Workflow
         ENGINE_API_URL = "https://api.threat-intelligence.local/v1/os-signatures"
         
+        # Load database dynamically upon execution
+        try:
+            with open(path_to_database) as f:
+                db = json.load(f)
+        except FileNotFoundError:
+            db = {}
+            
         # Clean up the target IP in case it was stored as a URL or includes a port
         raw_target = str(db.get("R_HOST", ""))
         if "://" in raw_target:
@@ -301,6 +305,13 @@ class Start:
             print("[-] No valid R_HOST set in the database.")
             return
 
+        raw_port = db.get("R_PORT", "80")
+        try:
+            target_port = int(raw_port)
+        except ValueError:
+            print(f"[-] Invalid R_PORT '{raw_port}', defaulting to 80.")
+            target_port = 80
+
         # Initialize the engine handler with debugging toggled on
         os_engine = OSFingerprintEngine(
             db_endpoint=ENGINE_API_URL,
@@ -308,7 +319,7 @@ class Start:
         )
 
         # Execute the module
-        result = os_engine.identify_os(TARGET_IP, port=80)
+        result = os_engine.identify_os(TARGET_IP, port=target_port)
         print(f"\n[+] Final Result: {result}")
 
 

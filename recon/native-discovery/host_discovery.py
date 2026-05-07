@@ -16,13 +16,6 @@ install_location = f'{os.getenv("HOME")}/.SuperSploit'
 path_to_database = f"{install_location}/.data/.config/data.json"
 path_to_targets_db = f"{install_location}/.data/.config/targets.json"
 
-# Load database directly
-try:
-    with open(path_to_database) as f:
-        db = json.load(f)
-except FileNotFoundError:
-    db = {}
-
 # Suppress Scapy's default routing warnings for cleaner console output
 conf.verb = 0
 
@@ -126,6 +119,13 @@ class HostDiscoveryEngine:
 
 class Start:
     def __init__(self):
+        # Load database dynamically upon execution to avoid stale memory cache
+        try:
+            with open(path_to_database) as f:
+                db = json.load(f)
+        except FileNotFoundError:
+            db = {}
+            
         # Fetch the target IP or Subnet from the SuperSploit database.
         # This value was previously set by the user (e.g., `set R_HOST 192.168.1.0/24`).
         target_cidr = str(db.get("R_HOST", ""))

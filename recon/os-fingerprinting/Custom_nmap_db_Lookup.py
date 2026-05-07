@@ -6,6 +6,7 @@ import json
 import re
 import time
 import math
+import random
 from scapy.all import IP, TCP, UDP, ICMP, sr1, sr, conf
 
 # --- Framework Integration ---
@@ -105,19 +106,36 @@ class OSFingerprintEngine:
         ]
         wins = [1, 63, 4, 4, 16, 512]
         responses = []
+
         for i in range(6):
             p = IP(dst=self.target, id=i + 1) / TCP(dport=self.open_tcp, flags="S", window=wins[i], options=opts[i])
-            ans = sr1(p, timeout=2)
+            # Added verbose=0 to sr1 so Scapy doesn't flood your console output
+            ans = sr1(p, timeout=2, verbose=0)
             responses.append(ans)
             time.sleep(0.1)
 
-        # Simplified analysis of SEQ, OPS, and WIN responses
-        self.results["OPS"], self.results["WIN"], self.results["SEQ"] = {}, {}, {}
+        # Safely initialize keys without wiping out existing state from other concurrent probes
+        self.results.setdefault("OPS", {})
+        self.results.setdefault("WIN", {})
+        self.results.setdefault("SEQ", {})
+        self.results.setdefault("IPID", {})  # Adding IPID tracking, crucial for native OS fingerprinting
+
+        # Parse responses and capture ALL required fingerprinting data
         for i, r in enumerate(responses):
             if r and r.haslayer(TCP):
-                self.results["WIN"][f"W{i+1}"] = hex(r[TCP].window)[2:].upper()
+                # 1. Window size capture
+                self.results["WIN"][f"W{i + 1}"] = hex(r[TCP].window)[2:].upper()
+
+                # 2. Options string extraction
                 opt_str = "".join([o[0][0] for o in r[TCP].options if o[0] != 'EOL'])
-                self.results["OPS"][f"O{i+1}"] = opt_str
+                self.results["OPS"][f"O{i + 1}"] = opt_str
+
+                # 3. FIX: Actually extract and save the sequence numbers!
+                self.results["SEQ"][f"S{i + 1}"] = r[TCP].seq
+
+                # 4. FIX: Extract IP ID for sequence generation analysis
+                if r.haslayer(IP):
+                    self.results["IPID"][f"I{i + 1}"] = r[IP].id
 
     def _probe_ecn(self):
         """Sends a TCP SYN/ECN packet to an open port."""
@@ -280,6 +298,24 @@ class Start:
     """
     Module entry point. Orchestrates the OS fingerprinting process.
     """
+    def find_closed_tcp(self, target_ip: str):
+        """Actively scans for a closed TCP port by looking for an RST response."""
+        for _ in range(5):
+            port = random.randint(30000, 60000)
+            ans = sr1(IP(dst=target_ip)/TCP(dport=port, flags="S"), timeout=0.5, verbose=0)
+            if ans and ans.haslayer(TCP) and 'R' in str(ans[TCP].flags):
+                return port
+        return None
+
+    def find_closed_udp(self, target_ip: str):
+        """Actively scans for a closed UDP port by looking for an ICMP Port Unreachable."""
+        for _ in range(5):
+            port = random.randint(30000, 60000)
+            ans = sr1(IP(dst=target_ip)/UDP(dport=port), timeout=0.5, verbose=0)
+            if ans and ans.haslayer(ICMP) and ans[ICMP].type == 3 and ans[ICMP].code == 3:
+                return port
+        return None
+
     def __init__(self, args=None):
         try:
             with open(path_to_db_config) as f:
@@ -300,14 +336,28 @@ class Start:
             print(f"[-] Invalid R_PORT: {open_port_str}. Must be an integer.")
             return
 
-        # A real implementation would scan for a closed port. For this example, we'll assume one.
-        # Nmap typically uses the last open port + 1, or a random high port.
-        closed_port = open_port + 1 if open_port < 65535 else open_port - 1
         print(f"[*] Starting OS fingerprinting for {target_ip}")
-        print(f"[*] Using Open Port: {open_port}, Assumed Closed Port: {closed_port}")
+        print(f"[*] Searching for explicitly closed TCP/UDP ports to ensure accurate T5-T7/U1 probes...")
+
+        closed_tcp = self.find_closed_tcp(target_ip)
+        closed_udp = self.find_closed_udp(target_ip)
+
+        if not closed_tcp:
+            closed_tcp = open_port + 1 if open_port < 65535 else open_port - 1
+            print(f"[-] Could not find a closed TCP port. Falling back to guess: {closed_tcp}")
+        else:
+            print(f"[+] Found closed TCP port: {closed_tcp}")
+
+        if not closed_udp:
+            closed_udp = 31337
+            print(f"[-] Could not find a closed UDP port. Falling back to guess: {closed_udp}")
+        else:
+            print(f"[+] Found closed UDP port: {closed_udp}")
+
+        print(f"[*] Using Open Port: {open_port}, Closed TCP: {closed_tcp}, Closed UDP: {closed_udp}")
 
         try:
-            engine = OSFingerprintEngine(target_ip, open_port, closed_port)
+            engine = OSFingerprintEngine(target_ip, open_port, closed_tcp, closed_udp)
             results = engine.run_all_probes()
 
             print("\n[*] Collected Fingerprint:")
@@ -330,15 +380,13 @@ class Start:
                     except (FileNotFoundError, json.JSONDecodeError):
                         targets_db = {"TARGETS": {}}
 
-                    if "TARGETS" not in targets_db:
-                        targets_db["TARGETS"] = {}
+                    targets_dict = targets_db.setdefault("TARGETS", {})
+                    target_entry = targets_dict.setdefault(target_ip, {})
+                    if not isinstance(target_entry, dict):
+                        target_entry = targets_dict[target_ip] = {}
 
-                    # If the host is just "N/A" or doesn't exist, change it to a dictionary
-                    if target_ip not in targets_db["TARGETS"] or not isinstance(targets_db["TARGETS"][target_ip], dict):
-                        targets_db["TARGETS"][target_ip] = {}
-
-                    targets_db["TARGETS"][target_ip]["fingerprint"] = "\n".join(captured_fingerprint)
-                    targets_db["TARGETS"][target_ip]["best match"] = best_match["name"]
+                    target_entry["fingerprint"] = "\n".join(captured_fingerprint)
+                    target_entry["best match"] = best_match["name"]
 
                     try:
                         with open(path_to_targets, 'w') as f:
@@ -357,4 +405,4 @@ class Start:
 #!#!#!
 name: "Nmap OS Fingerprinting"
 description: "Performs OS fingerprinting using Nmap-style probes and matches against the nmap-os-db."
-author: "Gemini Code Assist"
+author: "Donald Ford"

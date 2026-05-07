@@ -9,6 +9,8 @@ import json
 import os
 from urllib.parse import urlparse
 
+# DEBUG TIP: Ensure 'HOME' is properly set in the environment. If running as a different user 
+# (e.g., sudo without -E), os.getenv("HOME") might resolve to /root instead of the user's home.
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
 path_to_database = f"{install_location}/.data/.config/data.json"
 path_to_targets_db = f"{install_location}/.data/.config/targets.json"
@@ -43,6 +45,8 @@ class ServiceDetector:
         elif "MYSQL" in banner_upper or "MARIADB" in banner_upper:
             return "MySQL"
             
+        # DEBUG TIP: If a service isn't being identified accurately, it likely doesn't send a 
+        # recognizable banner. It falls back to COMMON_PORTS mapping here.
         # 2. Fallback to standard port mappings
         return cls.COMMON_PORTS.get(port, "Unknown")
 
@@ -73,6 +77,8 @@ class AsyncPortScanner:
         """
         banner = ""
         try:
+            # DEBUG TIP: If web servers are returning blank banners, check if this HEAD request 
+            # is being rejected because the server strictly requires HTTP/1.1 with a valid 'Host' header.
             # Active Probing: If the port is a standard web port, the server is waiting for an HTTP request.
             # We send a bare-minimum HTTP/1.0 HEAD request to violently provoke a response (e.g., "HTTP/1.1 200 OK...").
             if port in [80, 443, 8080, 8443]:
@@ -80,6 +86,8 @@ class AsyncPortScanner:
                 await writer.drain()
             
             # Passive Listening: Wait up to `self.timeout` seconds for data to arrive on the socket's read buffer.
+            # DEBUG TIP: If banners are truncating or timing out consistently on slow networks, 
+            # consider increasing `self.timeout`. `reader.read(1024)` pulls the first 1KB of data.
             data = await asyncio.wait_for(reader.read(1024), timeout=self.timeout)
             if data:
                 # Safely decode the payload, explicitly ignoring strict Unicode errors 
@@ -90,6 +98,8 @@ class AsyncPortScanner:
         except Exception:
             pass
         finally:
+            # DEBUG TIP: Failure to close the writer results in File Descriptor leaks. 
+            # If you hit an "OSError: [Errno 24] Too many open files" crash, check this block.
             # Socket Cleanup: Always close the writer and await its termination to free up the OS file descriptor.
             writer.close()
             await writer.wait_closed()
@@ -101,10 +111,14 @@ class AsyncPortScanner:
         Attempts an asynchronous connection to a specific target port.
         If the TCP 3-way handshake succeeds, it immediately attempts to grab the service banner.
         """
+        # async with self.semaphore: Acquires a lock. If `max_concurrency` (e.g., 500) tasks 
+        # are already running, this execution pauses right here until a slot opens up.
         async with self.semaphore:
             try:
                 # Attempt a non-blocking TCP connection.
                 # Under the hood, this handles the SYN -> SYN-ACK -> ACK handshake.
+                # DEBUG TIP: If `asyncio.open_connection` hangs indefinitely, ensure `self.timeout`
+                # is correctly wrapping it via `asyncio.wait_for`.
                 reader, writer = await asyncio.wait_for(
                     asyncio.open_connection(self.target, port), 
                     timeout=self.timeout
@@ -121,6 +135,11 @@ class AsyncPortScanner:
                 print(f"[+] Port {port:<5} | {service:<10} | OPEN{banner_disp}")
                 
             except (asyncio.TimeoutError, ConnectionRefusedError, ConnectionResetError, OSError):
+                # DEBUG TIP: Diagnosing connection failures:
+                # TimeoutError = The port is likely FILTERED by a firewall (packets silently dropped).
+                # ConnectionRefusedError = The port is CLOSED (server sent a TCP RST packet in response).
+                # ConnectionResetError = Connection started but was aborted mid-flight (often IPS/IDS interference).
+                # OSError = Usually "No route to host" or local OS limits exhausted.
                 # Port is either closed (ConnectionRefusedError via RST packet), 
                 # filtered by a firewall (TimeoutError via dropped packet), 
                 # or fundamentally unreachable (OSError).
@@ -136,6 +155,8 @@ class AsyncPortScanner:
         tasks = [self.scan_port(port) for port in self.ports]
         
         # Inject all tasks into the event loop. asyncio.gather() will run them concurrently,
+        # DEBUG TIP: If the scan crashes right at launch, the semaphore might be set too high 
+        # for the local machine's `ulimit -n` configuration.
         # constrained only by our Semaphore limits.
         await asyncio.gather(*tasks)
         
@@ -145,6 +166,8 @@ class Start:
     def __init__(self, args=None):
         # Load the database dynamically upon execution.
         # This ensures we are always reading the latest user-set variables, avoiding stale memory cache bugs.
+        # DEBUG TIP: If variables aren't updating when set in the CLI, verify that `path_to_database`
+        # points to the exact same file the CLI is writing to.
         try:
             with open(path_to_database) as f:
                 db = json.load(f)
@@ -153,6 +176,8 @@ class Start:
             
         # Target Sanitization:
         # Safely parse the database target, stripping out URI schemes (http://) and trailing ports.
+        # DEBUG TIP: If target parsing fails, verify that R_HOST doesn't contain multiple IPs 
+        # or malformed URI structures (e.g., missing slashes).
         raw_target = str(db.get("R_HOST", ""))
         if "://" in raw_target:
             target_ip = urlparse(raw_target).hostname
@@ -164,23 +189,36 @@ class Start:
             return
 
         # Generate the target scope: Allow users to specify custom ports via the 'PORTS' variable.
-        # Supports comma-separated lists and ranges (e.g., 80,443,8000-8080).
+        # Supports comma-separated lists and ranges (e.g., 80,443,8000-8080) and the PORT_RANGE flag.
         raw_ports = str(db.get("PORTS", ""))
+        raw_port_range = str(db.get("PORT_RANGE", ""))
+
+        # Combine both variables to allow maximum flexibility
+        # DEBUG TIP: If port ranges seem to duplicate or fail to parse, ensure no invisible whitespace 
+        # is breaking the split(',') logic below. `.strip(',')` removes trailing/leading commas.
+        combined_ports_raw = f"{raw_ports},{raw_port_range}".strip(',')
         ports_to_scan = []
         
-        if raw_ports:
-            for part in raw_ports.split(','):
+        if combined_ports_raw:
+            for part in combined_ports_raw.split(','):
                 part = part.strip()
                 if '-' in part:
                     try:
                         start, end = part.split('-', 1)
-                        ports_to_scan.extend(range(int(start), int(end) + 1))
+                        # Boundary Check: Caps the ranges between 0 and 65535 to prevent 
+                        # feeding invalid sockets to the asyncio layer which would cause fatal crashes.
+                        start_port = max(0, int(start))
+                        end_port = min(65535, int(end))
+                        ports_to_scan.extend(range(start_port, end_port + 1))
                     except ValueError:
                         continue
                 elif part.isdigit():
-                    ports_to_scan.append(int(part))
+                    port_val = int(part)
+                    if 0 <= port_val <= 65535:
+                        ports_to_scan.append(port_val)
             ports_to_scan = sorted(list(set(ports_to_scan)))
-        else:
+
+        if not ports_to_scan:
             # Fallback to the standard, privileged well-known ports (1-1024) if no custom ports are defined.
             ports_to_scan = list(range(1, 1025))
         
@@ -205,18 +243,18 @@ class Start:
                         except json.JSONDecodeError:
                             pass
                     
-                existing_targets = current_db.get("TARGETS", {})
+                # DEBUG TIP: dict.setdefault() is used here to avoid overwriting existing data.
+                # It gets the 'TARGETS' dict if it exists, or creates an empty one if it doesn't.
+                existing_targets = current_db.setdefault("TARGETS", {})
+                target_entry = existing_targets.setdefault(target_ip, {})
                 
-                # Fetch existing target data or initialize a new dictionary
-                target_entry = existing_targets.get(target_ip, {})
+                # Legacy migration: If an older version of the framework stored a basic string (like "N/A") 
+                # for this IP, convert it into a dictionary dynamically so we don't throw a KeyError.
                 if not isinstance(target_entry, dict):
-                    # Convert legacy string entries (like "N/A" from host discovery) into a structured dict
-                    target_entry = {"status": target_entry}
-                
-                # Store the discovered ports and update the database
+                    target_entry = existing_targets[target_ip] = {"status": target_entry}
+
+                # Save the new port array into the target's dictionary space.
                 target_entry["ports"] = results
-                existing_targets[target_ip] = target_entry
-                current_db["TARGETS"] = existing_targets
                 
                 with open(path_to_targets_db, "w") as f:
                     json.dump(current_db, f, sort_keys=True, indent=4)

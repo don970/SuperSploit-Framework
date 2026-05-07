@@ -120,6 +120,7 @@ class exploitDetails:
 class DatabaseManagment:
     aliases = {}
     db = {}
+    core_db = {}
     """
     Centralized utility for reading/writing configuration state
     and mapping module paths across the framework.
@@ -202,14 +203,15 @@ class DatabaseManagment:
 
     @classmethod
     def get(cls):
-        """Loads the current session database."""
-        if os.path.exists(path_to_database):
-            try:
-                with open(path_to_database, "r") as file:
-                    return json.load(file)
-            except Exception:
-                return {}
-        return {}
+        if len(cls.core_db) < 1:
+            """Loads the current session database."""
+            if os.path.exists(path_to_database):
+                try:
+                    with open(path_to_database, "r") as file:
+                        return json.load(file)
+                except Exception:
+                    return {}
+        return cls.core_db
 
     @staticmethod
     def getExploits():
@@ -279,11 +281,14 @@ class DatabaseManagment:
 
     @classmethod
     def getInstall(cls):
-        if not cls.get()["DEV_MODE"]:
-            """Returns the framework's base installation path."""
+        try:
+            if cls.get()["DEV_MODE"]:
+                """Returns the framework's base installation path."""
+                return cls.get()["DEV_DICT"]
             return install_location
-        return cls.get()["DEV_DICT"]
-    
+        except KeyError:
+            return install_location
+
     @classmethod
     def addVariableToDatabase(cls, data):
         """Parses a command string to add a custom variable to the JSON database."""
