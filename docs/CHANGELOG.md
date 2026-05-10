@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - **Fileless Payload Delivery:** Transformed the payload generator in `exploithandler.py` into a purely in-memory architecture. SuperSploit now automatically formats generated stagers into Base64-encoded Python one-liners, allowing for instant, diskless execution on target machines.
 - **Advanced Diagnostic Commentary:** Injected extensive inline debugging notes (`# DEBUG TIP:`) throughout the async port scanner detailing `asyncio` file descriptor constraints, TCP handshake bottlenecks, and socket exception triage.
 - **Automated Exploit-to-Payload Linking:** Upgraded the `ExploitHandler` execution logic to automatically detect if `PAYLOAD` is set in the database during exploit execution. If present, the framework seamlessly compiles the payload, caches the encryption key, and starts the C2 listener dynamically before the exploit fires.
+- **Modular Stage 2 Payloads:** Added the ability to dynamically load custom post-exploitation C2 payloads by setting the `STAGE_TWO` database variable. If not set, the framework safely falls back to a default interactive reverse shell.
 
 ### Changed
 - **Port Boundary Expansion:** Updated the async port scanner's boundary calculation to support scanning port `0`, officially spanning the entire `0-65535` range.
@@ -16,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - **JSON Dictionary Optimization:** Simplified target appending logic in both the port scanner and Custom Nmap OS Lookup modules using Python's native `dict.setdefault()`, significantly reducing verbosity and eliminating the risk of `KeyError` crashes.
 - **Dual Variable Syntax:** Updated the payload generator and listener to intelligently support both standard (`LHOST`/`LPORT`) and legacy (`L_HOST`/`L_PORT`) variable syntaxes simultaneously to prevent failed reverse shell callbacks.
 - **Silent Auto-Generation:** Refined the automated payload compilation workflow to run completely silently in the background, removing unnecessary UI view prompts and keeping the exploit execution sequence completely seamless.
+- **Show Command Formatting:** Refined the `show` command output to elegantly truncate extremely long values (like the Base64 generated payload) to keep the CLI visually aligned and prevent terminal clutter.
 
 ### Fixed
 - **Input Fallback Safety:** Hardened the async port scanner's scope generation block. If an invalid or malformed port range is provided, it now gracefully defaults to well-known privileged ports (`1-1024`) instead of crashing or executing an empty scan.
@@ -25,6 +27,8 @@ All notable changes to this project will be documented in this file.
 - **Dangling Listener Cleanup:** Fixed a bug where running an exploit multiple times in a single session resulted in an `[Errno 48] Address already in use` crash. The `ExploitHandler` now tracks active daemon sockets and cleanly terminates them before binding new listeners, preventing port contention and mismatched XOR keys.
 - **Stager Execution Bug:** Added the missing `Start()` initialization call to the bottom of the `stager.py` payload. The fileless Stage 1 stager now automatically executes upon being decoded in memory on the target.
 - **Loopback IP Trap:** Implemented a pre-generation sanity check that warns users if they accidentally attempt to map a reverse shell back to a local loopback or wildcard address (`127.0.0.1` or `0.0.0.0`).
+- **Stage 2 Cryptography Crash:** Fixed a `TypeError` in the C2 handler where dynamically loaded Stage 2 payload files were read as standard strings instead of raw bytes, which crashed the XOR encryption loop.
+- **Display Control Flow:** Fixed a missing `else` block in `show.py` that caused truncated strings to instantly print their full-length counterparts on the very next line.
 
 ## [1.2.9] - 2026-05-20
 ### Added

@@ -102,7 +102,10 @@ class Show:
             # Determine max key length for aligned output
             max_key_len = max(len(k) for k in db.keys()) if db else 0
             for k, v in db.items():
-                ToStdout.write(f"  {k:<{max_key_len}}: {v}\n")
+                if len(str(v)) > 100:
+                    ToStdout.write(f"  {k:<{max_key_len}}: {str(v)[:47]}...\n")
+                else:
+                    ToStdout.write(f"  {k:<{max_key_len}}: {v}\n")
         ToStdout.write("-" * 40 + "\n")  # Footer
 
     @staticmethod

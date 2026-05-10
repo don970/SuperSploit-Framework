@@ -16,7 +16,7 @@ install_location = f'{os.getenv("HOME")}/.SuperSploit'
 # Absolute path to the main configuration/session JSON database
 path_to_database = f"{install_location}/.data/.config/data.json"
 # Absolute path to the dedicated targets database
-path_to_targets = f"{install_location}/.data/.config/targets.json"
+path_to_targets = f"{install_location}/.data/.config/targets.json.b"
 # Alias for the standard output writing function
 write = ToStdout.write
 
