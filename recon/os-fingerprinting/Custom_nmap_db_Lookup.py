@@ -1,5 +1,4 @@
 import asyncio
-import concurrent.futures
 import logging
 import os
 import json
@@ -58,17 +57,15 @@ class OSFingerprintEngine:
         return asyncio.run(self._async_run_all_probes())
 
     async def _async_run_all_probes(self):
-        loop = asyncio.get_running_loop()
-        # Use a ThreadPoolExecutor to run blocking Scapy functions concurrently
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
-            tasks = [
-                loop.run_in_executor(pool, self._probe_seq_ops_win),
-                loop.run_in_executor(pool, self._probe_ecn),
-                loop.run_in_executor(pool, self._probe_t1_t7),
-                loop.run_in_executor(pool, self._probe_u1),
-                loop.run_in_executor(pool, self._probe_ie)
-            ]
-            await asyncio.gather(*tasks)
+        # asyncio.to_thread natively offloads blocking Scapy calls to background threads
+        tasks = [
+            asyncio.to_thread(self._probe_seq_ops_win),
+            asyncio.to_thread(self._probe_ecn),
+            asyncio.to_thread(self._probe_t1_t7),
+            asyncio.to_thread(self._probe_u1),
+            asyncio.to_thread(self._probe_ie)
+        ]
+        await asyncio.gather(*tasks)
         return self.results
 
     def _parse_response(self, pkt, probe_name):

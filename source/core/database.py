@@ -125,6 +125,12 @@ class DatabaseManagment:
     db = {}
     core_db = {}
 
+    # --- STATE MANAGEMENT VARIABLES ---
+    _targets_cache = None
+    _targets_dirty = False
+    _sync_thread = None
+    _stop_sync = False
+
     @classmethod
     def _update(cls, data):
         try:
@@ -146,14 +152,50 @@ class DatabaseManagment:
 
     @classmethod
     def getTargets(cls):
-        """Safely retrieves target list from the dedicated targets JSON database."""
-        if os.path.exists(path_to_targets):
+        """Reads targets from memory cache, fetching from disk only on first load."""
+        if cls._targets_cache is None:
+            if os.path.exists(path_to_targets):
+                try:
+                    with open(path_to_targets, "r") as file:
+                        cls._targets_cache = json.load(file).get("TARGETS", {})
+                except Exception:
+                    cls._targets_cache = {}
+            else:
+                cls._targets_cache = {}
+        return cls._targets_cache
+
+    @classmethod
+    def updateTargets(cls, updated_targets):
+        """Updates targets in memory and flags them to be written to disk in the background."""
+        cls._targets_cache = updated_targets
+        cls._targets_dirty = True
+
+    @classmethod
+    def sync_targets_to_disk(cls):
+        """Forces an immediate write to disk if memory is dirty."""
+        if cls._targets_dirty and cls._targets_cache is not None:
             try:
-                with open(path_to_targets, "r") as file:
-                    return json.load(file).get("TARGETS", {})
-            except Exception:
-                pass
-        return {}
+                with open(path_to_targets, "w") as file:
+                    json.dump({"TARGETS": cls._targets_cache}, file, indent=4, sort_keys=True)
+                cls._targets_dirty = False
+            except Exception as e:
+                write(f"[-] Failed to sync targets to disk: {e}")
+
+    @classmethod
+    def start_background_sync(cls, interval=60):
+        """Starts a daemon thread that writes target data to disk every 60 seconds."""
+        if cls._sync_thread is None:
+            import threading
+            import time
+            cls._stop_sync = False
+
+            def syncer():
+                while not cls._stop_sync:
+                    time.sleep(interval)
+                    cls.sync_targets_to_disk()
+
+            cls._sync_thread = threading.Thread(target=syncer, daemon=True)
+            cls._sync_thread.start()
 
     @classmethod
     def socketedExploit(cls) -> bool:

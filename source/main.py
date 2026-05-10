@@ -17,12 +17,18 @@ def initialize_session():
 class Main:
     def __init__(self):
         initialize_session()
+        # Start the background target synchronization thread
+        DatabaseManagment.start_background_sync()
         try:
             """calls the main input handler"""
             Input.get()
         except KeyboardInterrupt:
+            print(f"\n[*] Gracefully shutting down...")
+        finally:
+            # Flush any pending target updates to the disk
+            DatabaseManagment.sync_targets_to_disk()
             print(f"Good bye. );")
-            exit()
+            exit(0)
 
 
 Main()

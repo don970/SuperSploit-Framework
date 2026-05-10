@@ -7,6 +7,7 @@ network mapping and banner grabbing.
 import asyncio
 import json
 import os
+import platform
 from urllib.parse import urlparse
 
 # DEBUG TIP: Ensure 'HOME' is properly set in the environment. If running as a different user 
@@ -62,11 +63,24 @@ class AsyncPortScanner:
         self.ports = ports
         self.timeout = timeout
         
+        # Dynamically adjust max_concurrency based on OS limits
+        actual_limit = max_concurrency
+        if platform.system() != "Windows":
+            import resource
+            # Fetch the soft limit for maximum open file descriptors
+            soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+            
+            # Provide a safety buffer of 50 descriptors for the framework itself
+            safe_limit = max(10, soft_limit - 50)
+            actual_limit = min(max_concurrency, safe_limit)
+            if actual_limit < max_concurrency:
+                print(f"[*] OS File Descriptor limit detected. Scaling concurrency down to {actual_limit} tasks.")
+
         # asyncio.Semaphore acts as a concurrency throttle.
         # Operating Systems have strict limits on how many file descriptors (sockets) can be open at once (usually ~1024).
         # If we exceed this, the OS will violently terminate the script with a "Too many open files" error.
         # The Semaphore ensures we never have more than `max_concurrency` sockets open simultaneously.
-        self.semaphore = asyncio.Semaphore(max_concurrency)
+        self.semaphore = asyncio.Semaphore(actual_limit)
         self.open_ports = []
 
     async def grab_banner(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, port: int) -> str:
@@ -234,18 +248,27 @@ class Start:
         if results:
             print(f"[*] Saving port data for {target_ip} to the targets database...")
             try:
-                current_db = {"TARGETS": {}}
-                # Load existing targets DB or create new
-                if os.path.exists(path_to_targets_db):
-                    with open(path_to_targets_db, "r") as f:
-                        try:
-                            current_db = json.load(f)
-                        except json.JSONDecodeError:
-                            pass
-                    
-                # DEBUG TIP: dict.setdefault() is used here to avoid overwriting existing data.
-                # It gets the 'TARGETS' dict if it exists, or creates an empty one if it doesn't.
-                existing_targets = current_db.setdefault("TARGETS", {})
+                # Attempt to use the in-memory state manager if running within SuperSploit
+                try:
+                    from core.database import DatabaseManagment
+                    has_db_manager = True
+                except ImportError:
+                    has_db_manager = False
+
+                if has_db_manager:
+                    existing_targets = DatabaseManagment.getTargets()
+                else:
+                    existing_targets = {}
+                    if os.path.exists(path_to_targets_db):
+                        with open(path_to_targets_db, "r") as f:
+                            try:
+                                existing_targets = json.load(f).get("TARGETS", {})
+                            except json.JSONDecodeError:
+                                pass
+
+                if not isinstance(existing_targets, dict):
+                    existing_targets = {}
+
                 target_entry = existing_targets.setdefault(target_ip, {})
                 
                 # Legacy migration: If an older version of the framework stored a basic string (like "N/A") 
@@ -256,8 +279,11 @@ class Start:
                 # Save the new port array into the target's dictionary space.
                 target_entry["ports"] = results
                 
-                with open(path_to_targets_db, "w") as f:
-                    json.dump(current_db, f, sort_keys=True, indent=4)
+                if has_db_manager:
+                    DatabaseManagment.updateTargets(existing_targets)
+                else:
+                    with open(path_to_targets_db, "w") as f:
+                        json.dump({"TARGETS": existing_targets}, f, sort_keys=True, indent=4)
                 print("[+] Database updated successfully.")
             except Exception as e:
                 print(f"[-] Failed to update database: {e}")

@@ -164,21 +164,31 @@ class Start:
         if target_updates:
             print(f"[*] Saving {len(target_updates)} hosts to the targets database...")
             try:
-                current_db = {"TARGETS": {}}
-                # Load existing targets DB or create new
-                if os.path.exists(path_to_targets_db):
-                    with open(path_to_targets_db, "r") as f:
-                        try:
-                            current_db = json.load(f)
-                        except json.JSONDecodeError:
-                            pass
-                    
-                existing_targets = current_db.get("TARGETS", {})
+                # Attempt to use the in-memory state manager if running within SuperSploit
+                try:
+                    from core.database import DatabaseManagment
+                    has_db_manager = True
+                except ImportError:
+                    has_db_manager = False
+
+                if has_db_manager:
+                    existing_targets = DatabaseManagment.getTargets()
+                else:
+                    existing_targets = {}
+                    if os.path.exists(path_to_targets_db):
+                        with open(path_to_targets_db, "r") as f:
+                            try:
+                                existing_targets = json.load(f).get("TARGETS", {})
+                            except json.JSONDecodeError:
+                                pass
+
                 existing_targets.update(target_updates)
-                current_db["TARGETS"] = existing_targets
                 
-                with open(path_to_targets_db, "w") as f:
-                    json.dump(current_db, f, sort_keys=True, indent=4)
+                if has_db_manager:
+                    DatabaseManagment.updateTargets(existing_targets)
+                else:
+                    with open(path_to_targets_db, "w") as f:
+                        json.dump({"TARGETS": existing_targets}, f, sort_keys=True, indent=4)
                 print("[+] Database updated successfully.")
             except Exception as e:
                 print(f"[-] Failed to update database: {e}")

@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - **Advanced Diagnostic Commentary:** Injected extensive inline debugging notes (`# DEBUG TIP:`) throughout the async port scanner detailing `asyncio` file descriptor constraints, TCP handshake bottlenecks, and socket exception triage.
 - **Automated Exploit-to-Payload Linking:** Upgraded the `ExploitHandler` execution logic to automatically detect if `PAYLOAD` is set in the database during exploit execution. If present, the framework seamlessly compiles the payload, caches the encryption key, and starts the C2 listener dynamically before the exploit fires.
 - **Modular Stage 2 Payloads:** Added the ability to dynamically load custom post-exploitation C2 payloads by setting the `STAGE_TWO` database variable. If not set, the framework safely falls back to a default interactive reverse shell.
+- **Write-Back Memory Cache:** Implemented a centralized in-memory state manager for the targets database within `DatabaseManagment` to drastically reduce disk I/O and prevent race conditions.
+- **Background Synchronization & Graceful Shutdown:** Added a daemon thread that silently flushes dirty memory cache to disk every 60 seconds, along with a `finally` block in `main.py` to guarantee pending targets are safely serialized upon application exit.
 
 ### Changed
 - **Port Boundary Expansion:** Updated the async port scanner's boundary calculation to support scanning port `0`, officially spanning the entire `0-65535` range.
@@ -18,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - **Dual Variable Syntax:** Updated the payload generator and listener to intelligently support both standard (`LHOST`/`LPORT`) and legacy (`L_HOST`/`L_PORT`) variable syntaxes simultaneously to prevent failed reverse shell callbacks.
 - **Silent Auto-Generation:** Refined the automated payload compilation workflow to run completely silently in the background, removing unnecessary UI view prompts and keeping the exploit execution sequence completely seamless.
 - **Show Command Formatting:** Refined the `show` command output to elegantly truncate extremely long values (like the Base64 generated payload) to keep the CLI visually aligned and prevent terminal clutter.
+- **Recon Disk I/O Reduction:** Upgraded all native recon modules (`port_scanner.py`, `host_discovery.py`, and `Custom_nmap_db_Lookup.py`) to map discovered targets directly to the framework's lightning-fast in-memory cache. Included a seamless `ImportError` fallback so the modules remain fully functional as standalone CLI scripts using standard file I/O.
 
 ### Fixed
 - **Input Fallback Safety:** Hardened the async port scanner's scope generation block. If an invalid or malformed port range is provided, it now gracefully defaults to well-known privileged ports (`1-1024`) instead of crashing or executing an empty scan.
