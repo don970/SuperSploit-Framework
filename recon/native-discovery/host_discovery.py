@@ -183,7 +183,11 @@ class Start:
             except Exception as e:
                 print(f"[-] Failed to update database: {e}")
 
+if __name__ == "__main__":
+    Start()
+
 #!#!#!
+root: "true"
 name: "Native Network Discovery"
 category: "Discovery"
 desc: """Performs blazing fast host discovery utilizing raw sockets. 

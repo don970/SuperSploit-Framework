@@ -1,3 +1,5 @@
+# TODO: fix Index error not being handled line 58 " name = paths[int(index)].split("/")[-1] "
+
 import os
 from .database import DatabaseManagment
 from .ToStdOut import ToStdout

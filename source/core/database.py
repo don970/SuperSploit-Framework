@@ -87,9 +87,8 @@ class ExploitCache:
                     "options": meta.get("options", []),
                     "cve": meta.get("cve", "N/A"),
                     "target": meta.get("target", ""),
-                    "Android Version": meta.get("Android_Version", ""),
-                    "Android ID": meta.get("Android_ID", ""),
-                    "status": "ok"
+                    "payload": meta.get("payload", ""),
+                    "status": meta.get("status", "known")
                 }
         except Exception:
             cls.details = {"status": "error"}
@@ -118,13 +117,13 @@ class exploitDetails:
             write(f"{opt} = {value}")
 
 class DatabaseManagment:
-    aliases = {}
-    db = {}
-    core_db = {}
     """
     Centralized utility for reading/writing configuration state
     and mapping module paths across the framework.
     """
+    aliases = {}
+    db = {}
+    core_db = {}
 
     @classmethod
     def _update(cls, data):
@@ -156,39 +155,6 @@ class DatabaseManagment:
                 pass
         return {}
 
-    @classmethod
-    def saveTargets(cls, targets_dict: dict):
-        """Saves a dictionary of targets to the dedicated targets database."""
-        try:
-            db_data = {"TARGETS": {}}
-            if os.path.exists(path_to_targets):
-                try:
-                    with open(path_to_targets, "r") as file:
-                        db_data = json.load(file)
-                except Exception:
-                    pass
-            
-            # Merge new targets with any existing ones
-            existing = db_data.get("TARGETS", {})
-            existing.update(targets_dict)
-            db_data["TARGETS"] = existing
-            
-            with open(path_to_targets, "w") as file:
-                json.dump(db_data, file, sort_keys=True, indent=4)
-        except Exception:
-            error(traceback.format_exc())
-
-    @classmethod
-    def checkIntegration(cls) -> bool:
-        """Determines if the exploit is built specifically for SuperSploit."""
-        exploit_path = cls.get().get("EXPLOIT", "")
-        if not exploit_path or not os.path.exists(exploit_path):
-            return False
-            
-        # Scan the file for the specific integration variable flag
-        with open(exploit_path, "r", encoding="utf-8", errors="ignore") as file:
-            return "integrated = True" in file.read()
-    
     @classmethod
     def socketedExploit(cls) -> bool:
         """Checks if the exploit uses the socket module."""

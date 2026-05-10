@@ -24,8 +24,8 @@ USAGE:
 ----------------------------------------------------------------------
 [2] EXECUTION ENGINE
 ----------------------------------------------------------------------
-  run / exploit    Execute the currently loaded module
-  recon            Execute the currently loaded recon tool
+  exploit          Execute the currently loaded module
+  run              Execute the currently loaded recon tool
   
 ----------------------------------------------------------------------
 [3] SYSTEM & UTILITIES

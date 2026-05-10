@@ -9,9 +9,9 @@
     "nmapDb": "/Users/donald/.SuperSploit/.data/.config/nmap-os-db.txt",
     "aliases": "/Users/donald/.SuperSploit/.data/.config/aliases.json",
     "exploits": "/Users/donald/.SuperSploit/exploits",
-    "reconDb": "/Users/donald/.SuperSploit/recon",
+    "recon": "/Users/donald/.SuperSploit/recon",
     "assets": "/Users/donald/.SuperSploit/.data/.config/.assets/",
-    "activity": "/Users/donald/.SuperSploit/.data/.config/.activity/",
+    "activity": "/Users/donald/.SuperSploit/.data/.logs/activity.log",
     "targets": "/Users/donald/.SuperSploit/.data/.config/targets.json",
     "templates":"/Users/donald/.SuperSploit/templates",
     "payloads": "/Users/donald/.SuperSploit/payloads"

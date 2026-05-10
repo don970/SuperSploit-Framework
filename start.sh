@@ -9,11 +9,11 @@ if [ ! -d "$HOME/.SuperSploit" ]; then
     else
       # run the program from the source directory this
       echo "Running from source directory. This is not the intended way to run the program. development mode  is on"
-      sudo -e python3 "source/main.py"
+      python3 "source/main.py"
       exit
     fi
 fi
 
 # Launch: Execute the main application logic using the Python 3 interpreter.
 # The script is located within the hidden .SuperSploit directory in the user's home.
-sudo -e python3 "$HOME/.SuperSploit/source/main.py"
+python3 "$HOME/.SuperSploit/source/main.py"

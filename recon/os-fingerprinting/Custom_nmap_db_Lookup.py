@@ -402,7 +402,13 @@ class Start:
             print(f"\n[-] An unexpected error occurred: {e}")
 
 
+if __name__ == "__main__":
+    Start()
+
 #!#!#!
+root: "true"
 name: "Nmap OS Fingerprinting"
+catogory: "reconnaissance"
 description: "Performs OS fingerprinting using Nmap-style probes and matches against the nmap-os-db."
 author: "Donald Ford"
+#!#!#!

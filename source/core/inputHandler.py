@@ -1,3 +1,6 @@
+# TODO: • Background Listener: Start a native shell catcher via `set listener true`.
+# TODO: • Recon Automation: Enable `set auto_suggest true` for smart exploit hints.
+
 import os
 import traceback
 import subprocess
@@ -21,8 +24,6 @@ from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
 import shlex
 from .recon_engien import Recon
-
-# TODO: create a dictionary mapping for modules that need to run as root and handle them with subprocess.run using sudo
 
 # set global variables
 installation = DatabaseManagment.getInstall()
@@ -128,7 +129,7 @@ class Input:
                 "update-info": cls._update,
                 "info": exploitDetails,
                 "debugdb": DatabaseManagment.Debug,
-                "recon": Recon
+                "run": Recon
             }
 
             # ==========================================
@@ -156,7 +157,7 @@ class Input:
         while True:
             DatabaseManagment.getCVE()
             # Refresh the memory cache from the database module
-            ExploitCache.update() 
+            ExploitCache.update()
             data = DatabaseManagment.get()
             try:
                 session = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)

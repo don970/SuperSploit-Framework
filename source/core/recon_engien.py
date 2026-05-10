@@ -2,107 +2,126 @@ import os
 import subprocess
 import sys
 import traceback
+import tempfile
+import shlex
+import types
 from .logger import Logger
 from .database import DatabaseManagment
-import importlib
 
 install = DatabaseManagment.getInstall()
+
 
 class Recon:
     """
     Handles the loading, parsing, and execution of reconnaissance modules.
-    Modules can be executed directly as a Python module in memory or via an external subprocess.
-    memory is the preferred method
+    Securely isolates root-required modules via isolated sudo subprocesses
+    and dynamically loads standard modules into memory using cleaned buffers.
     """
 
     def __init__(self, args=None):
-        # Fetch the absolute latest database state on every initialization
+        # Fetch the absolute latest database state
         self.db = DatabaseManagment.get()
-
-        # Prompt the user to determine the execution method
-        self.module = False if input("[*] Run as a module in python [y/n]: ").lower().startswith("n") else True
-
-        # Fetch the recon name from the database (Note: this variable is currently unused)
-        name = self.db["RECON_NAME"]
 
         # Clean the raw file of metadata and create a buffer for execution
         self.buffer, self.metadata = self.createBuffer()
 
-        # If the user chose not to run as a module, execute it via subprocess immediately
-        if not self.module:
-            self.exec_with_sub(self.buffer)
-            DatabaseManagment._update(self.db)
-            return
-        self.run()
+        # Determine if root is needed via metadata flag
+        self.requires_root = "root: " in self.metadata
+
+        if self.requires_root:
+            print("[*] Metadata indicates ROOT privileges are required.")
+            self.exec_with_sub(self.buffer, use_sudo=True)
+        else:
+            # Standard prompt for non-root scripts
+            self.module = False if input("[*] Run as a module in python [y/n]: ").lower().startswith("n") else True
+            if not self.module:
+                self.exec_with_sub(self.buffer, use_sudo=False)
+            else:
+                self.run()
+
         DatabaseManagment._update(self.db)
-        return
-
-
-
 
     def run(self):
-        """Dynamically loads the recon script into memory as a module and executes its Start() method."""
-        print("[*] Running as a python module")
-        args = input(f'[*] Enter arguments for {self.db["RECON_PATH"]}: ').split(" ")
+        """Dynamically loads the cleaned script buffer into memory as a standard user."""
+        print("[*] Running in memory as standard user...")
 
-        # Dynamically load the python file from the path specified in the database
-        spec = importlib.util.spec_from_file_location("recon_module", self.db["RECON_PATH"])
-        recon_module = importlib.util.module_from_spec(spec)
-        sys.modules["recon_module"] = recon_module
-        spec.loader.exec_module(recon_module)
+        # Safe argument parsing
+        user_input = input(f'[*] Enter arguments for {self.db["RECON_PATH"]}: ')
+        args = shlex.split(user_input)
+
+        # Dynamic namespace to prevent collisions if multiple modules run
+        module_namespace = f"recon_dynamic_{self.db['RECON_NAME']}"
+
+        # 1. Create a blank, dynamic module object
+        recon_module = types.ModuleType(module_namespace)
+
+        # 2. Add it to sys.modules so it acts like a real loaded module
+        sys.modules[module_namespace] = recon_module
+
         try:
-            # Execute the Start function of the module, passing arguments if they were provided
-            if len(args) < 1 or args[0] == "":
+            # 3. Execute the CLEANED buffer directly into the module's dictionary
+            # This completely ignores the uncleaned file on the hard drive
+            exec(self.buffer, recon_module.__dict__)
+
+            if len(args) == 0:
                 recon_module.Start()
-                return
-            recon_module.Start(args)
+            else:
+                recon_module.Start(args)
+
         except Exception:
-            # Log the exception if the module fails to run
+            # Log the exception, but do NOT fall back to a risky subprocess execution
             Logger.initializeReconMoodle(self.db["RECON_NAME"], self.db["RECON_PATH"], traceback.format_exc())
-            print(traceback.format_exc())
+            print(f"[*] In-memory execution failed:\n{traceback.format_exc()}")
+
         finally:
-            del sys.modules["recon_module"]
-            print("clean up complete")
+            if module_namespace in sys.modules:
+                del sys.modules[module_namespace]
+            print("[*] Clean up complete")
 
     def createBuffer(self):
         """Reads the recon file and strips out the metadata section delimited by '#!#!#!'."""
         with open(self.db["RECON_PATH"], "r") as file:
             raw_data = file.read().split("#!#!#!")
 
-        # The metadata is expected to be in the second section (index 1)
-        metadata = raw_data[1]
-
-        # Reconstruct the code by removing the metadata section (index 1)
         if len(raw_data) >= 3:
-            # Join everything EXCEPT the metadata block
+            metadata = raw_data[1]
             clean_buffer = raw_data[0] + raw_data[2]
         else:
-            # If no delimiters found, use the first part
+            metadata = ""
             clean_buffer = raw_data[0]
+
         return clean_buffer, metadata
 
-    def exec_with_sub(self, clean_buffer):
-        """Writes the cleaned module to a temporary file and executes it via a separate subprocess."""
-        # Define a consistent temporary path for execution
-        temp_exec_path = f"{install}/source/core/exploit/recon_module.py"
-        with open(temp_exec_path, "w") as file1:
-            try:
-                file1.write(clean_buffer)
-                # Subprocess execution using the CLEANED file
-                # Note: db["EXPLOIT"] is used here. Double-check if this shouldn't be db["RECON_NAME"] instead
-                args = input(f'[*] Enter arguments for {self.db["RECON_NAME"]}: ').split(" ")
+    def exec_with_sub(self, clean_buffer, use_sudo=False):
+        """Securely executes the cleaned module via a temporary file and subprocess."""
 
-                # Build the command array for the subprocess
-                cmd = [f"python3", temp_exec_path]
-                for x in args:
-                    if len(x) > 0:
-                        cmd.append(x)
+        # Use NamedTemporaryFile to prevent static-path race conditions
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp:
+            tmp.write(clean_buffer)
+            temp_exec_path = tmp.name
 
-                print(f"[*] Executing {self.db['RECON_NAME']} via subprocess...")
-                subprocess.run(cmd)
-            except OSError:
-                return traceback.format_exc()
-            finally:
-                # Ensure the temporary execution file is always cleaned up, even if an error occurs
-                if os.path.exists(temp_exec_path):
-                    os.remove(temp_exec_path)
+        try:
+            # Sanitize arguments via shlex to prevent shell injection
+            user_input = input(f'[*] Enter arguments for {self.db["RECON_NAME"]}: ')
+            args = shlex.split(user_input)
+
+            # Isolated Python Mode (-I) prevents PYTHONPATH environment hijacking
+            if use_sudo:
+                print(f"[*] Executing {self.db['RECON_NAME']} via isolated sudo subprocess...")
+                cmd = ["sudo", "python3", "-I", temp_exec_path] + args
+            else:
+                print(f"[*] Executing {self.db['RECON_NAME']} via isolated subprocess...")
+                cmd = ["python3", "-I", temp_exec_path] + args
+
+            # check=True properly catches if the script itself crashes
+            subprocess.run(cmd, check=True)
+
+        except subprocess.CalledProcessError as e:
+            print(f"[*] Target script crashed or exited with error code: {e.returncode}")
+        except Exception as e:
+            print(f"[*] Subprocess failed to launch: {e}")
+            Logger.initializeReconMoodle(self.db["RECON_NAME"], self.db["RECON_PATH"], traceback.format_exc())
+        finally:
+            # Ensure the temporary execution file is ALWAYS cleaned up
+            if os.path.exists(temp_exec_path):
+                os.remove(temp_exec_path)

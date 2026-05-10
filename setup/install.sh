@@ -14,4 +14,4 @@ printf "[*] Changing ownership to $USER \n"
 sudo chown -R $USER ~/.SuperSploit
 
 # start application
-sudo supersploit
+supersploit

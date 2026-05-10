@@ -262,7 +262,11 @@ class Start:
             except Exception as e:
                 print(f"[-] Failed to update database: {e}")
 
+if __name__ == "__main__":
+    Start()
+
 #!#!#!
+root: "true"
 name: "Async Port Scanner"
 category: "Scanner"
 desc: """Performs hyper-fast concurrent network mapping and banner grabbing.

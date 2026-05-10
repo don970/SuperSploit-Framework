@@ -8,7 +8,7 @@ def initialize_session():
     db = DatabaseManagment.get()
     # Generate an 8-character unique session ID
     session_id = uuid.uuid4().hex[:8]
-    SetV.SetV(f"SESSION_ID {session_id}")
+    SetV.SetV(f"set SESSION_ID {session_id}")
     
     # Trigger the initial staged log entry for the session
     Logger.start_session()

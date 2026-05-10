@@ -33,13 +33,23 @@ class Search:
             return
 
         if category == "targets":
-            targets = DatabaseManagment.getTargets()
-            print("-" * 50)
-            for i, (k, v) in enumerate(targets.items()):
-                print(f"Target {i}: {k}")
-                for x, y in v.items():
-                    print(f"   {x}: {y}")
+            try:
+                targets = DatabaseManagment.getTargets()
+                if not isinstance(targets, dict):
+                    write("[-] Targets database is empty or malformed.")
+                    return
+                    
                 print("-" * 50)
+                for i, (k, v) in enumerate(targets.items()):
+                    print(f"Target {i}: {k}")
+                    if isinstance(v, dict):
+                        for x, y in v.items():
+                            print(f"   {x}: {y}")
+                    else:
+                        print(f"   status: {v}")
+                    print("-" * 50)
+            except Exception as e:
+                write(f"[-] Error parsing targets database: {e}")
             return
 
 

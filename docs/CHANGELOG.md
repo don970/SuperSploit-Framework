@@ -5,16 +5,26 @@ All notable changes to this project will be documented in this file.
 ## [1.2.10] - 2026-05-25
 ### Added
 - **Extended Port Scope Configuration:** Added support for the `PORT_RANGE` flag in the async port scanner. The scanner now intelligently merges the `PORTS` and `PORT_RANGE` database variables to allow for simultaneous custom lists and specific ranges.
+- **Fileless Payload Delivery:** Transformed the payload generator in `exploithandler.py` into a purely in-memory architecture. SuperSploit now automatically formats generated stagers into Base64-encoded Python one-liners, allowing for instant, diskless execution on target machines.
 - **Advanced Diagnostic Commentary:** Injected extensive inline debugging notes (`# DEBUG TIP:`) throughout the async port scanner detailing `asyncio` file descriptor constraints, TCP handshake bottlenecks, and socket exception triage.
+- **Automated Exploit-to-Payload Linking:** Upgraded the `ExploitHandler` execution logic to automatically detect if `PAYLOAD` is set in the database during exploit execution. If present, the framework seamlessly compiles the payload, caches the encryption key, and starts the C2 listener dynamically before the exploit fires.
 
 ### Changed
 - **Port Boundary Expansion:** Updated the async port scanner's boundary calculation to support scanning port `0`, officially spanning the entire `0-65535` range.
 - **Stale Cache Elimination:** Refactored `host_discovery.py` and `os-fingerprint.py` to load the `data.json` database dynamically at execution time (within `Start.__init__`) rather than at global module import time.
 - **Dynamic Port Targeting:** Updated the native `os-fingerprint.py` module to fetch the target port from the database (`R_PORT`) dynamically instead of enforcing a hardcoded port 80 check.
 - **JSON Dictionary Optimization:** Simplified target appending logic in both the port scanner and Custom Nmap OS Lookup modules using Python's native `dict.setdefault()`, significantly reducing verbosity and eliminating the risk of `KeyError` crashes.
+- **Dual Variable Syntax:** Updated the payload generator and listener to intelligently support both standard (`LHOST`/`LPORT`) and legacy (`L_HOST`/`L_PORT`) variable syntaxes simultaneously to prevent failed reverse shell callbacks.
+- **Silent Auto-Generation:** Refined the automated payload compilation workflow to run completely silently in the background, removing unnecessary UI view prompts and keeping the exploit execution sequence completely seamless.
 
 ### Fixed
 - **Input Fallback Safety:** Hardened the async port scanner's scope generation block. If an invalid or malformed port range is provided, it now gracefully defaults to well-known privileged ports (`1-1024`) instead of crashing or executing an empty scan.
+- **OS Fingerprint Accuracy:** Fixed a critical assumption in `Custom_nmap_db_Lookup.py` where closed ports were blindly guessed. The engine now actively scans for verifiable closed TCP (via `RST`) and UDP (via `ICMP Port Unreachable`) ports using random high-port probes, drastically improving the accuracy of T5-T7 and U1 Nmap signature metrics.
+- **Session ID Persistence:** Fixed a string-parsing logic bug in `source/main.py` where the framework's unique UUID session ID was failing to save to the database on boot. The `SetV` handler now correctly receives argument lists rather than raw strings, ensuring activity logs accurately track the active session.
+- **Listener Port Alignment:** Fixed a configuration key typo in `exploithandler.py` where the background C2 listener was querying `L_PORT` instead of `LPORT`, causing it to listen on port `4444` while payloads were generated for `5000`. The payload generator and listener are now perfectly synchronized.
+- **Dangling Listener Cleanup:** Fixed a bug where running an exploit multiple times in a single session resulted in an `[Errno 48] Address already in use` crash. The `ExploitHandler` now tracks active daemon sockets and cleanly terminates them before binding new listeners, preventing port contention and mismatched XOR keys.
+- **Stager Execution Bug:** Added the missing `Start()` initialization call to the bottom of the `stager.py` payload. The fileless Stage 1 stager now automatically executes upon being decoded in memory on the target.
+- **Loopback IP Trap:** Implemented a pre-generation sanity check that warns users if they accidentally attempt to map a reverse shell back to a local loopback or wildcard address (`127.0.0.1` or `0.0.0.0`).
 
 ## [1.2.9] - 2026-05-20
 ### Added
