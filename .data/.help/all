@@ -10,7 +10,7 @@
 
 USAGE:
   help <command>       Get detailed help for a specific command
-                       Example: help search, help set
+                       Example: help search, help recon, help c2, help sessions
 
 ----------------------------------------------------------------------
 [1] CORE WORKSPACE & VARIABLES
@@ -22,10 +22,11 @@ USAGE:
   search           Search exploits, payloads, recon tools, and targets
 
 ----------------------------------------------------------------------
-[2] EXECUTION ENGINE
+[2] EXECUTION & COMMAND AND CONTROL
 ----------------------------------------------------------------------
-  exploit          Execute the currently loaded module
-  run              Execute the currently loaded recon tool
+  exploit          Execute the currently loaded exploit or generate payload
+  run              Execute the currently loaded recon module
+  sessions         Manage and interact with active background C2 shells
   
 ----------------------------------------------------------------------
 [3] SYSTEM & UTILITIES
@@ -40,5 +41,5 @@ USAGE:
 ======================================================================
   • Auto-Suggestions: The CLI uses prompt-toolkit for dynamic hints.
   • Native Execution: Non-framework commands run in your system shell.
-  • Background Listener: Start a native shell catcher via `set listener true`.
-  • Recon Automation: Enable `set auto_suggest true` for smart exploit hints.
+  • Fileless C2: Payloads are executed directly in the target's RAM over SSL/TLS.
+  • Target Management: Recon modules automatically populate the targets database.

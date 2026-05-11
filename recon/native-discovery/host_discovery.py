@@ -18,6 +18,7 @@ path_to_targets_db = f"{install_location}/.data/.config/targets.json"
 
 # Suppress Scapy's default routing warnings for cleaner console output
 conf.verb = 0
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
 class HostDiscoveryEngine:
     """
@@ -166,9 +167,17 @@ class Start:
             try:
                 # Attempt to use the in-memory state manager if running within SuperSploit
                 try:
+                    print("[*] Using the in-memory state manager to find dictionary")
+                    import sys
+                    # Dynamically resolve the source directory relative to this script's location
+                    current_dir = os.path.dirname(os.path.abspath(__file__))
+                    source_dir = os.path.abspath(os.path.join(current_dir, "..", "..", "source"))
+                    if source_dir not in sys.path:
+                        sys.path.append(source_dir)
                     from core.database import DatabaseManagment
                     has_db_manager = True
                 except ImportError:
+                    print("[!] Are you running this as a standalone no database found.")
                     has_db_manager = False
 
                 if has_db_manager:

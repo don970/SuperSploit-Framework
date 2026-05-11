@@ -3,8 +3,15 @@ import uuid
 from core.database import DatabaseManagment
 from core.logger import Logger # We will create this next
 from core.set import SetV
+import sys
+
+install_location = DatabaseManagment.getInstall()
 
 def initialize_session():
+    # check sys path and add install if not present
+    if f"{install_location}/source" not in sys.path:
+        sys.path.append(f"{install_location}/source")
+
     db = DatabaseManagment.get()
     # Generate an 8-character unique session ID
     session_id = uuid.uuid4().hex[:8]

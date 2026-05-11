@@ -19,6 +19,7 @@ from .use import use
 from .search import Search
 from .banners import Banners
 from .inputfixes import Input_fixes
+from .sessions import Sessions
 from .clean import clean
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
@@ -129,7 +130,8 @@ class Input:
                 "update-info": cls._update,
                 "info": exploitDetails,
                 "debugdb": DatabaseManagment.Debug,
-                "run": Recon
+                "run": Recon,
+                "sessions": Sessions.manage
             }
 
             # ==========================================

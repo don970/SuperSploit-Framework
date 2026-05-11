@@ -16,7 +16,7 @@ install_location = f'{os.getenv("HOME")}/.SuperSploit'
 # Absolute path to the main configuration/session JSON database
 path_to_database = f"{install_location}/.data/.config/data.json"
 # Absolute path to the dedicated targets database
-path_to_targets = f"{install_location}/.data/.config/targets.json.b"
+path_to_targets = f"{install_location}/.data/.config/targets.json"
 # Alias for the standard output writing function
 write = ToStdout.write
 
@@ -130,6 +130,7 @@ class DatabaseManagment:
     _targets_dirty = False
     _sync_thread = None
     _stop_sync = False
+    _targets_last_mtime = 0
 
     @classmethod
     def _update(cls, data):
@@ -150,14 +151,21 @@ class DatabaseManagment:
             return cve
         return "None"
 
+
+
     @classmethod
     def getTargets(cls):
-        """Reads targets from memory cache, fetching from disk only on first load."""
-        if cls._targets_cache is None:
+        """Reads targets from memory cache, but reloads if the disk file was updated by a subprocess."""
+        current_mtime = 0
+        if os.path.exists(path_to_targets):
+            current_mtime = os.path.getmtime(path_to_targets)
+
+        if cls._targets_cache is None or current_mtime > cls._targets_last_mtime:
             if os.path.exists(path_to_targets):
                 try:
                     with open(path_to_targets, "r") as file:
                         cls._targets_cache = json.load(file).get("TARGETS", {})
+                    cls._targets_last_mtime = current_mtime
                 except Exception:
                     cls._targets_cache = {}
             else:
@@ -178,6 +186,7 @@ class DatabaseManagment:
                 with open(path_to_targets, "w") as file:
                     json.dump({"TARGETS": cls._targets_cache}, file, indent=4, sort_keys=True)
                 cls._targets_dirty = False
+                cls._targets_last_mtime = os.path.getmtime(path_to_targets)
             except Exception as e:
                 write(f"[-] Failed to sync targets to disk: {e}")
 
@@ -273,7 +282,9 @@ class DatabaseManagment:
                 "dev_mode": "DEV_MODE" ,
                 "sessionId": "SESSION_ID",
                 "recon_name": "RECON_NAME",
-                "recon_path": "RECON_PATH"
+                "recon_path": "RECON_PATH",
+                "stage2": "STAGE_TWO",
+                "stage_two": "STAGE_TWO"
             }
 
             # Update the mapped key if it matches the first item in the input data

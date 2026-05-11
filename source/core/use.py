@@ -1,5 +1,3 @@
-# TODO: fix Index error not being handled line 58 " name = paths[int(index)].split("/")[-1] "
-
 import os
 from .database import DatabaseManagment
 from .ToStdOut import ToStdout
@@ -13,7 +11,7 @@ class use:
     def execute(cls, data):
         args = data.split()
         if len(args) < 3:
-            print("[-] Usage: use <exploit|target|payload> <index>\n")
+            print("[-] Usage: use <exploit|target|payload|stage2|recon> <index>\n")
             return
             
         category = args[1].lower()
@@ -54,13 +52,23 @@ class use:
             else:
                 print("[-] Invalid payload index.\n")
 
+        elif category in ["stage2", "stage_two"]:
+            payloads = DatabaseManagment.getPayloads()
+            if 0 <= index < len(payloads):
+                DatabaseManagment.directlyModify(["stage2", payloads[index]])
+                print(f"[*] Set STAGE_TWO to {payloads[index]}\n")
+            else:
+                print("[-] Invalid stage2 payload index.\n")
+
         elif category == "recon":
             recondb, paths = DatabaseManagment.UpdateReconDB()
-            if 0 < len(paths):
+            if 0 <= index < len(paths):
                 name = paths[int(index)].split("/")[-1]
-                write(f"[*] Set RECON_NAME to {name}")
+                print(f"[*] Set RECON_NAME to {name}\n")
                 DatabaseManagment.directlyModify(["recon_name", name])
-                write(f"[*] Set RECON_PATH to {paths[int(index)]}")
+                print(f"[*] Set RECON_PATH to {paths[int(index)]}\n")
                 DatabaseManagment.directlyModify(["recon_path", paths[int(index)]])
+            else:
+                print("[-] Invalid recon index.\n")
         else:
             print(f"[-] Unknown category: {category}\n")

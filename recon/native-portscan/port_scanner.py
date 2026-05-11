@@ -6,6 +6,7 @@ network mapping and banner grabbing.
 
 import asyncio
 import json
+import logging
 import os
 import platform
 from urllib.parse import urlparse
@@ -15,6 +16,23 @@ from urllib.parse import urlparse
 install_location = f'{os.getenv("HOME")}/.SuperSploit'
 path_to_database = f"{install_location}/.data/.config/data.json"
 path_to_targets_db = f"{install_location}/.data/.config/targets.json"
+path_to_log = f"{install_location}/.data/.logs/recon_activity.log"
+
+# --- Module Logger Configuration ---
+os.makedirs(os.path.dirname(path_to_log), exist_ok=True)
+logger = logging.getLogger("AsyncPortScanner")
+logger.setLevel(logging.DEBUG)
+if not logger.handlers:
+    c_handler = logging.StreamHandler()
+    c_handler.setLevel(logging.INFO)
+    c_handler.setFormatter(logging.Formatter('%(message)s'))
+
+    f_handler = logging.FileHandler(path_to_log)
+    f_handler.setLevel(logging.DEBUG)
+    f_handler.setFormatter(logging.Formatter('%(asctime)s - [PortScanner] - %(levelname)s - %(message)s'))
+
+    logger.addHandler(c_handler)
+    logger.addHandler(f_handler)
 
 class ServiceDetector:
     """
@@ -74,7 +92,7 @@ class AsyncPortScanner:
             safe_limit = max(10, soft_limit - 50)
             actual_limit = min(max_concurrency, safe_limit)
             if actual_limit < max_concurrency:
-                print(f"[*] OS File Descriptor limit detected. Scaling concurrency down to {actual_limit} tasks.")
+                logger.warning(f"[*] OS File Descriptor limit detected. Scaling concurrency down to {actual_limit} tasks.")
 
         # asyncio.Semaphore acts as a concurrency throttle.
         # Operating Systems have strict limits on how many file descriptors (sockets) can be open at once (usually ~1024).
@@ -146,24 +164,23 @@ class AsyncPortScanner:
                 
                 # Print results to the console dynamically as they are found
                 banner_disp = f" | Banner: {banner[:50]}..." if banner else ""
-                print(f"[+] Port {port:<5} | {service:<10} | OPEN{banner_disp}")
+                logger.info(f"[+] Port {port:<5} | {service:<10} | OPEN{banner_disp}")
                 
-            except (asyncio.TimeoutError, ConnectionRefusedError, ConnectionResetError, OSError):
-                # DEBUG TIP: Diagnosing connection failures:
-                # TimeoutError = The port is likely FILTERED by a firewall (packets silently dropped).
-                # ConnectionRefusedError = The port is CLOSED (server sent a TCP RST packet in response).
-                # ConnectionResetError = Connection started but was aborted mid-flight (often IPS/IDS interference).
-                # OSError = Usually "No route to host" or local OS limits exhausted.
-                # Port is either closed (ConnectionRefusedError via RST packet), 
-                # filtered by a firewall (TimeoutError via dropped packet), 
-                # or fundamentally unreachable (OSError).
-                # ConnectionResetError is added to gracefully handle TCP RSTs sent mid-connection.
-                pass
+            except asyncio.TimeoutError:
+                logger.debug(f"Port {port} Timeout (Filtered/Dropped)")
+            except ConnectionRefusedError:
+                logger.debug(f"Port {port} Connection Refused (Closed via RST)")
+            except ConnectionResetError:
+                logger.debug(f"Port {port} Connection Reset (IDS/IPS Interference)")
+            except OSError as e:
+                logger.debug(f"Port {port} OS Socket Error: {e}")
+            except Exception as e:
+                logger.debug(f"Port {port} Unexpected Error: {e}")
 
     async def run_scan(self):
         """Constructs the event loop tasks and executes all port scanning coroutines concurrently."""
-        print(f"[*] Starting Async Port Scan on {self.target} ({len(self.ports)} ports)")
-        print("[*] Concurrency Limit: 500 tasks | Timeout: 1.5s\n")
+        logger.info(f"[*] Starting Async Port Scan on {self.target} ({len(self.ports)} ports)")
+        logger.info("[*] Concurrency Limit: 500 tasks | Timeout: 1.5s\n")
         
         # Create an un-executed coroutine object for every port in our target list.
         tasks = [self.scan_port(port) for port in self.ports]
@@ -199,7 +216,7 @@ class Start:
             target_ip = raw_target.split(":")[0]
             
         if not target_ip:
-            print("[-] No valid R_HOST set in the database.")
+            logger.error("[-] No valid R_HOST set in the database.")
             return
 
         # Generate the target scope: Allow users to specify custom ports via the 'PORTS' variable.
@@ -241,30 +258,20 @@ class Start:
         # Start the asyncio event loop and block until all port scanning tasks are finalized.
         results = asyncio.run(scanner.run_scan())
         
-        print(f"\n[+] Scan Complete. Found {len(results)} open ports.")
+        logger.info(f"\n[+] Scan Complete. Found {len(results)} open ports.")
         
         # Target Database Persistence
         # If we found open ports, save the structured data to the global targets.json database.
         if results:
-            print(f"[*] Saving port data for {target_ip} to the targets database...")
+            logger.info(f"[*] Saving port data for {target_ip} to the targets database...")
             try:
-                # Attempt to use the in-memory state manager if running within SuperSploit
-                try:
-                    from core.database import DatabaseManagment
-                    has_db_manager = True
-                except ImportError:
-                    has_db_manager = False
-
-                if has_db_manager:
-                    existing_targets = DatabaseManagment.getTargets()
-                else:
-                    existing_targets = {}
-                    if os.path.exists(path_to_targets_db):
-                        with open(path_to_targets_db, "r") as f:
-                            try:
-                                existing_targets = json.load(f).get("TARGETS", {})
-                            except json.JSONDecodeError:
-                                pass
+                existing_targets = {}
+                if os.path.exists(path_to_targets_db):
+                    with open(path_to_targets_db, "r") as f:
+                        try:
+                            existing_targets = json.load(f).get("TARGETS", {})
+                        except json.JSONDecodeError:
+                            pass
 
                 if not isinstance(existing_targets, dict):
                     existing_targets = {}
@@ -279,14 +286,11 @@ class Start:
                 # Save the new port array into the target's dictionary space.
                 target_entry["ports"] = results
                 
-                if has_db_manager:
-                    DatabaseManagment.updateTargets(existing_targets)
-                else:
-                    with open(path_to_targets_db, "w") as f:
-                        json.dump({"TARGETS": existing_targets}, f, sort_keys=True, indent=4)
-                print("[+] Database updated successfully.")
+                with open(path_to_targets_db, "w") as f:
+                    json.dump({"TARGETS": existing_targets}, f, sort_keys=True, indent=4)
+                logger.info("[+] Database updated successfully.")
             except Exception as e:
-                print(f"[-] Failed to update database: {e}")
+                logger.error(f"[-] Failed to update database: {e}")
 
 if __name__ == "__main__":
     Start()

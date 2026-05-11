@@ -1,5 +1,4 @@
 """
-TODO: test
 This is a modular engine designed for integration into SuperSploit's
 reconnaissance Framework. It performs active OS fingerprinting by sending 
 crafted TCP probes to target hosts analyzing TCP SYN/ACK responses against 

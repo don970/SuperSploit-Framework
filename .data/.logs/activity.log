@@ -1,0 +1,10 @@
+--------------------------------------------------
+[2026-05-10 18:08:17] [SESSION: 872e57be] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-05-10 18:08:41] [SESSION: 872e57be] TYPE: PAYLOAD-GEN | EXPLOIT: /Users/donald/.SuperSploit/exploits/test/RCE_test.py | TARGET: http://192.168.0.66 | SUCCESS: True
+[2026-05-10 18:08:47] [SESSION: 872e57be] TYPE: PYTHON-MODULE | EXPLOIT: /Users/donald/.SuperSploit/exploits/test/RCE_test.py | TARGET: http://192.168.0.66 | SUCCESS: True
+[2026-05-10 18:12:06] [SESSION: 872e57be] TYPE: PAYLOAD-GEN | EXPLOIT: /Users/donald/.SuperSploit/exploits/test/RCE_test.py | TARGET: http://192.168.0.66 | SUCCESS: True
+[2026-05-10 18:12:17] [SESSION: 872e57be] TYPE: PYTHON-MODULE | EXPLOIT: /Users/donald/.SuperSploit/exploits/test/RCE_test.py | TARGET: http://192.168.0.66 | SUCCESS: True
+--------------------------------------------------
+[2026-05-10 18:14:30] [SESSION: 0f010e66] --- SUPERSPLOIT FRAMEWORK LAUNCHED ---
+[2026-05-10 18:14:54] [SESSION: 0f010e66] TYPE: PAYLOAD-GEN | EXPLOIT: /Users/donald/.SuperSploit/exploits/test/RCE_test.py | TARGET: http://192.168.0.66 | SUCCESS: True
+[2026-05-10 18:15:02] [SESSION: 0f010e66] TYPE: PYTHON-MODULE | EXPLOIT: /Users/donald/.SuperSploit/exploits/test/RCE_test.py | TARGET: http://192.168.0.66 | SUCCESS: True

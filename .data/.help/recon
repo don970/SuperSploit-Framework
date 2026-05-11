@@ -7,7 +7,7 @@ Reconnaissance modules are designed to enumerate, scan, and gather intelligence 
 ---
 
 ## 2. LOCATING RECON MODULES
-Search the internal database for available reconnaissance modules using the `search` command. 
+Search the internal database for available reconnaissance modules using the `search` command.
 
 ### 🔎 Search Syntax
 `search recon [keyword1] [keyword2] ...`
