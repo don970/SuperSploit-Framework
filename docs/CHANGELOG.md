@@ -1,6 +1,16 @@
 # Changelog
-
+### [1.2.12] - 2026-06-05
 All notable changes to this project will be documented in this file.
+### Added
+- **ServiceDetector:** Introduced an asynchronous heuristic service and protocol detector to the native port scanner (`port_scanner.py`).
+- **Dual-Probe Architecture:** The port scanner now utilizes both passive listening and active generic HTTP probing to coerce service banners.
+- **Nmap Signature Parsing:** Added the ability to dynamically parse and compile regex signatures from `nmap-service-probes.txt` natively over Python raw sockets.
+- **Interpreter-Level Caching:** Implemented a global cache via the `sys` module (`sys._supersploit_nmap_cache`) to prevent re-parsing of the massive Nmap database during dynamic module reloads, resulting in near-instantaneous subsequent scans.
+- **Target Database Integration:** Discovered open ports, services, and banners are now seamlessly logged to the framework's core target database (`DatabaseManagment`).
+- **Heuristic Fallbacks:** Added a `COMMON_PORTS` dictionary to accurately guess services when banners cannot be extracted or active probes are dropped.
+
+### Changed
+- Updated the bundled `nmap-os-db.txt` with a modification notice to comply with the NPSL and appended custom framework signatures.
 
 ## [1.2.12] - 2026-06-05
 ### Fixed
