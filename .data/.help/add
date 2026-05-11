@@ -1,6 +1,8 @@
-                   Help section for add command
-        adds a a variable to the local database, and then sets it to a str casting of value
+# ➕ COMMAND: add
+Description: Adds a custom variable to the local database, allowing you to set arbitrary key-value pairs for exploits or recon modules.
 
-      [Usage]:
-        add [variable_name] [value]
+Usage:
+    add <VARIABLE_NAME> <VALUE>
 
+Example:
+    add CUSTOM_PORT 8080

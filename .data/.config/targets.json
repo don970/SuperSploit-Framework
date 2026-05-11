@@ -1,3 +1,35 @@
 {
-  "targets": {"192.168.0.1/24": {}}
+    "TARGETS": {
+        "192.168.0.1": "N/A",
+        "192.168.0.152": "N/A",
+        "192.168.0.206": "N/A",
+        "192.168.0.244": "N/A",
+        "192.168.0.58": "N/A",
+        "192.168.0.66": {
+            "ports": [
+                {
+                    "banner": "HTTP/1.1 200 OK Server: Werkzeug/3.1.8 Python/3.13.5 Date: Mon, 11 May 2026 17:33:53 GMT Content-Type: text/html; charset=utf-8 Content-Length: 80 Connection: close",
+                    "port": 8080,
+                    "service": "HTTP"
+                },
+                {
+                    "banner": "",
+                    "port": 38383,
+                    "service": "Unknown"
+                },
+                {
+                    "banner": "",
+                    "port": 39393,
+                    "service": "Unknown"
+                },
+                {
+                    "banner": "",
+                    "port": 63993,
+                    "service": "Unknown"
+                }
+            ],
+            "status": "N/A"
+        },
+        "192.168.0.81": "N/A"
+    }
 }

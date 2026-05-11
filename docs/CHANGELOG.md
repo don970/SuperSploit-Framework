@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.12] - 2026-06-05
+### Fixed
+- **Auto-Suggest Target Querying:** Fixed a bug in `inputHandler.py` where the `auto_suggest` engine queried the main configuration database instead of the dedicated targets database, resulting in missed port data.
+- **Metadata Parsing Crash:** Fixed an `auto_suggest.py` error where the correlation engine tried to read keywords as object attributes from file path strings. It now accurately queries the `ExploitCache` metadata index.
+- **Keyword Type Handling:** Added robust parsing in `auto_suggest.py` to gracefully handle legacy comma-separated string formats for `keywords` if a module developer forgets to use a YAML array.
+- **Exploit Cache Status Conflict:** Resolved an issue in `database.py` where a module's YAML `status` (e.g., "testing") collided with the framework's internal read `status` ("ok"). Separated these into `dev_status` and `status` to prevent the "Select a valid exploit first" lock-out error.
+- **Info Display Clutter:** Cleaned up the `info` command CLI output to actively filter out redundant internal framework keys (`name`, `cve`, `info`, `status`) from the secondary print loop.
+- **Target Serialization:** Ensured target dictionaries are properly queried and formatted when the auto-suggest engine executes post-reconnaissance.
+
+## [1.2.11] - 2026-06-01
+### Added
+- **Intelligent Auto-Suggest:** Introduced the `auto_suggest` command which automatically analyzes a target's open ports from RAM and correlates them with framework exploits based on metadata keywords.
+- **C2 Connection Heartbeat:** Implemented an aggressive heartbeat monitor in the background TLS listener. It utilizes both OS-level TCP Keepalives and a 60-second 1-byte ping loop to automatically detect drops and purge dead sessions.
+- **macOS/BSD Socket Reclamation:** Added `socket.SO_REUSEPORT` support to the background listener to forcefully bypass strict kernel-level socket TIME_WAIT locks that previously caused "Address still in use" errors on macOS.
+- **Help Documentation Redesign:** Overhauled the entire `.data/.help/` directory. Help menus now feature a stylized markdown aesthetic with emojis, clearer syntax examples, and updated C2 documentation.
+
+### Changed
+- **Unified C2 Listener Routing:** Removed duplicate and conflicting socket listening code from `exploithandler.py`. All reverse shell catching is now routed cleanly through the centralized `Listener` class, ensuring `sessions` always displays active connections.
+- **Robust Argument Parsing:** Updated `sessions.py` to use `shlex.split()` instead of standard string splitting, preventing index out-of-bounds crashes when users enter multiple spaces.
+
+### Fixed
+- **Path Parsing Resilience:** Replaced hardcoded colon (`:`) path separators in `inputHandler.py` with cross-platform `os.pathsep`, preventing crashes on Windows or misconfigured PATH environments.
+- **Boolean Parsing Bug:** Fixed an initialization crash in `inputHandler.py` where a raw boolean `True` from the configuration database would crash the `.lower()` string cast check.
+- **Use Command Bounds Check:** Added bounds checking and `ValueError` handling in `use.py` to gracefully reject invalid or non-integer indices instead of crashing the framework.
+
 ## [1.2.10] - 2026-05-25
 ### Added
 - **Extended Port Scope Configuration:** Added support for the `PORT_RANGE` flag in the async port scanner. The scanner now intelligently merges the `PORTS` and `PORT_RANGE` database variables to allow for simultaneous custom lists and specific ranges.

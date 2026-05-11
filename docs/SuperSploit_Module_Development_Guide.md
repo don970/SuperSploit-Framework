@@ -16,6 +16,23 @@ The file is expected to be split into three parts:
 2. **Index 1 (Between the delimiters):** Metadata. The framework strips this section out entirely before execution.
 3. **Index 2:** The actual executable code.
 
+### Available YAML Metadata Fields
+You can include various YAML keys inside the `#!#!#!` block to hook into SuperSploit's advanced automation features:
+* `name`: The display name of the exploit.
+* `description`: A brief summary of the exploit.
+* `cve`: The CVE identifier (e.g., `CVE-2024-1234`).
+* `target`: The intended target OS or service.
+* `payload`: A linked payload file (e.g., `payloads/stager/stager.py`). If set, SuperSploit automatically generates a fileless stager and launches a C2 listener before the exploit fires!
+* `keywords`: A list of strings/integers (e.g., `[8080, "http", "apache"]`). This directly hooks into the `auto_suggest` engine, which dynamically recommends your exploit when a recon module discovers a matching open port or service.
+
+**Example Metadata Block:**
+```yaml
+name: Custom Apache RCE
+cve: CVE-2024-1234
+keywords: [80, 443, 8080, "http", "apache"]
+payload: payloads/stager/stager.py
+```
+
 ---
 
 ## 2. Adding Python Exploit Modules
@@ -32,6 +49,7 @@ import sys
 # Author: Your Name
 # Description: Example RCE exploit
 # Target: Vulnerable Server v1.0
+# keywords: [80, "http"]
 #!#!#!
 
 def exploit(args=None):

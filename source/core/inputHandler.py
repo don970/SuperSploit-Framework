@@ -73,7 +73,13 @@ class Input:
         args = shlex.split(data) if data else []
         # Extract target IP from arguments or fallback to database context
         target_ip = args[1] if len(args) > 1 else db_data.get('R_HOST', db_data.get('TARGET', 'unknown'))
-        target_open_ports = db_data.get('open_ports', db_data.get('ports', []))
+        
+        targets_db = DatabaseManagment.getTargets()
+        target_open_ports = []
+        if target_ip in targets_db:
+            target_info = targets_db[target_ip]
+            if isinstance(target_info, dict):
+                target_open_ports = target_info.get('open_ports', target_info.get('ports', []))
         
         suggester = ASC(ExploitCache)
         suggester.execute(target_ip, target_open_ports)

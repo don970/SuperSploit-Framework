@@ -1,6 +1,5 @@
-                   Help section for banner command
-        banner displays a random fun fact about computers.
+# 🎨 COMMAND: banner
+Description: Clears the terminal screen and displays the SuperSploit ASCII art logo along with a random computer or OSINT fun fact.
 
-      [Usage]:
-        banner
-
+Usage:
+    banner

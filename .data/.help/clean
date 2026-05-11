@@ -1,8 +1,5 @@
-                   Help section for clean command
-        Does a full clean. this opens each of the file's responsible
-        for keeping error logs, history, nmap history, target history, recon
-        history, phoneinfoga lookup history, harvested credentials history,
-        and google dork name search.
+# 🧹 COMMAND: clean
+Description: Performs a full cleanup of the framework environment. This truncates and clears history files, error logs, nmap scans, target history, gathered credentials, and other locally cached loot.
 
-      [Usage]:
-        clean
+Usage:
+    clean

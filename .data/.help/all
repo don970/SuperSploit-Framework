@@ -27,6 +27,7 @@ USAGE:
   exploit          Execute the currently loaded exploit or generate payload
   run              Execute the currently loaded recon module
   sessions         Manage and interact with active background C2 shells
+  auto_suggest     Analyze target RAM and suggest matching exploits
   
 ----------------------------------------------------------------------
 [3] SYSTEM & UTILITIES

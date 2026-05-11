@@ -11,5 +11,3 @@ Background Listener Details:
     - Connections are caught securely via an ephemeral TLS certificate.
     - Stage 2 fileless payloads are automatically injected upon connection.
     - To return to SuperSploit while interacting with a session, type `bg` or `background`.
-    
-*(Note: You can use `help sessions` or `help session`)*

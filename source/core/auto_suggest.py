@@ -28,9 +28,15 @@ class AutoSuggestCommand:
             service_name = str(port_info.get('service', '')).lower()
             
             for exploit in self.exploit_cache.all_exploits:
+                meta = self.exploit_cache.metadata_index.get(exploit, {})
+                
                 # Extract keywords from the exploit module, falling back to an empty list
-                keywords = [str(k).lower() for k in getattr(exploit, 'keywords', [])]
-                exploit_name = getattr(exploit, 'name', 'Unknown Exploit')
+                raw_keywords = meta.get('keywords', meta.get('auto_suggest', []))
+                if isinstance(raw_keywords, str):
+                    raw_keywords = [k.strip() for k in raw_keywords.split(',')]
+                    
+                keywords = [str(k).lower() for k in raw_keywords]
+                exploit_name = meta.get('name', 'Unknown Exploit')
                 
                 # Check if the scanned port or service matches any of the exploit's keywords
                 if port_num in keywords or service_name in keywords:

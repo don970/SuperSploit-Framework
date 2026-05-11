@@ -60,7 +60,8 @@ class ExploitCache:
                         "name": meta.get("name", os.path.basename(path)),
                         "cve": meta.get("cve", "N/A"),
                         "desc": meta.get("description", "").lower(),
-                        "target": meta.get("target", "")
+                        "target": meta.get("target", ""),
+                        "keywords": meta.get("keywords", meta.get("auto_suggest", []))
                     }
         except Exception:
             pass
@@ -86,9 +87,11 @@ class ExploitCache:
                     "info": meta.get("description", "No description provided."),
                     "options": meta.get("options", []),
                     "cve": meta.get("cve", "N/A"),
+                    "cwe": meta.get("cwe", "N/A"),
                     "target": meta.get("target", ""),
                     "payload": meta.get("payload", ""),
-                    "status": meta.get("status", "known")
+                    "dev_status": meta.get("status", "known"),
+                    "status": "ok"
                 }
         except Exception:
             cls.details = {"status": "error"}
@@ -114,7 +117,9 @@ class exploitDetails:
         db = DatabaseManagment.get()
         # Dynamically print out all available options mapped in the cache
         for opt, value in cache.items():
-            write(f"{opt} = {value}")
+            # Hide redundant internal framework keys from the CLI output
+            if opt not in ["name", "cve", "info", "status"]:
+                write(f"{opt.capitalize()}: {value}")
 
 class DatabaseManagment:
     """
