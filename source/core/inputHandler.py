@@ -1,6 +1,3 @@
-# TODO: • Background Listener: Start a native shell catcher via `set listener true`.
-# TODO: • Recon Automation: Enable `set auto_suggest true` for smart exploit hints.
-
 import os
 import traceback
 import subprocess
@@ -24,12 +21,14 @@ from .clean import clean
 from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .exploithandler import ExploitHandler
 import shlex
+from .listener import Listener
 from .recon_engien import Recon
+from .auto_suggest import AutoSuggestCommand as ASC
 
 # set global variables
 installation = DatabaseManagment.getInstall()
 history = FileHistory(f'{installation}/.data/.history/history')
-path = os.getenv("PATH").split(":")
+path = os.getenv("PATH", "").split(os.pathsep)
 env = os.environ
 Aliases = DatabaseManagment._UpdateAliases()
 
@@ -67,6 +66,17 @@ class Input:
         except OSError as e:
             ToStdout.write(f"OS Error during system call: {e}\n{traceback.format_exc()}")
             return False
+
+    @classmethod
+    def _auto_suggest(cls, data=None):
+        db_data = DatabaseManagment.get()
+        args = shlex.split(data) if data else []
+        # Extract target IP from arguments or fallback to database context
+        target_ip = args[1] if len(args) > 1 else db_data.get('R_HOST', db_data.get('TARGET', 'unknown'))
+        target_open_ports = db_data.get('open_ports', db_data.get('ports', []))
+        
+        suggester = ASC(ExploitCache)
+        suggester.execute(target_ip, target_open_ports)
 
     @classmethod
     def check(cls, data):
@@ -131,7 +141,8 @@ class Input:
                 "info": exploitDetails,
                 "debugdb": DatabaseManagment.Debug,
                 "run": Recon,
-                "sessions": Sessions.manage
+                "sessions": Sessions.manage,
+                "auto_suggest": cls._auto_suggest
             }
 
             # ==========================================
@@ -141,6 +152,16 @@ class Input:
                 if cmd_name in general_cmds:
                     general_cmds[cmd_name](data)
                     DatabaseManagment._update(DatabaseManagment.get())
+
+                    # Trigger background shell listener if set
+                    if cmd_name == "set" and len(dataList) >= 3:
+                        if dataList[1].lower() == "listener" and dataList[2].lower() == "true":
+                            Listener.start(DatabaseManagment.get())
+
+                    # Trigger Recon Automation auto_suggest if enabled
+                    if cmd_name == "run" and DatabaseManagment.get().get("auto_suggest", "").lower() == "true":
+                        cls._auto_suggest()
+
                     return True
                 else:
                     # If not an internal command, treat as a system call
@@ -155,6 +176,11 @@ class Input:
 
     @classmethod
     def get(cls):
+        # Start background listener automatically on startup if configured
+        initial_db = DatabaseManagment.get()
+        if str(initial_db.get("listener", "")).lower() == "true":
+            Listener.start(initial_db)
+
         Banners(None)
         while True:
             DatabaseManagment.getCVE()

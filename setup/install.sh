@@ -7,7 +7,7 @@ fi
 
 # copy latest local version to install path
 printf  "[*] Copying files to install path \n"
-sudo cp -r  $HOME/PycharmProjects/SuperSploit-updated ~/.SuperSploit
+sudo cp -r  $HOME/PycharmProjects/SuperSploit-Framework ~/.SuperSploit
 
 # change ownership
 printf "[*] Changing ownership to $USER \n"

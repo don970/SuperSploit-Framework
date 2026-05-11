@@ -102,6 +102,12 @@ class Listener:
                 # framework crashes. Without this, you get "Address already in use" errors for ~60 seconds.
                 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 
+                # Add SO_REUSEPORT for macOS/BSD to forcefully allow binding if the port is held by a stale session
+                try:
+                    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+                except AttributeError:
+                    pass
+                
                 # Register the active socket so future executions can clean it up
                 cls.active_listener_socket = server
                 
@@ -120,6 +126,7 @@ class Listener:
                             
                 if not bound:
                     write(f"\n[!] Fatal: Could not bind to {host}:{port}. Address still in use.")
+                    cls.active_listener_socket = None
                     return
 
                 server.listen(5)

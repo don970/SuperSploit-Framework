@@ -1,4 +1,5 @@
-from .exploithandler import ExploitHandler
+import shlex
+from .listener import Listener
 from .ToStdOut import ToStdout
 
 write = ToStdout.write
@@ -6,11 +7,11 @@ write = ToStdout.write
 class Sessions:
     @staticmethod
     def manage(args):
-        parts = args.split(" ")
+        parts = shlex.split(args) if args else []
         
         # Show list of active sessions (e.g., "sessions" or "sessions -l")
-        if len(parts) == 1 or (len(parts) == 2 and parts[1] == "-l"):
-            sessions = ExploitHandler.active_sessions
+        if not parts or len(parts) == 1 or (len(parts) == 2 and parts[1] == "-l"):
+            sessions = Listener.active_sessions
             if not sessions:
                 write("[-] No active sessions.")
                 return
@@ -29,7 +30,7 @@ class Sessions:
         if len(parts) >= 3 and parts[1] == "-i":
             try:
                 sid = int(parts[2])
-                ExploitHandler.interact_with_session(sid)
+                Listener.interact(sid)
             except ValueError:
                 write("[-] Invalid session ID. Usage: sessions -i <id>")
             return
