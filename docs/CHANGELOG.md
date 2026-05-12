@@ -1,4 +1,28 @@
 # Changelog
+
+## [1.2.13] - 2026-06-10
+All notable changes to this project will be documented in this file.
+
+### Added
+- **CIDR Subnet Support:** Upgraded the async port scanner to natively support CIDR notation (`192.168.0.1/24`) by utilizing the built-in `ipaddress` module to automatically expand and iterate through target ranges.
+- **Global Exception Handler:** Implemented a global exception catching block in `main.py` to prevent silent crashes and gracefully dump tracebacks during fatal framework failures.
+
+### Changed
+- **In-Memory Config Caching:** Completely overhauled `DatabaseManagment` and the `set` command to treat `cls.core_db` as the single source of truth in memory, drastically reducing disk I/O and resolving cache desynchronization.
+- **Pretty-Print JSON:** Standardized `data.json` and `targets.json` output formatting to use `indent=4` to automatically generate clean, human-readable configuration files right from startup.
+- **Sudo Subprocess Resilience:** Enhanced `recon_engien.py` to dynamically inject true script paths into the execution buffer, fixing `__file__` resolution issues when executing from `/tmp`.
+- **Target Cache Syncing:** Configured `recon_engien.py` and `port_scanner.py` to explicitly flush memory to disk before and after execution, ensuring `sudo` subprocesses always access and update the absolute latest target data.
+
+### Fixed
+- **Info Command UI Bug:** Removed a rogue `os.system("clear")` call in `exploitDetails` that was wiping the terminal screen and deleting previous command outputs.
+- **Sudo Module Imports:** Fixed an `ImportError` bug during isolated `sudo` module execution by dynamically appending the framework's `source` directory to `sys.path`.
+- **POSIX Locale Encoding Crash:** Added `encoding="utf-8"` to all file read/write operations across the framework to prevent `UnicodeDecodeError` silent crashes when running in restricted `C` or `POSIX` `sudo` environments.
+- **Legacy Target Database Crash:** Fixed a `TypeError` in the target database manager that caused the framework to crash when encountering legacy or corrupt string entries instead of mapping them as dictionaries.
+- **Multi-Word Variable Truncation:** Fixed the `set` command parsing logic so that multi-word values (e.g., payloads or descriptions) are joined properly and no longer truncated to the first word.
+- **Startup Crash:** Removed an orphaned, parameter-less `_quick_parse()` call in `inputHandler.py` that was triggering a fatal `TypeError` on framework boot.
+
+---
+
 ### [1.2.12] - 2026-06-05
 All notable changes to this project will be documented in this file.
 ### Added
