@@ -1,15 +1,18 @@
 import json
 import os
 import traceback
+
+from .database import DatabaseManagment
 from .errors import Error
 from .ToStdOut import ToStdout
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
-db_path = f"{installation}/.data/.config/data.json" # Fixed Path
+
 
 class SetV:
     @classmethod
     def SetV(cls, data):
+        db = DatabaseManagment.get()
         try:
             args = data.split()
             if len(args) < 3: # Changed from < 2 to < 3 to ensure data[2] exists
@@ -17,26 +20,37 @@ class SetV:
                 return
                 
             key = args[1]
-            value = args[2]
-            
+            value = " ".join(args[2:])
             # Type casting for booleans
             if value.lower() == "true":
                 value = True
             elif value.lower() == "false":
                 value = False
 
-            try:
-                with open(db_path, "r") as file:
-                    variables = json.load(file)
-            except (FileNotFoundError, json.JSONDecodeError):
-                variables = {} # Create new if missing/corrupt
+            variables = db
+
+            key_map = {
+                "exploit": "EXPLOIT",
+                "payload": "PAYLOAD",
+                "target": "R_HOST",
+                "port": "R_PORT",
+                "verbose": "VERBOSE_LOGGING",
+                "dev_mode": "DEV_MODE",
+                "host": "L_HOST",
+                "l_port": "L_PORT",
+                "port_range": "PORT_RANGE",
+                "generated_payload": "GENERATED_PAYLOAD"
+
+            }
+
+            for k, internal_key in key_map.items():
+                if k == key.lower():
+                    key = internal_key
+                    break
 
             # Direct assignment handles both updating AND adding new variables
             variables[key] = value
 
-            with open(db_path, "w") as file:
-                json.dump(variables, file, indent=4)
-                
             print(f"[*] {key} => {value}\n")
             
         except Exception:

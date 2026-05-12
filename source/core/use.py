@@ -1,5 +1,5 @@
 import os
-from .database import DatabaseManagment
+from .database import DatabaseManagment, ExploitCache
 from .ToStdOut import ToStdout
 from .help import write
 
@@ -25,8 +25,10 @@ class use:
         if category == "exploit":
             exploits = DatabaseManagment.getExploits()
             if 0 <= index < len(exploits):
-                DatabaseManagment.directlyModify(["exploit", exploits[index]])
-                print(f"[*] Set exploit to {exploits[index]}\n")
+                exploit_path = exploits[index]
+                DatabaseManagment.directlyModify(["exploit", exploit_path])
+                ExploitCache._parse_details(exploit_path)  # Explicitly update the cache
+                print(f"[*] Set exploit to {exploit_path}\n")
             else:
                 print("[-] Invalid exploit index.\n")
                 
@@ -38,6 +40,7 @@ class use:
                     targetList.append(v)
                 if 0 <= index < len(targetList):
                     DatabaseManagment.directlyModify(["target", targetList[index]])
+                    DatabaseManagment.directlyModify(["rhost", targetList[index]])
                     print(f"[*] Set R_HOST to {targetList[index]}\n")
                 else:
                     print("[-] Invalid target index.\n")

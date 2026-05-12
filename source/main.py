@@ -17,6 +17,9 @@ def initialize_session():
     session_id = uuid.uuid4().hex[:8]
     SetV.SetV(f"set SESSION_ID {session_id}")
     
+    # Flush the updated session ID to disk so data.json formats as a multi-line JSON
+    DatabaseManagment._update()
+
     # Trigger the initial staged log entry for the session
     Logger.start_session()
 
@@ -31,6 +34,10 @@ class Main:
             Input.get()
         except KeyboardInterrupt:
             print(f"\n[*] Gracefully shutting down...")
+        except Exception as e:
+            print(f"\n[!] Fatal Framework Crash: {e}")
+            import traceback
+            traceback.print_exc()
         finally:
             # Flush any pending target updates to the disk
             DatabaseManagment.sync_targets_to_disk()
