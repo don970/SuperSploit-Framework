@@ -183,22 +183,23 @@ class Input:
     @classmethod
     def get(cls):
         # Start background listener automatically on startup if configured
-        initial_db = DatabaseManagment.get()
-        if str(initial_db.get("listener", "")).lower() == "true":
-            Listener.start(initial_db)
+        cls.initial_db = DatabaseManagment.get()
+
+        # update full exploit cache once at startup:
+        ExploitCache.update()
 
         Banners(None)
+
+        if str(cls.initial_db.get("listener", "")).lower() == "true":
+            Listener.start(cls.initial_db)
+
         while True:
-            DatabaseManagment.getCVE()
-            # Refresh the memory cache from the database module
-            ExploitCache.update()
-            data = DatabaseManagment.get()
             try:
                 session = PromptSession(history=history, auto_suggest=AutoSuggestFromHistory(), enable_history_search=True)
                 inp = session.prompt(f"[SuperSploit]: ")
                 cls.check(inp)
             except (KeyboardInterrupt, EOFError):
-                DatabaseManagment._update(data)
+                DatabaseManagment._update()
                 ToStdout.write("\n[*] Exiting SuperSploit...\n")
                 break
             except Exception:

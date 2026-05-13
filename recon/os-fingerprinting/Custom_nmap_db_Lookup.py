@@ -6,18 +6,31 @@ import re
 import time
 import math
 import random
+import sys
 from scapy.all import IP, TCP, UDP, ICMP, sr1, sr, conf
 
 # --- Framework Integration ---
+# Dynamically append the framework's source directory to sys.path
+_scanner_dir = os.path.dirname(os.path.abspath(__file__))
+_framework_root = os.path.abspath(os.path.join(_scanner_dir, "..", ".."))
+_source_dir = os.path.join(_framework_root, "source")
+if _source_dir not in sys.path:
+    sys.path.append(_source_dir)
+
+try:
+    from core.database import DatabaseManagment
+except ImportError as e:
+    print(f"[*] Note: Framework core modules unavailable in sudo environment ({e}). Using native file I/O.")
+    DatabaseManagment = None
+
 # Suppress Scapy's verbose output and set up logging
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 conf.verb = 0
 
 # --- Database Paths ---
-install_location = f'{os.getenv("HOME")}/.SuperSploit'
-path_to_db_config = f"{install_location}/.data/.config/data.json"
-path_to_nmap_db = f"{install_location}/.data/.config/nmap-os-db.txt"
-path_to_targets = f"{install_location}/.data/.config/targets.json"
+path_to_db_config = os.path.join(_framework_root, ".data", ".config", "data.json")
+path_to_nmap_db = os.path.join(_framework_root, ".data", ".config", "nmap-os-db.txt")
+path_to_targets = os.path.join(_framework_root, ".data", ".config", "targets.json")
 
 # ---------------------------------------------------------
 # 1. NMAP MATCH POINTS (WEIGHTS)
@@ -251,6 +264,30 @@ class NmapDBMatcher:
         except Exception as e:
             logging.error(f"[-] Error parsing Nmap OS DB: {e}")
 
+    def _match_nmap_value(self, target_val, db_val):
+        """
+        Matches a target value against an Nmap DB expression.
+        Handles alternatives (|) and hex ranges (-).
+        """
+        if not target_val:
+            target_val = ""
+            
+        parts = db_val.split('|')
+        for part in parts:
+            if part == target_val:
+                return True
+                
+            if '-' in part:
+                # Try hex range matching (Nmap ranges are natively hex)
+                try:
+                    min_str, max_str = part.split('-', 1)
+                    if int(min_str, 16) <= int(target_val, 16) <= int(max_str, 16):
+                        return True
+                except ValueError:
+                    pass # Not a valid hex range, move to the next part
+                    
+        return False
+
     def score_target(self, target_results: dict):
         """
         Iterate through all loaded DB fingerprints. Compare the target_results
@@ -268,9 +305,7 @@ class NmapDBMatcher:
                 if probe_name in fp['probes']:
                     db_probe = fp['probes'][probe_name]
                     for attr, value in attributes.items():
-                        # This is a major simplification. It only handles exact matches.
-                        # A full engine would need to parse ranges (A-F), alternatives (O|S+), etc.
-                        if attr in db_probe and value in db_probe[attr].split('|'):
+                        if attr in db_probe and self._match_nmap_value(value, db_probe[attr]):
                             current_score += MATCH_POINTS.get(probe_name, {}).get(attr, 0)
 
             if current_score > highest_score:
@@ -314,11 +349,14 @@ class Start:
         return None
 
     def __init__(self, args=None):
-        try:
-            with open(path_to_db_config) as f:
-                db = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            db = {}
+        if DatabaseManagment:
+            db = DatabaseManagment.get()
+        else:
+            try:
+                with open(path_to_db_config, "r", encoding="utf-8") as f:
+                    db = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                db = {}
 
         target_ip = db.get("R_HOST")
         open_port_str = db.get("R_PORT")
@@ -369,28 +407,42 @@ class Start:
             if matcher.fingerprints:
                 best_match = matcher.score_target(results)
                 if best_match:
-                    try:
-                        with open(path_to_targets, 'r') as f:
-                            targets_db = json.load(f)
-                            if not isinstance(targets_db, dict):
-                                targets_db = {"TARGETS": {}}
-                    except (FileNotFoundError, json.JSONDecodeError):
-                        targets_db = {"TARGETS": {}}
+                    if DatabaseManagment:
+                        targets_db = DatabaseManagment.getTargets()
+                        target_entry = targets_db.setdefault(target_ip, {})
+                        if not isinstance(target_entry, dict):
+                            target_entry = {}
+                            targets_db[target_ip] = target_entry
 
-                    targets_dict = targets_db.setdefault("TARGETS", {})
-                    target_entry = targets_dict.setdefault(target_ip, {})
-                    if not isinstance(target_entry, dict):
-                        target_entry = targets_dict[target_ip] = {}
+                        target_entry["fingerprint"] = "\n".join(captured_fingerprint)
+                        target_entry["best match"] = best_match["name"]
 
-                    target_entry["fingerprint"] = "\n".join(captured_fingerprint)
-                    target_entry["best match"] = best_match["name"]
-
-                    try:
-                        with open(path_to_targets, 'w') as f:
-                            json.dump(targets_db, f, indent=4)
+                        DatabaseManagment.updateTargets(targets_db)
+                        DatabaseManagment.sync_targets_to_disk()
                         print("[*] Successfully saved OS fingerprint to targets database.")
-                    except Exception as e:
-                        print(f"[-] Failed to save to targets database: {e}")
+                    else:
+                        try:
+                            with open(path_to_targets, 'r', encoding="utf-8") as f:
+                                targets_db = json.load(f)
+                                if not isinstance(targets_db, dict):
+                                    targets_db = {"TARGETS": {}}
+                        except (FileNotFoundError, json.JSONDecodeError):
+                            targets_db = {"TARGETS": {}}
+
+                        targets_dict = targets_db.setdefault("TARGETS", {})
+                        target_entry = targets_dict.setdefault(target_ip, {})
+                        if not isinstance(target_entry, dict):
+                            target_entry = targets_dict[target_ip] = {}
+
+                        target_entry["fingerprint"] = "\n".join(captured_fingerprint)
+                        target_entry["best match"] = best_match["name"]
+
+                        try:
+                            with open(path_to_targets, 'w', encoding="utf-8") as f:
+                                json.dump(targets_db, f, indent=4, sort_keys=True)
+                            print("[*] Successfully saved OS fingerprint to targets database.")
+                        except Exception as e:
+                            print(f"[-] Failed to save to targets database: {e}")
 
         except PermissionError:
             print("\n[-] PermissionError: This script requires root/administrator privileges to craft raw packets.")

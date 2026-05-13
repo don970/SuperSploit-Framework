@@ -11,8 +11,16 @@ from .ToStdOut import ToStdout
 import yaml
 
 # Framework Constants
-# Base installation directory for the framework
-install_location = f'{os.getenv("HOME")}/.SuperSploit'
+# Base installation directory for the framework dynamically resolved
+# (Calculates the path 2 directories up from source/core/database.py)
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+install_location = os.path.abspath(os.path.join(_current_dir, "..", ".."))
+
+# Check if the framework is being executed from a different working directory (e.g. dev workspace)
+_cwd = os.getcwd()
+if os.path.exists(os.path.join(_cwd, ".data", ".config", "data.json")):
+    install_location = _cwd
+
 # Absolute path to the main configuration/session JSON database
 path_to_database = f"{install_location}/.data/.config/data.json"
 # Absolute path to the dedicated targets database
@@ -25,7 +33,7 @@ class ExploitCache:
     """Manages memory-resident YAML metadata for all framework modules."""
     # Holds detailed info for the currently active exploit
     details = {}
-    metadata_index = {} # Maps path -> YAML metadata summary
+    metadata_index = {}  # Maps path -> YAML metadata summary
     all_exploits = []
     all_payloads = []
 
@@ -56,20 +64,24 @@ class ExploitCache:
                 if len(data) > 1:
                     # Parse the YAML block
                     meta = yaml.safe_load(data[1])
+                    if not isinstance(meta, dict):
+                        meta = {}
                     return {
                         "name": meta.get("name", os.path.basename(path)),
                         "cve": meta.get("cve", "N/A"),
+                        "cwe": meta.get("cwe", "N/A"),
                         "desc": meta.get("description", "").lower(),
                         "target": meta.get("target", ""),
                         "keywords": meta.get("keywords", meta.get("auto_suggest", []))
                     }
         except Exception:
-            pass
+            print(traceback.format_exc())
         return {"name": os.path.basename(path), "cve": "N/A", "desc": ""}
 
     @classmethod
     def _parse_details(cls, path):
         """Full YAML parser for the 'info' command."""
+        cls.details = {}
         if not os.path.exists(path):
             # Mark as missing if the exploit file was removed or path is invalid
             cls.details = {"status": "missing"}
@@ -78,48 +90,62 @@ class ExploitCache:
             with open(path, "r", encoding="utf-8", errors="ignore") as file:
                 # Split to isolate the YAML metadata section
                 data = file.read().split("#!#!#!")
+            
+            meta = {}
             if len(data) > 1:
-                meta = yaml.safe_load(data[1])
-                # Populate the details dictionary with all relevant exploit properties
-                cls.details = {
-                    "path": path,
-                    "name": meta.get("name", "Unknown"),
-                    "info": meta.get("description", "No description provided."),
-                    "options": meta.get("options", []),
-                    "cve": meta.get("cve", "N/A"),
-                    "cwe": meta.get("cwe", "N/A"),
-                    "target": meta.get("target", ""),
-                    "payload": meta.get("payload", ""),
-                    "dev_status": meta.get("status", "known"),
-                    "status": "ok"
-                }
+                try:
+                    parsed_meta = yaml.safe_load(data[1])
+                    if isinstance(parsed_meta, dict):
+                        meta = parsed_meta
+                except Exception:
+                    pass
+                
+            # Populate the details dictionary with all relevant exploit properties
+            cls.details = {
+                "path": path,
+                "name": meta.get("name", os.path.basename(path)),
+                "info": meta.get("description", "No description provided."),
+                "options": meta.get("options", []),
+                "cve": meta.get("cve", "N/A"),
+                "cwe": meta.get("cwe", "N/A"),
+                "target": meta.get("target", ""),
+                "payload": meta.get("payload", ""),
+                "dev_status": meta.get("status", "known"),
+                "status": "ok"
+            }
         except Exception:
             cls.details = {"status": "error"}
+
 
 class exploitDetails:
     """Handles the display of currently selected exploit metadata."""
 
     def __init__(self, *args):
-        """Initializes the display, clearing the terminal and printing the cached exploit information."""
-        os.system("clear")
+        """Initializes the display and prints the cached exploit information."""
+        db = DatabaseManagment.get()
+        if "EXPLOIT" in db:
+             ExploitCache._parse_details(db["EXPLOIT"])
+             
         cache = ExploitCache.details
         # Validate that an exploit is selected and its cache loaded successfully
         if not cache or cache.get("status") != "ok":
-            write("[!] Select a valid exploit first.")
+            write("[!] Select a valid exploit first.\n")
             return
 
         # Print the core exploit details header
-        write(f"[*] Exploit:     {cache['name']}")
-        write(f"[*] CVE:         {cache['cve']}")
-        write(f"[*] Description: {cache['info']}")
-        write(f"==================================")
+        write(f"[*] Exploit:     {cache.get('name', 'Unknown')}\n")
+        write(f"[*] CVE:         {cache.get('cve', 'N/A')}\n")
+        write(f"[*] CWE:         {cache.get('cwe', 'N/A')}\n")
+        write(f"[*] Description: {cache.get('info', 'No description provided.')}\n")
+        write(f"==================================\n")
 
         db = DatabaseManagment.get()
         # Dynamically print out all available options mapped in the cache
         for opt, value in cache.items():
             # Hide redundant internal framework keys from the CLI output
-            if opt not in ["name", "cve", "info", "status"]:
-                write(f"{opt.capitalize()}: {value}")
+            if opt not in ["name", "cve", "info", "status", "path", "cwe"]:
+                write(f"{opt.capitalize()}: {value}\n")
+
 
 class DatabaseManagment:
     """
@@ -136,12 +162,18 @@ class DatabaseManagment:
     _sync_thread = None
     _stop_sync = False
     _targets_last_mtime = 0
+    _db_loaded = False
 
     @classmethod
-    def _update(cls, data):
+    def _update(cls, data=None):
         try:
-            with open(path_to_database, "w") as file:
-                file.write(json.dumps(data))
+            if data is None:
+                data = cls.core_db
+            os.makedirs(os.path.dirname(path_to_database), exist_ok=True)
+            with open(path_to_database, "w", encoding="utf-8") as file:
+                json.dump(data, file, indent=4, sort_keys=True)
+            cls.core_db = data
+            cls._db_loaded = True
         except FileNotFoundError as e:
             return e
 
@@ -156,8 +188,6 @@ class DatabaseManagment:
             return cve
         return "None"
 
-
-
     @classmethod
     def getTargets(cls):
         """Reads targets from memory cache, but reloads if the disk file was updated by a subprocess."""
@@ -168,7 +198,7 @@ class DatabaseManagment:
         if cls._targets_cache is None or current_mtime > cls._targets_last_mtime:
             if os.path.exists(path_to_targets):
                 try:
-                    with open(path_to_targets, "r") as file:
+                    with open(path_to_targets, "r", encoding="utf-8") as file:
                         cls._targets_cache = json.load(file).get("TARGETS", {})
                     cls._targets_last_mtime = current_mtime
                 except Exception:
@@ -188,7 +218,7 @@ class DatabaseManagment:
         """Forces an immediate write to disk if memory is dirty."""
         if cls._targets_dirty and cls._targets_cache is not None:
             try:
-                with open(path_to_targets, "w") as file:
+                with open(path_to_targets, "w", encoding="utf-8") as file:
                     json.dump({"TARGETS": cls._targets_cache}, file, indent=4, sort_keys=True)
                 cls._targets_dirty = False
                 cls._targets_last_mtime = os.path.getmtime(path_to_targets)
@@ -217,7 +247,7 @@ class DatabaseManagment:
         exploit_path = cls.get().get("EXPLOIT", "")
         if not exploit_path or not os.path.exists(exploit_path):
             return False
-            
+
         # Identify if the exploit script imports the native socket module
         with open(exploit_path, "r", encoding="utf-8", errors="ignore") as file:
             data = file.read()
@@ -225,14 +255,16 @@ class DatabaseManagment:
 
     @classmethod
     def get(cls):
-        if len(cls.core_db) < 1:
-            """Loads the current session database."""
+        """Loads the current session database."""
+        if not cls._db_loaded:
             if os.path.exists(path_to_database):
                 try:
-                    with open(path_to_database, "r") as file:
-                        return json.load(file)
+                    with open(path_to_database, "r", encoding="utf-8") as file:
+                        cls.core_db = json.load(file)
+                        cls._db_loaded = True
                 except Exception:
-                    return {}
+                    cls.core_db = {}
+            cls._db_loaded = True
         return cls.core_db
 
     @staticmethod
@@ -247,7 +279,8 @@ class DatabaseManagment:
                 if os.path.isdir(sub_dir):
                     # Collect individual exploit script paths inside each category
                     for i in os.listdir(sub_dir):
-                        exploits.append(os.path.join(sub_dir, i))
+                        if i.endswith(".py") and not i.startswith("__"):
+                            exploits.append(os.path.join(sub_dir, i))
         return exploits
 
     @staticmethod
@@ -262,7 +295,8 @@ class DatabaseManagment:
                 if os.path.isdir(sub_dir):
                     # Collect individual payload script paths
                     for i in os.listdir(sub_dir):
-                        payloads.append(os.path.join(sub_dir, i))
+                        if i.endswith(".py") and not i.startswith("__"):
+                            payloads.append(os.path.join(sub_dir, i))
         return payloads
 
     @classmethod
@@ -270,11 +304,9 @@ class DatabaseManagment:
         """Directly writes key-value pairs to the database."""
         if len(data) != 2:
             return
-            
+
         try:
-            # Read current configurations
-            with open(path_to_database, "r") as file:
-                variables = json.load(file)
+            variables = cls.get()
 
             # Map incoming human-readable keys to internal JSON database keys
             key_map = {
@@ -284,7 +316,7 @@ class DatabaseManagment:
                 "target": "R_HOST",
                 "port": "R_PORT",
                 "verbose": "VERBOSE_LOGGING",
-                "dev_mode": "DEV_MODE" ,
+                "dev_mode": "DEV_MODE",
                 "sessionId": "SESSION_ID",
                 "recon_name": "RECON_NAME",
                 "recon_path": "RECON_PATH",
@@ -297,9 +329,7 @@ class DatabaseManagment:
                 if k in data[0].lower():
                     variables[mapped_key] = data[1]
 
-            # Write changes back to the database
-            with open(path_to_database, "w") as file:
-                json.dump(variables, file, sort_keys=True, indent=4)
+            cls._update(variables)
         except Exception:
             error(traceback.format_exc())
 
@@ -322,22 +352,17 @@ class DatabaseManagment:
             # Print the help menu if the arguments are incomplete
             help_path = f"{install_location}/.data/.help/add"
             if os.path.exists(help_path):
-                with open(help_path, 'r') as file:
+                with open(help_path, 'r', encoding="utf-8") as file:
                     print(file.read())
             return
-            
+
         try:
-            if os.path.exists(path_to_database):
-                # Load existing database state
-                with open(path_to_database, "r") as file:
-                    database = json.load(file)
-                
-                # Set the key-value pair dynamically
-                database[parts[1]] = parts[2]
-                
-                # Save changes back to the file
-                with open(path_to_database, "w") as file:
-                    json.dump(database, file, sort_keys=True, indent=4)
+            database = cls.get()
+
+            # Set the key-value pair dynamically
+            database[parts[1]] = parts[2]
+
+            cls._update(database)
         except Exception as e:
             print(f"[-] Database Error: {e}")
 
@@ -346,9 +371,9 @@ class DatabaseManagment:
         """Locates an available terminal emulator on the host system based on a predefined list."""
         try:
             # Read preferred terminals list
-            with open(f"{install_location}/.data/.config/.terminals", "r") as file:
+            with open(f"{install_location}/.data/.config/.terminals", "r", encoding="utf-8") as file:
                 terms = [line.strip() for line in file if line.strip()]
-                
+
             bin_files = set(os.listdir("/bin"))
             # Return the first terminal emulator that exists in /bin
             for term in terms:
@@ -357,7 +382,7 @@ class DatabaseManagment:
         except Exception:
             pass
         return None
-    
+
     @classmethod
     def Debug(cls, data=None):
         """Dumps all primary data structures to standard output for debugging purposes."""
@@ -366,7 +391,7 @@ class DatabaseManagment:
         payloads = cls.getPayloads()
         exploitdetails = ExploitCache.details
         exploitcache = ExploitCache.metadata_index
-        
+
         print(json.dumps(db, indent=4))
         print(json.dumps(targets, indent=4))
         print(json.dumps(payloads, indent=4))

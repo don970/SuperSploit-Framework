@@ -28,6 +28,10 @@ class Recon:
         # Determine if root is needed via metadata flag
         self.requires_root = "root: " in self.metadata
 
+        # Force the cached memory version to write to the disk before spawning subprocesses
+        DatabaseManagment._update()
+        DatabaseManagment.sync_targets_to_disk()
+
         if self.requires_root:
             print("[*] Metadata indicates ROOT privileges are required.")
             self.exec_with_sub(self.buffer, use_sudo=True)
@@ -40,6 +44,10 @@ class Recon:
                 self.run()
 
         DatabaseManagment._update(self.db)
+        # Reload the targets cache into memory in case the subprocess updated it natively
+        # Force the mtime check to trigger by zeroing out the last known read time
+        DatabaseManagment._targets_last_mtime = 0
+        DatabaseManagment.getTargets()
 
     def run(self):
         """Dynamically loads the cleaned script buffer into memory as a standard user."""
@@ -89,6 +97,10 @@ class Recon:
         else:
             metadata = ""
             clean_buffer = raw_data[0]
+
+        # Fix relative pathing: the subprocess runs from a /tmp/ temp file, which breaks __file__ resolving.
+        # Replace __file__ with the true original script path so the isolated sudo reads the right disk paths!
+        clean_buffer = clean_buffer.replace("__file__", f"r'{self.db['RECON_PATH']}'")
 
         return clean_buffer, metadata
 

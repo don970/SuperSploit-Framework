@@ -1,6 +1,14 @@
 import socket, sys
 
 
+#!#!#!
+# METADATA SECTION
+# Author: Your Name
+# category: enumeration
+# Description: Custom port scanner
+#!#!#!
+
+
 def Start(args=None):
     """Main entry point for the recon module."""
     print("[*] Initializing Reconnaissance Module...")
@@ -18,11 +26,3 @@ def Start(args=None):
 # Fallback for standard subprocess execution via CLI
 if __name__ == "__main__":
     Start(sys.argv[1:])
-
-
-#!#!#!
-# METADATA SECTION
-# Author: Your Name
-# category: enumeration
-# Description: Custom port scanner
-#!#!#!

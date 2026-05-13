@@ -1,6 +1,57 @@
+# SuperSploit Framework - Changelog
 # Changelog
-### [1.2.12] - 2026-06-05
 All notable changes to this project will be documented in this file.
+
+## [1.2.15] - 2026-05-13
+
+### Added
+- **Fileless ELF Memory Loader (`session_loader.py`):** Added intelligent payload routing that detects compiled binaries (`.elf`, `.bin`) and automatically wraps them in a `memfd_create` Python loader. Allows execution of C-based kernel exploits directly from RAM without touching the disk.
+- **Native Python Execution Engine:** Upgraded the Stage 2 reverse shell (`dynamic_reverse_shell.py`) to actively intercept Python execution strings (`exec()` or function calls). Evaluates them directly in RAM and captures `sys.stdout` over the TLS socket, completely bypassing the noisy `shell=True` subprocess fallback.
+
+### Changed
+- **Universal C2 Load Command:** Updated the session manager's `load` command to route through the new `SessionLoader` class, providing seamless loading of both Python exploits and native C binaries.
+- **Stage 2 Fallback Synchronization:** Synced the hardcoded Stage 2 shell in `listener.py` with the new native Python execution engine to ensure the C2 remains fully functional even if external payload files are deleted.
+
+---
+
+## [1.2.14] - 2026-05-12
+
+### Added
+- **Advanced Nmap Signature Parsing:** Enhanced the OS fingerprinting engine (`Custom_nmap_db_Lookup.py`) to natively parse complex Nmap ranges (e.g., hex ranges like `400-FFFF`) and alternatives (`Y|N`), dramatically improving accuracy on noisy networks.
+- **Non-Interactive TTY Fallback:** Added a safety net in the core input handler. If the framework is executed in a background process, IDE, or detached sudo environment where `prompt_toolkit` fails to attach to a TTY (`termios.error`), it gracefully falls back to the standard Python `input()` function.
+
+### Changed
+- **Safe Target Merging:** Upgraded `host_discovery.py` and `Custom_nmap_db_Lookup.py` to safely merge discovered data (like MAC addresses and OS fingerprints) into existing target dictionaries without destroying previously collected open ports.
+- **OS Fingerprinting Engine Parity:** Brought `Custom_nmap_db_Lookup.py` up to architectural parity with the port scanner by adding dynamic `sys.path` injection for sudo subprocesses and native JSON file I/O fallbacks.
+
+### Fixed
+- **Target Database Wipes:** Fixed a critical bug in `host_discovery.py` that aggressively overwrote existing target dictionaries with a string (`"N/A"`), wiping out previously discovered port data.
+- **Subprocess Memory Loss:** Added explicit `DatabaseManagment.sync_targets_to_disk()` calls inside `host_discovery.py` and `Custom_nmap_db_Lookup.py` so isolated sudo subprocesses properly flush their memory to disk before exiting, ensuring the main framework recognizes the updates.
+
+---
+
+## [1.2.13] - 2026-05-10
+### Added
+- **CIDR Subnet Support:** Upgraded the async port scanner to natively support CIDR notation (`192.168.0.1/24`) by utilizing the built-in `ipaddress` module to automatically expand and iterate through target ranges.
+- **Global Exception Handler:** Implemented a global exception catching block in `main.py` to prevent silent crashes and gracefully dump tracebacks during fatal framework failures.
+
+### Changed
+- **In-Memory Config Caching:** Completely overhauled `DatabaseManagment` and the `set` command to treat `cls.core_db` as the single source of truth in memory, drastically reducing disk I/O and resolving cache desynchronization.
+- **Pretty-Print JSON:** Standardized `data.json` and `targets.json` output formatting to use `indent=4` to automatically generate clean, human-readable configuration files right from startup.
+- **Sudo Subprocess Resilience:** Enhanced `recon_engien.py` to dynamically inject true script paths into the execution buffer, fixing `__file__` resolution issues when executing from `/tmp`.
+- **Target Cache Syncing:** Configured `recon_engien.py` and `port_scanner.py` to explicitly flush memory to disk before and after execution, ensuring `sudo` subprocesses always access and update the absolute latest target data.
+
+### Fixed
+- **Info Command UI Bug:** Removed a rogue `os.system("clear")` call in `exploitDetails` that was wiping the terminal screen and deleting previous command outputs.
+- **Sudo Module Imports:** Fixed an `ImportError` bug during isolated `sudo` module execution by dynamically appending the framework's `source` directory to `sys.path`.
+- **POSIX Locale Encoding Crash:** Added `encoding="utf-8"` to all file read/write operations across the framework to prevent `UnicodeDecodeError` silent crashes when running in restricted `C` or `POSIX` `sudo` environments.
+- **Legacy Target Database Crash:** Fixed a `TypeError` in the target database manager that caused the framework to crash when encountering legacy or corrupt string entries instead of mapping them as dictionaries.
+- **Multi-Word Variable Truncation:** Fixed the `set` command parsing logic so that multi-word values (e.g., payloads or descriptions) are joined properly and no longer truncated to the first word.
+- **Startup Crash:** Removed an orphaned, parameter-less `_quick_parse()` call in `inputHandler.py` that was triggering a fatal `TypeError` on framework boot.
+
+---
+
+### [1.2.12] - 2026-05-10
 ### Added
 - **ServiceDetector:** Introduced an asynchronous heuristic service and protocol detector to the native port scanner (`port_scanner.py`).
 - **Dual-Probe Architecture:** The port scanner now utilizes both passive listening and active generic HTTP probing to coerce service banners.
@@ -12,7 +63,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Updated the bundled `nmap-os-db.txt` with a modification notice to comply with the NPSL and appended custom framework signatures.
 
-## [1.2.12] - 2026-06-05
+## [1.2.12] - 2026-05-10
 ### Fixed
 - **Auto-Suggest Target Querying:** Fixed a bug in `inputHandler.py` where the `auto_suggest` engine queried the main configuration database instead of the dedicated targets database, resulting in missed port data.
 - **Metadata Parsing Crash:** Fixed an `auto_suggest.py` error where the correlation engine tried to read keywords as object attributes from file path strings. It now accurately queries the `ExploitCache` metadata index.
@@ -21,7 +72,7 @@ All notable changes to this project will be documented in this file.
 - **Info Display Clutter:** Cleaned up the `info` command CLI output to actively filter out redundant internal framework keys (`name`, `cve`, `info`, `status`) from the secondary print loop.
 - **Target Serialization:** Ensured target dictionaries are properly queried and formatted when the auto-suggest engine executes post-reconnaissance.
 
-## [1.2.11] - 2026-06-01
+## [1.2.11] - 2026-05-10
 ### Added
 - **Intelligent Auto-Suggest:** Introduced the `auto_suggest` command which automatically analyzes a target's open ports from RAM and correlates them with framework exploits based on metadata keywords.
 - **C2 Connection Heartbeat:** Implemented an aggressive heartbeat monitor in the background TLS listener. It utilizes both OS-level TCP Keepalives and a 60-second 1-byte ping loop to automatically detect drops and purge dead sessions.
@@ -37,7 +88,7 @@ All notable changes to this project will be documented in this file.
 - **Boolean Parsing Bug:** Fixed an initialization crash in `inputHandler.py` where a raw boolean `True` from the configuration database would crash the `.lower()` string cast check.
 - **Use Command Bounds Check:** Added bounds checking and `ValueError` handling in `use.py` to gracefully reject invalid or non-integer indices instead of crashing the framework.
 
-## [1.2.10] - 2026-05-25
+## [1.2.10] - 2026-05-10
 ### Added
 - **Extended Port Scope Configuration:** Added support for the `PORT_RANGE` flag in the async port scanner. The scanner now intelligently merges the `PORTS` and `PORT_RANGE` database variables to allow for simultaneous custom lists and specific ranges.
 - **Fileless Payload Delivery:** Transformed the payload generator in `exploithandler.py` into a purely in-memory architecture. SuperSploit now automatically formats generated stagers into Base64-encoded Python one-liners, allowing for instant, diskless execution on target machines.
@@ -70,7 +121,7 @@ All notable changes to this project will be documented in this file.
 - **Stage 2 Cryptography Crash:** Fixed a `TypeError` in the C2 handler where dynamically loaded Stage 2 payload files were read as standard strings instead of raw bytes, which crashed the XOR encryption loop.
 - **Display Control Flow:** Fixed a missing `else` block in `show.py` that caused truncated strings to instantly print their full-length counterparts on the very next line.
 
-## [1.2.9] - 2026-05-20
+## [1.2.9] - 2026-05-10
 ### Added
 - **Advanced Nmap OS Fingerprinting:** Implemented a highly accurate, pure-Python OS fingerprinting engine (`Custom_nmap_db_Lookup.py`) using Scapy. Replicates Nmap's 13 specific probes (SEQ, OPS, WIN, ECN, T1-T7, U1, IE) and correlates raw responses against `nmap-os-db.txt` using official generation match points and weight formulas.
 - **Concurrent Network Probing:** Upgraded the OS fingerprinting engine to utilize `asyncio` combined with a `ThreadPoolExecutor` to execute blocking Scapy network probes concurrently, drastically accelerating OS detection.
@@ -87,7 +138,7 @@ All notable changes to this project will be documented in this file.
 - **Scapy Parsing Exception:** Resolved a `Layer [IP] not found` exception in the OS fingerprint module's ICMP Echo (IE) probe by validating packet request IDs directly instead of improperly digging into Echo Reply payloads.
 - **Connection Reset Handling:** Added `ConnectionResetError` catching in the port scanner to prevent mid-handshake firewall `RST` packets from crashing the asynchronous event loop.
 
-## [1.2.8] - 2026-05-15
+## [1.2.8] - 2026-05-08
 ### Added
 - **Recon Documentation:** Created a dedicated and highly detailed help page for reconnaissance modules (`.data/.help/recon`).
 - **Feature Documentation:** Documented new core framework features in the help files, including automated post-recon exploit suggestions (`auto_suggest`), native background raw TCP listeners (`listener`), and comprehensive target database management.
@@ -99,7 +150,7 @@ All notable changes to this project will be documented in this file.
 - **Search Output Clutter:** Updated `source/core/search.py` to correctly filter out and hide `__pycache__` directories when searching for exploits, payloads, and recon modules.
 - **Code Cleanup:** Fixed a malformed and duplicate class definition/import statement at the top of `source/core/search.py`.
 
-## [1.2.7] - 2026-05-10
+## [1.2.7] - 2026-05-08
 ### Added
 - **Native Host Discovery:** Implemented `recon/native-discovery/host_discovery.py` using raw sockets and Scapy to perform hyper-fast asynchronous Layer 2 (ARP) and Layer 3 (ICMP) ping sweeps, completely replacing Nmap's `-sn` capabilities.
 - **Async Port Scanner:** Upgraded the native port scanner in `recon/native-portscan/port_scanner.py` to utilize Python's `asyncio` and `Semaphore` for non-blocking, concurrent network mapping and dynamic active banner grabbing.
@@ -298,3 +349,52 @@ version 1.2.0
 ### General Improvements
 * **Typo Corrections:** Fixed typos in `main.py`, `set.py`, `exploitHandler.py`, and other files.
 * **Author Attribution:** Added proper citations for external tool authors (phoneinfoga, recon-ng, Bettercap) in documentation and code comments.
+
+## Unreleased
+### Added
+* Chrome OS support started.
+* Added `bettercap` to the tool list.
+* Added `clean` method to clear the target list and scan history.
+* Added a name search ability to recon.
+* Added the eternal blue exploits and a leaked emails and password file.
+* Added new exploit android root and linux setup file.
+* Added blueDucky hid attack script and payloads, organized `.data` folder better.
+* Added sha256-checksum verification for all external tools including blue-ducky, recon-ng, blue-ranger, nmap, phoneinfoga.
+* Added the ability to run the python exploit as a module.
+* Created SuperSploit Module Development Guide.
+
+### Changed
+* Updated `exploithandler.exploitDetails` class to show required arguments.
+* Fixed `ToStdOut` to use `sys.stdout` then fallback on manually opening `stdout` if an error happens.
+* Updated ADB interface: added the push method and ability to use the back camera.
+* Updated the exploit handler to show required options.
+* Updated input handlers for main, recon and Wi-Fi menus.
+* Updated exploit handler to now be compatible with C exploits.
+* Updated the recon to be able to run from anywhere on the disk.
+* Integrated recon mode into main menu.
+* UI and display text updates.
+* Beautified the output of json dumps and more.
+* Updated logo.
+* Encryption update.
+* Security and stability update.
+* Enhance README with disclaimer and framework details.
+* Update README with core strengths and features.
+* Revise README with framework capabilities and roadmap.
+* Enhance README with images for architecture and roadmap.
+
+### Fixed
+* Fixed the issue of aliases not working.
+* Fixed formatting issues with exploits details, updated exploit handler.
+* Fixed formatting issues with router exploits and added the ability to show aliases.
+* Setup fixes.
+* Fixed file path error in code.
+* Fixed the setup script.
+* Fixed typo in exploit handler.
+* Fixed typo in `main.py` and `set.py`.
+* Fixed typos.
+* `exploithandler` fix.
+* Fixed issues with missing functions.
+* Fixed syntax error in `logger.py`.
+
+### Removed
+* Deleted a bunch of old test payloads and exploits from original dev back in 2020.

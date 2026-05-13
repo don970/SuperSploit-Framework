@@ -96,3 +96,22 @@ def Start(args=None):
 if __name__ == "__main__":
     import sys
     Start(sys.argv[1:])
+```
+
+---
+
+## 5. DYNAMIC SESSION LOADING (IN-MEMORY C2)
+To make your Python exploit compatible with the interactive C2 `load` command, your `exploit()` or `Start()` function must accept a `silent=False` parameter. 
+
+When `silent=True` is passed, the module should NOT print anything to the screen. Instead, it must `return` a string containing a pure-Python execution loader (e.g., an `exec(...)` wrapper containing your Base64 encoded payload) that will be transferred over the TLS socket and evaluated natively in the target's RAM.
+
+Example:
+```python
+def exploit(args=None, silent=False):
+    loader = "exec(__import__('base64').b64decode('...'))"
+    
+    if silent:
+        return loader
+        
+    print("[*] Exploit execution output...")
+```
