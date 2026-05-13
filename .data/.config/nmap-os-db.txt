@@ -52,13 +52,25 @@ T7(R=80%DF=20%T=15%TG=15%W=25%S=20%A=20%F=30%O=10%RD=20%Q=20)
 U1(R=50%DF=20%T=15%TG=15%IPL=100%UN=100%RIPL=100%RID=100%RIPCK=100%RUCK=50%RUD=100)
 IE(R=50%DFI=40%T=15%TG=15%CD=100)
 
-# Samsung Galaxy s21 56
-Fingerprint Samsung Galaxy s21 56
-Class Linux | Linux | 5.4.X
-CPE cpe:/o:linux:linux_kernel:5.4.x auto
-T1(R=N)
-T2(R=Y%DF=Y%T=64%TG=64%W=0%O=)
-T5(R=Y%DF=Y%T=64%TG=64%W=0%O=)
+# Samsung Android Chromebook
+Fingerprint Samsung Android Chromebook
+Class Google | Android || embeded
+CPE cpe:/h:google:android:chromebook
+SEQ(S1=0%S2=0%S3=0%S4=0%S5=0%S6=0)
+OPS(O1=%O2=%O3=%O4=%O5=%O6=)
+WIN(W1=0%W2=0%W3=0%W4=0%W5=0%W6=0)
+ECN(R=Y%DF=Y%T=40%W=0%S=%A=A%CC=N)
+T1(R=Y%DF=Y%T=40%W=0%O=%S=%A=A)
+T2(R=Y%DF=Y%T=40%W=0%O=%S=%A=A)
+T3(R=Y%DF=Y%T=40%W=0%O=%S=%A=A)
+T4(R=Y%DF=Y%T=40%W=0%O=%S=%A=)
+T5(R=Y%DF=Y%T=40%W=0%O=%S=%A=A)
+T6(R=Y%DF=Y%T=40%W=0%O=%S=%A=)
+T7(R=N)
+IE(R=Y%DFI=Y)
+U1(R=Y%DF=N%T=40)
+IPID(I1=0%I2=0%I3=0%I4=0%I5=0%I6=0)
+
 
 # 2N VOIP doorbell
 Fingerprint 2N Helios IP VoIP doorbell

@@ -1,0 +1,17 @@
+# 💉 COMMAND: load
+Description: Dynamically loads a Python exploit, module, or compiled ELF binary directly into the memory of an active C2 session. 
+
+Python modules are converted into pure-Python fileless loaders. Compiled binaries (.elf, .bin) are automatically wrapped in a `memfd_create` payload to execute directly from RAM without touching the target's hard drive.
+
+Usage (Inside an active session):
+    load <path_to_exploit_or_binary>
+
+Examples:
+    Session 1> load /Users/donald/.SuperSploit/exploits/linux/cve_2022_0847_dirtypipe.py
+    Session 1> load /Users/donald/Downloads/cve-2024-1086.elf
+
+Requirements:
+    - You must be interacting with an active C2 session (`sessions -i <ID>`).
+    - Python modules must support the `silent=True` argument and return a loader string.
+
+Note: The loaded module or binary is registered as a background function in the target's memory. The console will instruct you on the exact function name to call (e.g., `dirtypipe()` or `run_cve_2024_1086_elf()`) to trigger execution.

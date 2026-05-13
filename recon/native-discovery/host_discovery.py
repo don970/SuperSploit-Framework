@@ -157,7 +157,7 @@ class Start:
         for ip, data in sorted(discovered.items(), key=lambda x: ipaddress.IPv4Address(x[0])):
             mac_str = f" [{data['mac']}]" if data['mac'] != "Unknown (Routed)" else ""
             print(f"    - {ip}{mac_str} (via {data['protocol']})")
-            target_updates[ip] = "N/A"
+            target_updates[ip] = {"mac": data["mac"], "status": "up"}
 
         # Target Database Persistence
         # Automatically saves newly discovered live hosts to targets.json.
@@ -191,10 +191,16 @@ class Start:
                             except json.JSONDecodeError:
                                 pass
 
-                existing_targets.update(target_updates)
+                # Safely merge discovered hosts without overwriting existing data (like open ports)
+                for ip, info in target_updates.items():
+                    if ip not in existing_targets or not isinstance(existing_targets[ip], dict):
+                        existing_targets[ip] = info
+                    else:
+                        existing_targets[ip].update(info)
                 
                 if has_db_manager:
                     DatabaseManagment.updateTargets(existing_targets)
+                    DatabaseManagment.sync_targets_to_disk()
                 else:
                     with open(path_to_targets_db, "w") as f:
                         json.dump({"TARGETS": existing_targets}, f, sort_keys=True, indent=4)
