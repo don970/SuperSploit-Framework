@@ -107,16 +107,17 @@ class Recon:
     def exec_with_sub(self, clean_buffer, use_sudo=False):
         """Securely executes the cleaned module via a temporary file and subprocess."""
 
+        # Sanitize arguments via shlex to prevent shell injection
+        # FIX: Prompting for input BEFORE writing the temp file closes the TOCTOU race condition window!
+        user_input = input(f'[*] Enter arguments for {self.db["RECON_NAME"]}: ')
+        args = shlex.split(user_input)
+
         # Use NamedTemporaryFile to prevent static-path race conditions
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp:
             tmp.write(clean_buffer)
             temp_exec_path = tmp.name
 
         try:
-            # Sanitize arguments via shlex to prevent shell injection
-            user_input = input(f'[*] Enter arguments for {self.db["RECON_NAME"]}: ')
-            args = shlex.split(user_input)
-
             # Isolated Python Mode (-I) prevents PYTHONPATH environment hijacking
             if use_sudo:
                 print(f"[*] Executing {self.db['RECON_NAME']} via isolated sudo subprocess...")

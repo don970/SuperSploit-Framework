@@ -120,11 +120,16 @@ class HostDiscoveryEngine:
 
 class Start:
     def __init__(self):
-        # Load database dynamically upon execution to avoid stale memory cache
         try:
-            with open(path_to_database) as f:
-                db = json.load(f)
-        except FileNotFoundError:
+            import sys
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            source_dir = os.path.abspath(os.path.join(current_dir, "..", "..", "source"))
+            if source_dir not in sys.path:
+                sys.path.append(source_dir)
+            from core.database import DatabaseManagment
+            db = DatabaseManagment.get()
+        except ImportError:
+            print("[-] Core framework modules could not be loaded. Are you running this standalone?")
             db = {}
             
         # Fetch the target IP or Subnet from the SuperSploit database.

@@ -1,9 +1,9 @@
 import json
 import os
 import shlex
-from .database import DatabaseManagment
+from .database import DatabaseManagment, ExploitCache, exploitDetails
 from .ToStdOut import ToStdout
-from .exploithandler import exploitDetails
+
 
 installation = f'{os.getenv("HOME")}/.SuperSploit'
 
@@ -112,20 +112,14 @@ class Show:
     def _show_aliases():
         """Displays all configured aliases with an ASCII art banner."""
         ToStdout.write(BANNER_ALIASES + "\n")
-        try:
-            with open(f"{installation}/.data/.config/Aliases.json", "r") as file:
-                aliases = json.load(file)
-            if not aliases:
-                ToStdout.write("  No aliases currently defined.\n")
-            else:
-                # Determine max key length for aligned output
-                max_key_len = max(len(k) for k in aliases.keys()) if aliases else 0
-                for k, v in aliases.items():
-                    ToStdout.write(f"  {k:<{max_key_len}}: {v}\n")
-        except FileNotFoundError:
-            ToStdout.write(f"[-] Error: Aliases file not found at {installation}/.data/.config/Aliases.json\n")
-        except json.JSONDecodeError:
-            ToStdout.write("[-] Error: Aliases file is corrupt or malformed JSON.\n")
+        aliases = DatabaseManagment.getAliases()
+        if not aliases:
+            ToStdout.write("  No aliases currently defined.\n")
+        else:
+            # Determine max key length for aligned output
+            max_key_len = max(len(k) for k in aliases.keys()) if aliases else 0
+            for k, v in aliases.items():
+                ToStdout.write(f"  {k:<{max_key_len}}: {v}\n")
         ToStdout.write("-" * 40 + "\n")  # Footer
 
     @staticmethod

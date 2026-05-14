@@ -1,3 +1,43 @@
++-----------------------------------------+
+                        |             SuperSploit CLI             |
+                        |       (input_handling_engine.py)        |
+                        +--------------------+--------------------+
+                                             |
+                   +-------------------------+-------------------------+
+                   |                         |                         |
+          [Command: "exploit"]       [Command: "run"]      [State / Background]
+                   |                         |                         |
+        +----------v----------+   +----------v----------+   +----------v----------+
+        |   Exploit Engine    |   |    Recon Engine     |   |  State Management   |
+        | (exploit_engine.py) |   |  (recon_engine.py)  |   |    (database.py)    |
+        +----------+----------+   +----------+----------+   +---------------------+
+                   |                         |              | SQLiteDict Wrapper  |
+       +-----------+-----------+             |              | Fileless Cache      |
+       |           |           |             |              +----------+----------+
+ +-----v----+ +----v----+ +----v----+  +-----v----+ +----v----+        |
+ | Python   | | C Src   | | Bash    |  | Python   | | Python  |        |
+ | Exec     | | Compile | | Exec    |  | Exec     | | Exec    |        |
+ +--+--+----+ +----+----+ +----+----+  +----+-----+ +----+----+        |
+    |  |           |           |            |            |             |
++---v--v---+  +----v----+  +---v---+   +----v---+   +----v---+         |
+|In-Memory |  |Isolated |  |Sub-   |   |In-Memory|  |Sudo    |         |
+|Module    |  |Subproc  |  |process|   |Module   |  |Subproc |         |
+|sys.module|  |tmp file |  |       |   |sys.mod  |  |tmp file|         |
++----------+  +---------+  +-------+   +---------+  +--------+         |
+      |             |          |            |            |             |
+      v             v          v            v            v             |
+=======================================================================|===
+|                            TARGET ENVIRONMENT                        |
+=======================================================================|===
+                                                                       |
+                                                            +----------v----------+
+                                                            |  Background C2      |
+                                                            |  (listener.py)      |
+                                                            +---------------------+
+                                                            | Catches Stage 2     |
+                                                            | In-Memory Payloads  |
+                                                            +---------------------+
+#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!
 The First Computer Weighed More Than 27 Tons
 Her name was ENIAC, and she took up a modest 1800 square feet of space.
 #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!

@@ -20,7 +20,7 @@ It is the end user's sole responsibility to obey all applicable local, state, fe
 By continuing to use, download, or distribute the SuperSploit Framework, you acknowledge that you have read, understood, and agreed to the terms of this disclaimer.
 
 
-**SuperSploit Module Development Guide [Available Here](docs/devolopment/SuperSploit_Module_Development_Guide.md)**
+**SuperSploit Module Development Guide [Available Here](docs/SuperSploit_Module_Development_Guide.md)**
 
 ![SuperSploit Logo](https://github.com/user-attachments/assets/02f43367-1b7e-42f0-b25c-6ed786079567)
 

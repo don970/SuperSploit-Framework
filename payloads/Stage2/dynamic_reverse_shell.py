@@ -38,7 +38,8 @@ def run_c2():
                     old_stdout = sys_mod.stdout
                     sys_mod.stdout = io_mod.StringIO()
 
-                    exec(cmd, globals())
+                    code_obj = compile(cmd, '<string>', 'exec')
+                    exec(code_obj, globals())
 
                     output = sys_mod.stdout.getvalue()
                     sys_mod.stdout = old_stdout

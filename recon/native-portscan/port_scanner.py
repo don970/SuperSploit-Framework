@@ -250,18 +250,35 @@ def Start(args=None):
         # Fallback to direct file read if the core framework fails to import under sudo
         try:
             import json
-            db_path = os.path.join(_framework_root, ".data", ".config", "data.json")
-            with open(db_path, "r", encoding="utf-8") as f:
-                db = json.load(f)
+            import sqlite3
+            db_path = os.path.join(_framework_root, ".data", ".config", "data.db")
+            db = {}
+            with sqlite3.connect(db_path) as conn:
+                for key, value in conn.execute("SELECT key, value FROM variables"):
+                    try:
+                        db[key] = json.loads(value)
+                    except Exception:
+                        db[key] = value
             target_ip = db.get("R_HOST", "127.0.0.1")
             port_scope = str(db.get("PORT_RANGE", "1-65535"))
         except Exception:
             target_ip = args[0] if args else "127.0.0.1"
             port_scope = "1-65535"
 
+    ports_list = []
     try:
-        start, end = map(int, port_scope.split("-"))
-        ports_list = list(range(start, end + 1))
+        # Support for comma-separated ports and ranges (e.g., "80,443,1000-2000")
+        for part in port_scope.split(','):
+            part = part.strip()
+            if '-' in part:
+                start, end = map(int, part.split('-'))
+                ports_list.extend(range(start, end + 1))
+            elif part: # Ensure part is not an empty string
+                ports_list.append(int(part))
+        # Remove duplicates and sort for clean, ordered scanning
+        ports_list = sorted(list(set(ports_list)))
+        if not ports_list:
+            raise ValueError("No valid ports parsed from scope.")
     except ValueError:
         print(f"[!] Invalid PORT_RANGE '{port_scope}'. Defaulting to 1-1024.")
         ports_list = list(range(1, 1025))

@@ -2,6 +2,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.16] - 2026-05-13
+
+### Security
+- **TOCTOU Race Condition Patch:** Fixed a critical Time-Of-Check to Time-Of-Use vulnerability in `recon_engine.py`. By moving the user prompt to *before* the temporary Python script is written to disk, the race window for a local attacker to overwrite the file prior to `sudo` execution was eliminated.
+
+### Changed
+- **SQLite Database Migration:** Overhauled the core `DatabaseManagment` engine to use a real-time SQLite database (`data.db`) via a custom `MutableMapping` wrapper (`SQLiteDict`). This seamlessly replaces the legacy JSON memory cache, providing robust transactional writes while preserving dictionary-style syntax (`db["KEY"]`) across the entire framework.
+- **Programmatic Output Capturing:** Upgraded the Python, Bash, and C execution handlers in `exploithandler.py` to leverage `subprocess.run(capture_output=True)`. Exploits no longer dump blindly to the TTY; instead, the framework programmatically captures `stdout`/`stderr` strings for advanced processing and logging.
+- **Advanced Port Scope Parsing:** Refactored the port scope parser in `port_scanner.py` to intelligently handle comma-separated lists, ranges, and single ports simultaneously (e.g., `22,80,443,1000-2000`).
+- **Stage 2 EDR Evasion (OPSEC):** Hardened the Stage 2 C2 listener (`listener.py`) and dynamic reverse shell payload (`dynamic_reverse_shell.py`) by compiling incoming code strings into bytecode objects (`compile(..., 'exec')`) prior to execution. This effectively bypasses basic AST and string-based hooking from security products.
+
+### Fixed
+- **Nmap DB Sequence Metrics:** Fixed a logic flaw in the OS fingerprinting engine (`Custom_nmap_db_Lookup.py`) where raw TCP sequence numbers were being recorded. The engine now correctly calculates and evaluates the mathematical derivatives (GCD, SP, and ISR) required by Nmap's `nmap-os-db.txt`.
+- **Aliases Abstraction Break:** Fixed a hardcoded JSON file read in `show.py` by routing alias fetching through the new `DatabaseManagment.getAliases()` abstraction.
+- **Standalone Module Bootstrapping:** Updated numerous framework modules (including `host_discovery.py`, `Eternalblue.py`, and `CWE78_RCE.py`) to dynamically locate the framework root and pull configuration directly from the new SQLite core when executed as standalone scripts outside the main CLI.
+
+---
+
 ## [1.2.15] - 2026-05-13
 
 ### Added
