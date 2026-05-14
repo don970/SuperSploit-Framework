@@ -103,6 +103,42 @@ class OSFingerprintEngine:
             # ... add other flags as needed
         return resp
 
+    def _calculate_seq_metrics(self, seqs):
+        """Calculates Nmap-style Sequence Predictability (SP), GCD, and ISR."""
+        if len(seqs) < 2:
+            return {}
+            
+        diffs = []
+        for i in range(1, len(seqs)):
+            diff = (seqs[i] - seqs[i-1]) % (2**32)
+            if diff > 0:
+                diffs.append(diff)
+                
+        if not diffs:
+            return {"GCD": "0", "SP": "0", "ISR": "0"}
+            
+        # Calculate Greatest Common Divisor
+        gcd_val = diffs[0]
+        for d in diffs[1:]:
+            gcd_val = math.gcd(gcd_val, d)
+            
+        # Calculate Initial Sequence Rate (Assumes ~0.1s delay between packets)
+        avg_diff = sum(diffs) / len(diffs)
+        rate = avg_diff / 0.1  
+        isr_val = min(255, int(math.log2(rate) * 8)) if rate > 0 else 0
+        
+        # Calculate Sequence Predictability (Standard Deviation)
+        mean = sum(diffs) / len(diffs)
+        variance = sum((x - mean) ** 2 for x in diffs) / len(diffs)
+        std_dev = math.sqrt(variance)
+        sp_val = min(255, int(math.log2(std_dev) * 8)) if std_dev > 1 else 0
+            
+        return {
+            "GCD": hex(gcd_val)[2:].upper(),
+            "SP": hex(sp_val)[2:].upper(),
+            "ISR": hex(isr_val)[2:].upper()
+        }
+
     def _probe_seq_ops_win(self):
         """Sends 6 TCP SYN packets to an open port to test SEQ, OPS, and WIN."""
         logging.info("[*] Sending SEQ/OPS/WIN Probes (6 packets)...")
@@ -116,6 +152,7 @@ class OSFingerprintEngine:
         ]
         wins = [1, 63, 4, 4, 16, 512]
         responses = []
+        raw_seqs = []
 
         for i in range(6):
             p = IP(dst=self.target, id=i + 1) / TCP(dport=self.open_tcp, flags="S", window=wins[i], options=opts[i])
@@ -140,12 +177,17 @@ class OSFingerprintEngine:
                 opt_str = "".join([o[0][0] for o in r[TCP].options if o[0] != 'EOL'])
                 self.results["OPS"][f"O{i + 1}"] = opt_str
 
-                # 3. FIX: Actually extract and save the sequence numbers!
-                self.results["SEQ"][f"S{i + 1}"] = r[TCP].seq
+                # 3. Extract raw seqs to calculate mathematical metrics later
+                raw_seqs.append(r[TCP].seq)
 
                 # 4. FIX: Extract IP ID for sequence generation analysis
                 if r.haslayer(IP):
                     self.results["IPID"][f"I{i + 1}"] = r[IP].id
+                    
+        # 5. Calculate and inject actual Nmap DB Match Points
+        if len(raw_seqs) >= 2:
+            metrics = self._calculate_seq_metrics(raw_seqs)
+            self.results["SEQ"].update(metrics)
 
     def _probe_ecn(self):
         """Sends a TCP SYN/ECN packet to an open port."""
@@ -353,9 +395,16 @@ class Start:
             db = DatabaseManagment.get()
         else:
             try:
-                with open(path_to_db_config, "r", encoding="utf-8") as f:
-                    db = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
+                import sqlite3
+                db_path = os.path.join(_framework_root, ".data", ".config", "data.db")
+                db = {}
+                with sqlite3.connect(db_path) as conn:
+                    for key, value in conn.execute("SELECT key, value FROM variables"):
+                        try:
+                            db[key] = json.loads(value)
+                        except Exception:
+                            db[key] = value
+            except Exception:
                 db = {}
 
         target_ip = db.get("R_HOST")

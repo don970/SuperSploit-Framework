@@ -6,6 +6,8 @@ import json
 import os
 import pathlib
 import traceback
+import sqlite3
+from collections.abc import MutableMapping
 from .errors import Error as error
 from .ToStdOut import ToStdout
 import yaml
@@ -18,16 +20,83 @@ install_location = os.path.abspath(os.path.join(_current_dir, "..", ".."))
 
 # Check if the framework is being executed from a different working directory (e.g. dev workspace)
 _cwd = os.getcwd()
-if os.path.exists(os.path.join(_cwd, ".data", ".config", "data.json")):
+if os.path.exists(os.path.join(_cwd, ".data", ".config", "data.db")) or os.path.exists(os.path.join(_cwd, ".data", ".config", "data.json")):
     install_location = _cwd
 
 # Absolute path to the main configuration/session JSON database
-path_to_database = f"{install_location}/.data/.config/data.json"
+path_to_database = f"{install_location}/.data/.config/data.db"
 # Absolute path to the dedicated targets database
 path_to_targets = f"{install_location}/.data/.config/targets.json"
 # Alias for the standard output writing function
 write = ToStdout.write
 
+class SQLiteDict(MutableMapping):
+    def __init__(self, db_path, table_name="variables"):
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        self.db_path = db_path
+        self.table = table_name
+        self._init_db()
+
+    def _init_db(self):
+        with sqlite3.connect(self.db_path, check_same_thread=False) as conn:
+            conn.execute(f"CREATE TABLE IF NOT EXISTS {self.table} (key TEXT PRIMARY KEY, value TEXT)")
+            conn.commit()
+            
+        # Migrate old JSON data if it exists
+        old_json_path = self.db_path.replace(".db", ".json")
+        if os.path.exists(old_json_path):
+            try:
+                with open(old_json_path, "r", encoding="utf-8") as file:
+                    old_data = json.load(file)
+                    for k, v in old_data.items():
+                        self[k] = v
+                os.rename(old_json_path, old_json_path + ".bak")
+            except Exception:
+                pass
+
+    def _get_conn(self):
+        return sqlite3.connect(self.db_path, check_same_thread=False)
+
+    def __getitem__(self, key):
+        with self._get_conn() as conn:
+            cursor = conn.execute(f"SELECT value FROM {self.table} WHERE key=?", (key,))
+            row = cursor.fetchone()
+            if row:
+                try:
+                    return json.loads(row[0])
+                except (json.JSONDecodeError, TypeError):
+                    return row[0]
+            raise KeyError(key)
+
+    def __setitem__(self, key, value):
+        val_str = json.dumps(value) if isinstance(value, (dict, list, bool, int, float)) else str(value)
+        with self._get_conn() as conn:
+            conn.execute(f"INSERT OR REPLACE INTO {self.table} (key, value) VALUES (?, ?)", (key, val_str))
+            conn.commit()
+
+    def __delitem__(self, key):
+        with self._get_conn() as conn:
+            cursor = conn.execute(f"DELETE FROM {self.table} WHERE key=?", (key,))
+            if cursor.rowcount == 0:
+                raise KeyError(key)
+            conn.commit()
+
+    def __iter__(self):
+        with self._get_conn() as conn:
+            cursor = conn.execute(f"SELECT key FROM {self.table}")
+            for row in cursor:
+                yield row[0]
+
+    def __len__(self):
+        with self._get_conn() as conn:
+            cursor = conn.execute(f"SELECT COUNT(*) FROM {self.table}")
+            return cursor.fetchone()[0]
+
+    def __repr__(self):
+        return repr(dict(self))
+        
+    def copy(self):
+        return dict(self)
 
 class ExploitCache:
     """Manages memory-resident YAML metadata for all framework modules."""
@@ -154,7 +223,7 @@ class DatabaseManagment:
     """
     aliases = {}
     db = {}
-    core_db = {}
+    core_db = None
 
     # --- STATE MANAGEMENT VARIABLES ---
     _targets_cache = None
@@ -166,16 +235,10 @@ class DatabaseManagment:
 
     @classmethod
     def _update(cls, data=None):
-        try:
-            if data is None:
-                data = cls.core_db
-            os.makedirs(os.path.dirname(path_to_database), exist_ok=True)
-            with open(path_to_database, "w", encoding="utf-8") as file:
-                json.dump(data, file, indent=4, sort_keys=True)
-            cls.core_db = data
-            cls._db_loaded = True
-        except FileNotFoundError as e:
-            return e
+        # With SQLiteDict, real-time writes are handled by the __setitem__ wrapper.
+        # We keep this method for backward compatibility in the framework so it doesn't crash 
+        # when modules call DatabaseManagment._update(self.database).
+        pass
 
     @classmethod
     def getCVE(cls):
@@ -257,13 +320,7 @@ class DatabaseManagment:
     def get(cls):
         """Loads the current session database."""
         if not cls._db_loaded:
-            if os.path.exists(path_to_database):
-                try:
-                    with open(path_to_database, "r", encoding="utf-8") as file:
-                        cls.core_db = json.load(file)
-                        cls._db_loaded = True
-                except Exception:
-                    cls.core_db = {}
+            cls.core_db = SQLiteDict(path_to_database)
             cls._db_loaded = True
         return cls.core_db
 
@@ -401,19 +458,17 @@ class DatabaseManagment:
     @classmethod
     def _UpdateAliases(cls):
         if len(cls.aliases) > 0:
-            write("[*] Using cached aliases database")
             return cls.aliases
         try:
-            write("[*] initial launch loading database in to memory")
             with open(f"{install_location}/.data/.config/Aliases.json", "rb") as f:
                 cls.aliases = json.load(f)
                 return cls.aliases
         except FileNotFoundError:
             write("[!] Error: Aliases.json not found.")
-            return 1
+            return {}
 
     @classmethod
-    def _getAliases(cls):
+    def getAliases(cls):
         return cls.aliases
 
     @classmethod

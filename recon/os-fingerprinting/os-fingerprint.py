@@ -286,11 +286,15 @@ class Start:
         # Example Framework Execution Workflow
         ENGINE_API_URL = "https://api.threat-intelligence.local/v1/os-signatures"
         
-        # Load database dynamically upon execution
         try:
-            with open(path_to_database) as f:
-                db = json.load(f)
-        except FileNotFoundError:
+            import sys
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            source_dir = os.path.abspath(os.path.join(current_dir, "..", "..", "source"))
+            if source_dir not in sys.path:
+                sys.path.append(source_dir)
+            from core.database import DatabaseManagment
+            db = DatabaseManagment.get()
+        except ImportError:
             db = {}
             
         # Clean up the target IP in case it was stored as a URL or includes a port

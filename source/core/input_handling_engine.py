@@ -19,10 +19,10 @@ from .inputfixes import Input_fixes
 from .sessions import Sessions
 from .clean import clean
 from .database import DatabaseManagment, ExploitCache, exploitDetails
-from .exploithandler import ExploitHandler
+from .exploit_engine import ExploitHandler
 import shlex
 from .listener import Listener
-from .recon_engien import Recon
+from .recon_engine import Recon
 from .auto_suggest import AutoSuggestCommand as ASC
 
 # set global variables
