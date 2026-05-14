@@ -30,18 +30,6 @@ With recent updates, SuperSploit has evolved into a highly autonomous, dependenc
 
 ---
 
-## ⚠️ Legal Disclaimer
-*This program is fully capable of breaking the law depending on how it is used.*
-
-1. **Educational and Defensive Purpose Only:** The SuperSploit Framework ("the Software") is an advanced penetration testing and security research tool developed strictly for educational purposes, ethical hacking, and defensive security auditing.
-2. **Explicit Authorization Required:** You must have explicit, mutual, and written consent from the owner of the network, device, or application before using this Software against it. Using this Software against systems without prior permission is strictly prohibited and constitutes a criminal offense.
-3. **No Liability:** The author(s), contributors, and maintainers assume no liability and are not responsible for any misuse, damage, or illegal activity caused by this Software.
-4. **No Warranty:** The Software is provided "AS IS", without warranty of any kind.
-
-By continuing to use, download, or distribute the SuperSploit Framework, you acknowledge that you have read, understood, and agreed to the terms of this disclaimer.
-
----
-
 ## 🚀 Core Strengths & Features
 
 ### 1. In-Memory Execution & Fileless Payloads
