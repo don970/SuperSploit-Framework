@@ -22,7 +22,8 @@ By continuing to use, download, or distribute the SuperSploit Framework, you ack
 
 **SuperSploit Module Development Guide [Available Here](docs/devolopment/SuperSploit_Module_Development_Guide.md)**
 
-![SuperSploit Logo](https://github.com/user-attachments/assets/02f43367-1b7e-42f0-b25c-6ed786079567)
+<img width="1408" height="768" alt="Logo1" src="https://github.com/user-attachments/assets/767efaa6-de20-4214-8980-341ceb05cbfe" />
+
 
 **SuperSploit** is a highly optimized, Python 3-based exploitation and payload management framework. Built as a lightweight, command-line alternative to heavier GUI-laden platforms, it prioritizes speed, operational security (OPSEC), and a minimal system footprint. 
 
