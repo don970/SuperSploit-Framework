@@ -88,6 +88,7 @@ class Input:
     def check(cls, data):
         # Sanitize and handle empty input
         clean_data = data.strip()
+        # Check if there is data if not just return 0
         if not clean_data:
             return
 
@@ -127,9 +128,11 @@ class Input:
             if cmd_name in inputFixList:
                 if Input_fixes(dataList):
                     return
+
             # ==========================================
             # COMMAND REGISTRIES
             # ==========================================
+
             general_cmds = {
                 "decrypt": Encrypter.decrypt_file,
                 "encrypt": Encrypter.encrypt_file,
@@ -148,7 +151,7 @@ class Input:
                 "debugdb": DatabaseManagment.Debug,
                 "run": Recon,
                 "sessions": Sessions.manage,
-                "auto_suggest": cls._auto_suggest
+                "suggest": cls._auto_suggest
             }
 
             # ==========================================
@@ -157,7 +160,6 @@ class Input:
             try:
                 if cmd_name in general_cmds:
                     general_cmds[cmd_name](data)
-                    DatabaseManagment._update(DatabaseManagment.get())
 
                     # Trigger background shell listener if set
                     if cmd_name == "set" and len(dataList) >= 3:
@@ -167,7 +169,6 @@ class Input:
                     # Trigger Recon Automation auto_suggest if enabled
                     if cmd_name == "run" and DatabaseManagment.get().get("auto_suggest", "").lower() == "true":
                         cls._auto_suggest()
-
                     return True
                 else:
                     # If not an internal command, treat as a system call

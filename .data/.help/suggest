@@ -2,7 +2,7 @@
 Description: Analyzes the target's open ports currently stored in RAM and correlates them with available exploits in the framework's database.
 
 Usage:
-    auto_suggest
+    suggest
 
 Automation:
     To enable automatic suggestions after every recon scan, use: `set auto_suggest true`

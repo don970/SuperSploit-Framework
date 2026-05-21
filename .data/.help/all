@@ -29,7 +29,7 @@ USAGE:
   run              Execute the currently loaded recon module
   sessions         Manage and interact with active background C2 shells
   load             (Session Only) Silently inject a Python exploit into RAM
-  auto_suggest     Analyze target RAM and suggest matching exploits
+  suggest          Analyze target RAM and suggest matching exploits
   
 ----------------------------------------------------------------------
 [3] SYSTEM & UTILITIES
